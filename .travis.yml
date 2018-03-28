@@ -1,4 +1,3 @@
-# Validate this file using http://lint.travis-ci.org/
 language: python
 sudo: false
 cache: pip
