@@ -151,6 +151,73 @@ multivar: singleallelevars | multiallelevars
 
 multitranscriptvar: dref "[" extendedrawvar (";" extendedrawvar)* ("," extendedrawvar (";" extendedrawvar)*)+ "]"
 
+// Protein level variants
+
+pref: ((refseqacc | genesymbol) ":")? "p."
+
+aa3: "Ala" | "Arg" | "Asn" | "Asp" | "Cys" | "Gln" | "Glu"
+   | "Gly" | "His" | "Ile" | "Leu" | "Lys" | "Met" | "Phe"
+   | "Pro" | "Ser" | "Thr" | "Trp" | "Tyr" | "Val" | "Ter"
+
+aa1: "A" | "R" | "N" | "D" | "C" | "Q" | "E" | "G" | "H" | "I"
+   | "L" | "K" | "M" | "F" | "P" | "S" | "T" | "W" | "Y" | "V"
+
+aa: aa1 | aa3 | ("X" | "*")
+
+// Locations
+
+pptloc: ("-" | "*")? NUMBER | NUMBER ("+" | "-") NUMBER
+
+aaptloc: aa pptloc
+
+pextent: aaptloc "_" aaptloc
+
+aarange: pextent | "(" pextent ")"
+
+aaloc: aaptloc | aarange
+
+// Single variations
+
+psubst: aaptloc aa ("extX" "*"? NUMBER)? | ("Met1" | "M1") ("?" | "ext" "-" NUMBER)
+
+pdel: aaloc "del"
+
+pdup: aaloc "dup"
+
+pvarssr: aaloc "(" NUMBER "_" NUMBER ")"
+
+pins: aarange "ins" (aa+ | NUMBER)
+
+pindel: aaloc "delins" (aa+ | NUMBER)
+
+shortfs: aaptloc "fs"
+
+longfs: aaptloc aa "fs" ("X" | "*") NUMBER
+
+frameshift: shortfs | longfs
+
+pcrawvar: psubst | pdel | pdup | pvarssr | pins | pindel | frameshift | "=" | "?" | "0" | "0?"
+
+prawvar: pcrawvar | "(" pcrawvar ")"
+
+psinglevar: pref prawvar
+
+// Multiple variations
+
+punkallelevars: pref "[" prawvar "(;)" prawvar "]"
+
+psingleallelevarset: "[" prawvar (";" prawvar)+  | ("," prawvar)+ "]"
+
+pmultiallelevars: pref psingleallelevarset ";" pref? psingleallelevarset
+
+psingleallelevars: pref psingleallelevarset
+
+pmultivar: psingleallelevars | pmultiallelevars | punkallelevars
+
+// Protein top level rule
+
+proteinvar: psinglevar | pmultivar
+
 // Top-level rule
 
-var: singlevar | multivar | multitranscriptvar | unkeffectvar | nornavar | splicingvar //| proteinvar
+var: singlevar | multivar | multitranscriptvar | unkeffectvar | nornavar | splicingvar | proteinvar

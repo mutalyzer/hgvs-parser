@@ -148,6 +148,7 @@ def test_parse_compound_delins(parser, description):
     'NM_000076.2(CDKN1C):p.(Ala123_Leu126del)',
     'NM_000076.2(CDKN1C):p.(Ala123_Leu126delinsVal)',
     'NM_000076.2(CDKN1C):p.Ala123del',
+    'NM_000076.2(CDKN1C):p.Ala*123del',
     'NM_000076.2(CDKN1C):p.Ala123_Leu126del',
     'NM_000076.2(CDKN1C):p.Ala123_Leu126delinsVal',
     'NM_000076.2(CDKN1C):p.Ala123_*317delinsVal',
