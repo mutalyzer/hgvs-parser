@@ -99,7 +99,7 @@ abrssr: ptloc NT+ "(" NUMBER "_" NUMBER ")"
 
 varssr: (ptloc NT+ "[" NUMBER "]") | (rangeloc "[" NUMBER "]") | abrssr
 
-seq: (NT+ | NUMBER | "inv"? | farloc) // nest?
+seq: (NT+ | NUMBER | rangeloc "inv"? | farloc) // nest?
 
 seqlist: seq (";" seq)* // check delimitedList(Seq, delim=';')
 

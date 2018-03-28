@@ -64,7 +64,7 @@ def test_ud_references(parser, description):
     'NC_000017.10(KRTAP2-4_v001):c.100del',
     'UD_136095285869(MIR1302-2_v001):c.3813del',
     'NC_000001.10(NM_002074.3):c.58del',
-    'NC_012920.1(MT-ND1):m.3460del'
+    'NC_012920.1(MT-ND1):m.3460del',
     'LRG_9t1:c.159del',
     'LRG_9p1:c.159del',
 ])
