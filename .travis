@@ -1,0 +1,8 @@
+# Validate this file using http://lint.travis-ci.org/
+language: python
+sudo: false
+cache: pip
+python: "3.5"
+before_install:
+  - pip install -r requirements.txt
+install: pip install .
