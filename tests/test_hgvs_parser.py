@@ -24,19 +24,70 @@ def parser(grammar):
 
 
 @pytest.mark.parametrize('description', [
+    'NC_000001.10:c.58del',
     'NM_002001.2:c.12del',
+    'NR_026752.1:c.1621del',
+    'AB026906.1:c.40del',
+])
+def test_ncbi_references(parser, description):
+    """
+    Parse example variants with NCBI references.
+    """
+    parser(description)
+
+
+@pytest.mark.parametrize('description', [
+    'LRG_9:c.159del',
+    'LRG_199:c.159del',
+])
+def test_lrg_references(parser, description):
+    """
+    Parse example variants with LRG references.
+    """
+    parser(description)
+
+
+@pytest.mark.parametrize('description', [
+    'UD_136095285869:g.100del',
+])
+def test_ud_references(parser, description):
+    """
+    Parse example variants with UD references.
+    """
+    parser(description)
+
+
+@pytest.mark.parametrize('description', [
+    'NG_012337.1(SDHD_v001):c.274G>T',
+    'NG_012337.1(SDHD_i001):c.274G>T',
+    'NG_012337.1(NM_003002.2):c.274G>T',
+    'NC_000017.10(KRTAP2-4_v001):c.100del',
+    'UD_136095285869(MIR1302-2_v001):c.3813del',
+    'NC_000001.10(NM_002074.3):c.58del',
+    'NC_012920.1(MT-ND1):m.3460del',
+    'LRG_9t1:c.159del',
+    'LRG_9p1:c.159del',
+])
+def test_references_with_specific_segments(parser, description):
+    """
+    Parse example variants with specifications to a specific annotated segment
+    of a reference sequence that be given in parentheses directly after the
+    reference sequence.
+    """
+    parser(description)
+
+
+@pytest.mark.parametrize('description', [
     'NM_002001.2:c.[12del]',
     'NM_002001.2:c.[(12del)]',
     'NM_002001.2:c.[(12del)?]',
     'NM_002001.2:c.[(12del);(12del)]',
     'NM_002001.2:c.[(12del;12del)]',
     'NM_002001.2:c.[((12del)?;12del)?]',
-    'NG_012337.1(SDHD_v001):c.274G>T'
-
 ])
-def test_parse_variants(parser, description):
+def test_alleles(parser, description):
     """
-    Parse some example variants.
+    Parse .
     """
     parser(description)
 
@@ -97,6 +148,7 @@ def test_parse_compound_delins(parser, description):
     'NM_000076.2(CDKN1C):p.(Ala123_Leu126del)',
     'NM_000076.2(CDKN1C):p.(Ala123_Leu126delinsVal)',
     'NM_000076.2(CDKN1C):p.Ala123del',
+    'NM_000076.2(CDKN1C):p.Ala*123del',
     'NM_000076.2(CDKN1C):p.Ala123_Leu126del',
     'NM_000076.2(CDKN1C):p.Ala123_Leu126delinsVal',
     'NM_000076.2(CDKN1C):p.Ala123_*317delinsVal',
