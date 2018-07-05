@@ -17,7 +17,6 @@ __author__ = 'LUMC, Mihai Lefter, Jeroen Laros, Martijn Vermaat'
 __contact__ = 'M.Lefter@lumc.nl'
 __homepage__ = 'https://github.com/mutalyzer/hgvs-parser'
 
-
 usage = __doc__.split("\n\n\n")
 
 

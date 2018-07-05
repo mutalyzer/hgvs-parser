@@ -22,7 +22,7 @@ The grammar is described in [3].
 from pyparsing import (Forward, Word, Group, Suppress, alphanums, Combine,
                        OneOrMore, nums, Optional, NotAny, alphas, Literal,
                        replaceWith, delimitedList, originalTextFor, ZeroOrMore,
-                       Empty, ParserElement)
+                       Empty, ParserElement, ParseException)
 
 
 class PyparsingParser:
@@ -491,7 +491,11 @@ class PyparsingParser:
         try:
             return self.Var.parseString(variant, parseAll=True)
             # Todo: check .dump()
-        except:
-            return None
+
+        except ParseException as err:
+            pos = int(str(err).split(':')[-1][:-1]) - 1
+            print(variant)
+            print(pos * ' ' + '^')
+
     #parse
 #Grammar

@@ -1,16 +1,20 @@
-import os
 from setuptools import setup
 import sys
+import os
 
 
 package = 'hgvsparser'
-package_name = 'HgvsParser'
+package_name = 'hgvsparser'
 description = '{}: HGVS variant description parser.'.format(package_name)
 documentation = 'README.md'
 license = 'MIT License'
 keywords = ['bioinformatics']
 
-dependencies = []
+dependencies = [
+    'lark-parser',
+    'pyparsing'
+]
+
 supported = [(3, 5)]
 classifiers = [
     'Development Status :: 3 - Alpha',

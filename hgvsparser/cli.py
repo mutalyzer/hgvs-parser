@@ -3,10 +3,10 @@ CLI entry point.
 """
 
 import argparse
-import json
 
 from . import usage, version
-from .hgvs_parser import HgvsParser
+from hgvsparser.hgvs_parser import HgvsParser
+from lark import ParseError
 
 
 def pyparsing_parser(description):
@@ -15,9 +15,10 @@ def pyparsing_parser(description):
     parser.status()
     parse_tree = parser.parse(description)
     if parse_tree is not None:
-        print("Success")
-        print(json.dumps(parse_tree.asDict(), indent=2))
+        print("Successful parsing.")
         print(parse_tree.dump())
+    else:
+        print("Parse error.")
 
 
 def hgvs_parser(description):
@@ -29,13 +30,16 @@ def hgvs_parser(description):
     print(description)
     parser = HgvsParser()
     parser.status()
-    parse_tree = parser.parse(description)
-    if parse_tree is not None:
-        print("Success")
-        print(parse_tree.pretty())
-        from lark.tree import pydot__tree_to_png  # Just a neat utility function
-        # pydot__tree_to_png(parse_tree, description + '.png')
-        pydot__tree_to_png(parse_tree, 'test.png')
+    try:
+        parse_tree = parser.parse(description)
+    except ParseError as e:
+        print(e)
+    else:
+        if parse_tree is not None:
+            print("Successful parsing.")
+            print(parse_tree.pretty())
+        else:
+            print("Parse error.")
 
 
 def main():
