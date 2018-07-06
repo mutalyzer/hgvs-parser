@@ -7,6 +7,8 @@ import argparse
 from . import usage, version
 from hgvsparser.hgvs_parser import HgvsParser
 from lark import ParseError
+from hgvsparser.transform import transform
+from lark.tree import pydot__tree_to_png
 
 
 def pyparsing_parser(description):
@@ -21,7 +23,7 @@ def pyparsing_parser(description):
         print("Parse error.")
 
 
-def hgvs_parser(description):
+def hgvs_parser(description, transform_to_model, save_png):
     """
     Parse the HGVS description.
 
@@ -38,6 +40,14 @@ def hgvs_parser(description):
         if parse_tree is not None:
             print("Successful parsing.")
             print(parse_tree.pretty())
+            if transform_to_model:
+                try:
+                    transform(parse_tree)
+                except Exception as e:
+                    print(str(e))
+            if save_png:
+                pydot__tree_to_png(parse_tree, 'test.png')
+                print("image saved to test.png")
         else:
             print("Parse error.")
 
@@ -58,12 +68,20 @@ def main():
                         required=False, action='store_true',
                         help='use the pyparsing parser instead of the Lark one')
 
+    parser.add_argument('-t',
+                        required=False, action='store_true',
+                        help='transform to model')
+
+    parser.add_argument('-s',
+                        required=False, action='store_true',
+                        help='save graph as "temp.png"')
+
     args = parser.parse_args()
 
     if args.p:
         pyparsing_parser(args.description)
     else:
-        hgvs_parser(args.description)
+        hgvs_parser(args.description, args.t, args.s)
 
 
 if __name__ == '__main__':
