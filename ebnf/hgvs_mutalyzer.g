@@ -36,7 +36,7 @@ VERSION: NUMBER // transformed into a token (moved the '.' into the accno rule)
 
 ACC: (LETTER | NUMBER | "_")+
 
-accno: ACC "." VERSION?
+accno: ACC "." VERSION
 
 UD: "UD_" [LETTER+] ("_" | NUMBER)+ // hopefully is equivalent to pyparsing
 
