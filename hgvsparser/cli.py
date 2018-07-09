@@ -3,11 +3,12 @@ CLI entry point.
 """
 
 import argparse
+import json
 
 from . import usage, version
 from hgvsparser.hgvs_parser import HgvsParser
 from lark import ParseError
-from hgvsparser.transform import transform
+from hgvsparser.transform import transform, extract_tokens, extract_reference_information
 from lark.tree import pydot__tree_to_png
 
 
@@ -41,10 +42,11 @@ def hgvs_parser(description, transform_to_model, save_png):
             print("Successful parsing.")
             print(parse_tree.pretty())
             if transform_to_model:
-                try:
-                    transform(parse_tree)
-                except Exception as e:
-                    print(str(e))
+                print(json.dumps(extract_reference_information(parse_tree), indent=2))
+                # try:
+                #     transform(parse_tree)
+                # except Exception as e:
+                #     print(str(e))
             if save_png:
                 pydot__tree_to_png(parse_tree, 'test.png')
                 print("image saved to test.png")
