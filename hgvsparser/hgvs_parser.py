@@ -33,7 +33,7 @@ class HgvsParser:
 
         parser = None
         try:
-            parser = Lark(grammar, start='var')#, parser='lalr', lexer='contextual')
+            parser = Lark(grammar, parser='earley', start='var', ambiguity='resolve')
         except Exception as exc:
             print('Lark based parser not generated from the \'%s\' grammar file.'
                   % self._grammar_path)

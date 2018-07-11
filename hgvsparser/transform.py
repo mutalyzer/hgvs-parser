@@ -54,35 +54,63 @@ def get_specific_locus(parse_tree):
 
 def extract_reference_information(parse_tree):
     reference = {}
+    specific_locus = {}
 
     genbank_ref_tree = get_subtree(parse_tree, 'genbankref')
     if isinstance(genbank_ref_tree, Tree):
+        reference['source'] = 'ncbi'
+        ncbi_specific_locus = {
+            'LRGTRANSCRIPTID': 'selector'
+        }
         ncbi_token_types = {
-            'ACC': 'accession',
+            'ACC': 'id',
             'VERSION': 'version',
         }
         reference.update(extract_tokens(genbank_ref_tree, ncbi_token_types))
 
-    lrg_ref_tree = get_subtree(parse_tree, 'lrg')
+    lrg_ref_tree = get_subtree(parse_tree, 'lrgref')
     if isinstance(lrg_ref_tree, Tree):
+        reference['source'] = 'lrg'
         lrg_token_types = {
-            'NUMBER': 'accession',
+            'LRGREF': 'id',
         }
         print(lrg_ref_tree)
         reference.update(extract_tokens(lrg_ref_tree, lrg_token_types))
-
-    print(extract_tokens(get_subtree(parse_tree, 'transvar'), {'NUMBER': 'transvar'}))
+        reference['version'] = None
+        lrg_specific_locus = {
+            'LRGTRANSCRIPTID': 'selector'
+        }
+        specific_locus.update(extract_tokens(lrg_ref_tree, lrg_specific_locus))
+        lrg_specific_locus = {
+            'LRGPROTEINID': 'selector'
+        }
+        if specific_locus:
+            specific_locus['type'] = 'transcript'
+        else:
+            specific_locus.update(extract_tokens(lrg_ref_tree, lrg_specific_locus))
+            if specific_locus:
+                specific_locus['type'] = 'protein'
+        if specific_locus:
+            specific_locus['id'] = None
+            specific_locus['version'] = None
 
     return reference
 
 
 def extract_tokens(parse_tree, token_types):
+    """
+    Extract the token_types from a parse_tree.
+
+    :param parse_tree: A lark parse tree.
+    :param token_types: Dictionary with the keys meaning the tokens to be
+    extracted and the values the new keys.
+    :return: A dictionary with the token_types values as keys and the token
+    values as values.
+    """
     tokens = {}
     if isinstance(parse_tree, Tree):
         for token in parse_tree.scan_values(lambda t: t.type in token_types):
             tokens[token_types[token.type]] = token.value
-            print(vars(token))
-
     return tokens
 
 
@@ -90,7 +118,7 @@ def get_subtree(parse_tree, rule_name):
     """
     Returns the subtree for the corresponding rule name.
 
-    Note: It assumes that there is only one such subtree:
+    Note: It assumes that there is only one such subtree.
     :param parse_tree: Parent tree in which to search for the subtree.
     :param rule_name: The name of the rule to search subtree for.
     :return: found subtree or None

@@ -36,19 +36,23 @@ VERSION: NUMBER // transformed into a token (moved the '.' into the accno rule)
 
 ACC: (LETTER | NUMBER | "_")+
 
-accno: ACC "." VERSION
+accno: ACC ("." VERSION)?
 
-UD: "UD_" [LETTER+] ("_" | NUMBER)+ // hopefully is equivalent to pyparsing
+UD: "UD_" [LETTER+] ("_" | NUMBER)+
 
-lrgtranscriptid: "t" NUMBER
+udref: UD
 
-lrgproteinid: "p" NUMBER
+LRGTRANSCRIPTID: "t" NUMBER
 
-lrg: "LRG_" NUMBER (lrgtranscriptid | lrgproteinid)?
+LRGPROTEINID: "p" NUMBER
 
-genbankref: (gi | accno | UD) genesymbol?
+LRGREF: "LRG_" NUMBER
 
-refseqacc: genbankref | lrg
+lrgref: LRGREF (LRGTRANSCRIPTID | LRGPROTEINID)?
+
+ncbiref: accno  genesymbol?
+
+refseqacc: ncbiref | lrgref | udref
 
 chrom: NAME
 
