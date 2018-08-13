@@ -57,26 +57,26 @@ def extract_reference_information(parse_tree):
     specific_locus = {}
 
     genbank_ref_tree = get_subtree(parse_tree, 'genbankref')
+    print(genbank_ref_tree)
     if isinstance(genbank_ref_tree, Tree):
-        reference['source'] = 'ncbi'
-        ncbi_specific_locus = {
-            'LRGTRANSCRIPTID': 'selector'
-        }
+        reference['type'] = 'genbank'
         ncbi_token_types = {
             'ACC': 'id',
             'VERSION': 'version',
         }
         reference.update(extract_tokens(genbank_ref_tree, ncbi_token_types))
+        genbank_specific_locus = {
+            'GENENAME': 'id',
+        }
+        specific_locus.update(extract_tokens(genbank_ref_tree, genbank_specific_locus))
 
     lrg_ref_tree = get_subtree(parse_tree, 'lrgref')
     if isinstance(lrg_ref_tree, Tree):
-        reference['source'] = 'lrg'
+        reference['type'] = 'lrg'
         lrg_token_types = {
             'LRGREF': 'id',
         }
-        print(lrg_ref_tree)
         reference.update(extract_tokens(lrg_ref_tree, lrg_token_types))
-        reference['version'] = None
         lrg_specific_locus = {
             'LRGTRANSCRIPTID': 'selector'
         }
@@ -90,9 +90,8 @@ def extract_reference_information(parse_tree):
             specific_locus.update(extract_tokens(lrg_ref_tree, lrg_specific_locus))
             if specific_locus:
                 specific_locus['type'] = 'protein'
-        if specific_locus:
-            specific_locus['id'] = None
-            specific_locus['version'] = None
+
+    reference['specific_locus'] = specific_locus
 
     return reference
 
