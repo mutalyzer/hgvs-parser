@@ -17,7 +17,7 @@ NT: "a" | "c" | "g" | "t" | "u" | "r" | "y" | "k"
 // Top rule
 // --------
 
-var: reference
+var: reference ":" coordinatesystem
 
 // References
 // ----------
@@ -26,38 +26,37 @@ reference: genbankref | lrgref
 
 // Genbank references
 
-genbankref: (ncbiref | udref) specificlocus?
-
-ncbiref: ACC ("." VERSION)?
-
-udref: UD
-
-UD: "UD_" NUMBER+ "." NUMBER+
+genbankref: ACCESSION ("." VERSION)? specificlocus?
 
 // Specific locus
 
-specificlocus: "(" (ACCNOFULL | geneproductid) ")"
+specificlocus: "(" (accessionversion | geneproductid) ")"
 
-ACCNOFULL: ACC "." VERSION
+accessionversion: ACCESSION "." VERSION
 
-ACC: (LETTER | NUMBER | "_")+
+ACCESSION: (LETTER | NUMBER | "_")+
 
 VERSION: NUMBER
 
-geneproductid: GENENAME ( transvar | protiso)?
+geneproductid: GENENAME ( "_v" TRANSVAR | "_i" PROTISO)?
 
 GENENAME: (LETTER | NUMBER | "-")+
 
-transvar: "_v" NUMBER
+TRANSVAR: NUMBER
 
-protiso: "_i" NUMBER
+PROTISO: NUMBER
 
 // LRG references
 
-lrgref.4: LRGREF (LRGTRANSCRIPTID | LRGPROTEINID)?
+lrgref.20: LRGREF (LRGSPECIFICLOCUS)?
 
 LRGREF: "LRG_" NUMBER
 
-LRGTRANSCRIPTID: "t" NUMBER
+LRGSPECIFICLOCUS: ("t" | "p") NUMBER
 
-LRGPROTEINID: "p" NUMBER
+// Coordinate system
+
+COORD: ("c" | "g" | "m" | "n" | "r")
+
+coordinatesystem: COORD "."
+

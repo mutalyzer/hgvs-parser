@@ -3,21 +3,25 @@ from lark import Tree
 
 
 def transform(parse_tree):
-    variant = {
-        'accession': extract_value(parse_tree, 'accno', 'ACC'),
-        'version': extract_value(parse_tree, 'accno', 'VERSION'),
-        'coordinate_system': extract_value(parse_tree, 'reftype', 'COORD'),
-        # 'specific_locus': get_specific_locus(parse_tree)
+    """
+    Builds the equivalent nested dictionary model from the lark parse tree.
+
+    :param parse_tree: Lark based parse tree.
+    :return: Nested dictionary equivalent for the parse tree.
+    """
+    tree_model = {
+        'reference': get_reference(parse_tree),
+        'coordinate_system': extract_value(parse_tree, 'coordinatesystem', 'COORD'),
     }
-    print(json.dumps(variant, indent=2))
-
-
-def get_coordinate_system(parse_tree):
-    coord = list(parse_tree.find_data('reftype'))[0].children
-    print(coord)
+    return tree_model
 
 
 def extract_value(parse_tree, rule_name, token_name):
+    """
+    Extracts the token value from a parse tree, given the rule name and the
+    token name.
+    :return: The token value or None, if not found.
+    """
     rule_tree = parse_tree.find_data(rule_name)
     if rule_tree:
         rule_tree_list = list(rule_tree)
@@ -28,47 +32,44 @@ def extract_value(parse_tree, rule_name, token_name):
                     return token.value
 
 
-def get_accession_version(parse_tree):
-    accno = list(parse_tree.find_data('accno'))[0].children
-    accession = None
-    version_no = None
-    for t in accno:
-        if t.type == 'ACC':
-            accession = t.value
-        if t.type == 'VERSION':
-            version_no = int(t.value)
-    return accession, version_no
-
-
-def get_specific_locus(parse_tree):
-    gene_symbol = parse_tree.find_data('genesymbol')
-    if gene_symbol:
-        gene_symbol = list(gene_symbol)
-    if gene_symbol:
-        gene_symbol = gene_symbol[0].children
-    accession = None
-    version_no = None
-    print(gene_symbol)
-    return accession, version_no
-
-
-def extract_reference_information(parse_tree):
+def get_reference(parse_tree):
+    """
+    Convert the reference information from the parse tree.
+    """
     reference = {}
     specific_locus = {}
 
     genbank_ref_tree = get_subtree(parse_tree, 'genbankref')
     print(genbank_ref_tree)
     if isinstance(genbank_ref_tree, Tree):
+        # get the accession and the version
         reference['type'] = 'genbank'
-        ncbi_token_types = {
-            'ACC': 'id',
+        genbank_tokens = {
+            'ACCESSION': 'id',
             'VERSION': 'version',
         }
-        reference.update(extract_tokens(genbank_ref_tree, ncbi_token_types))
-        genbank_specific_locus = {
-            'GENENAME': 'id',
-        }
-        specific_locus.update(extract_tokens(genbank_ref_tree, genbank_specific_locus))
+        reference.update(extract_tokens(genbank_ref_tree, genbank_tokens))
+
+        # get the spcific locus
+        specific_locus_tree = get_subtree(genbank_ref_tree, 'specificlocus')
+        specific_locus.update(extract_tokens(specific_locus_tree,
+                                             genbank_tokens))
+        if specific_locus:
+            specific_locus['type'] = 'accession'
+        else:
+            genbank_specific_locus = {
+                'GENENAME': 'id',
+                'TRANSVAR': 'selector',
+            }
+            specific_locus.update(extract_tokens(specific_locus_tree,
+                                                 genbank_specific_locus))
+            if specific_locus.get('selector'):
+                specific_locus['type'] = 'gene transcript'
+            else:
+                specific_locus.update(extract_tokens(specific_locus_tree,
+                                                     {'PROTISO': 'selector'}))
+                if specific_locus.get('selector'):
+                    specific_locus['type'] = 'gene protein'
 
     lrg_ref_tree = get_subtree(parse_tree, 'lrgref')
     if isinstance(lrg_ref_tree, Tree):
@@ -78,20 +79,17 @@ def extract_reference_information(parse_tree):
         }
         reference.update(extract_tokens(lrg_ref_tree, lrg_token_types))
         lrg_specific_locus = {
-            'LRGTRANSCRIPTID': 'selector'
+            'LRGSPECIFICLOCUS': 'id'
         }
         specific_locus.update(extract_tokens(lrg_ref_tree, lrg_specific_locus))
-        lrg_specific_locus = {
-            'LRGPROTEINID': 'selector'
-        }
         if specific_locus:
-            specific_locus['type'] = 'transcript'
-        else:
-            specific_locus.update(extract_tokens(lrg_ref_tree, lrg_specific_locus))
-            if specific_locus:
+            if 't' in specific_locus['id']:
+                specific_locus['type'] = 'transcript'
+            elif specific_locus and 'p' in specific_locus['id']:
                 specific_locus['type'] = 'protein'
 
-    reference['specific_locus'] = specific_locus
+    if specific_locus:
+        reference['specific_locus'] = specific_locus
 
     return reference
 
@@ -101,8 +99,8 @@ def extract_tokens(parse_tree, token_types):
     Extract the token_types from a parse_tree.
 
     :param parse_tree: A lark parse tree.
-    :param token_types: Dictionary with the keys meaning the tokens to be
-    extracted and the values the new keys.
+    :param token_types: Dictionary with the keys representing the tokens to be
+    extracted and the values representing the new keys.
     :return: A dictionary with the token_types values as keys and the token
     values as values.
     """
