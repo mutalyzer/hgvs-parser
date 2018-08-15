@@ -2,12 +2,10 @@
 
 LCASE_LETTER: "a".."z"
 UCASE_LETTER: "A".."Z"
-
 NAME: ((LCASE_LETTER) | (UCASE_LETTER) | (NUMBER))+
-
 LETTER: UCASE_LETTER | LCASE_LETTER
-
-NUMBER: ("0".."9")+
+DIGIT: "0".."9"
+NUMBER: DIGIT+
 
 NT: "a" | "c" | "g" | "t" | "u" | "r" | "y" | "k"
   | "m" | "s" | "w" | "b" | "d" | "h" | "v" | "n"
@@ -17,40 +15,30 @@ NT: "a" | "c" | "g" | "t" | "u" | "r" | "y" | "k"
 // Top rule
 // --------
 
-var: reference ":" coordinatesystem
+var: reference OPERATIONS?
 
 // References
 // ----------
 
-reference: genbankref | lrgref
+reference: refid specificlocus? ":" coordinatesystem?
 
-// Genbank references
+refid: ACCESSION ("." VERSION)?
 
-genbankref: ACCESSION ("." VERSION)? specificlocus?
-
-// Specific locus
-
-specificlocus: "(" (accessionversion | geneproductid) ")"
-
-accessionversion: ACCESSION "." VERSION
-
-ACCESSION: (LETTER | NUMBER | "_")+
+ACCESSION: (LETTER | NUMBER | "_")+ DIGIT DIGIT
 
 VERSION: NUMBER
 
-geneproductid: GENENAME ( "_v" TRANSVAR | "_i" PROTISO)?
+// Specific locus
+
+specificlocus: genbanklocus | LRGSPECIFICLOCUS
+
+genbanklocus: "(" (refid | geneproductid) ")"
+
+geneproductid: GENENAME SELECTOR?
 
 GENENAME: (LETTER | NUMBER | "-")+
 
-TRANSVAR: NUMBER
-
-PROTISO: NUMBER
-
-// LRG references
-
-lrgref.20: LRGREF (LRGSPECIFICLOCUS)?
-
-LRGREF: "LRG_" NUMBER
+SELECTOR: ("_v" | "_i") NUMBER
 
 LRGSPECIFICLOCUS: ("t" | "p") NUMBER
 
@@ -60,3 +48,6 @@ COORD: ("c" | "g" | "m" | "n" | "r")
 
 coordinatesystem: COORD "."
 
+// Operations
+
+OPERATIONS: (LETTER | NUMBER | "-" | "_")+
