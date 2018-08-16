@@ -12,7 +12,8 @@ class HgvsParser:
     Either the pyparsing method or the lark one.
     """
 
-    def __init__(self, parser_type='lark', grammar_path='local'):
+    def __init__(self, parser_type='lark', grammar_path='local',
+                 start_rule='var'):
         if grammar_path == 'local':
             self._grammar_path = os.path.join(os.path.dirname(__file__),
                                               '../ebnf/hgvs_mutalyzer.g')
@@ -20,6 +21,7 @@ class HgvsParser:
             self._grammar_path = grammar_path
             print(self._grammar_path)
         self._parser_type = parser_type
+        self._start_rule = start_rule
         if parser_type == 'lark':
             self._create_lark_parser()
         elif parser_type == 'pyparsing':
@@ -34,10 +36,12 @@ class HgvsParser:
 
         parser = None
         try:
-            parser = Lark(grammar, parser='earley', start='var', ambiguity='resolve')
+            print(self._start_rule)
+            parser = Lark(grammar, parser='earley',
+                          start=self._start_rule, ambiguity='resolve')
             # parser = Lark(grammar, parser='lalr', start='var', lexer="contextual")
         except Exception as exc:
-            print('Lark based parser not generated from the \'%s\' grammar file.'
+            print('Lark parser not generated from the \'%s\' grammar file.'
                   % self._grammar_path)
             print(exc)
         self._parser = parser

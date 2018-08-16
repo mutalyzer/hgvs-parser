@@ -25,7 +25,7 @@ def pyparsing_parser(description):
         print("Parse error.")
 
 
-def hgvs_parser(description, transform_to_model, save_png, grammar_file):
+def hgvs_parser(description, transform_to_model, save_png, grammar_file, start_rule):
     """
     Parse the HGVS description.
 
@@ -46,13 +46,16 @@ def hgvs_parser(description, transform_to_model, save_png, grammar_file):
     else:
         if parse_tree is not None:
             print("Successful parsing.")
+            print("parse_tree")
             print(parse_tree.pretty())
+            print(parse_tree)
             if transform_to_model:
-                print(json.dumps(transform(parse_tree), indent=2))
-                # try:
-                #     transform(parse_tree)
-                # except Exception as e:
-                #     print(str(e))
+                try:
+                    model = transform(parse_tree)
+                    print(json.dumps(model, indent=2))
+                except Exception as e:
+                    print("Transform error: \n %s\n" % str(e))
+
             if save_png:
                 pydot__tree_to_png(parse_tree, 'test.png')
                 print("image saved to test.png")
@@ -88,12 +91,16 @@ def main():
                         required=False, action='store_true',
                         help='save graph as "temp.png"')
 
+    parser.add_argument('-r',
+                        required=False,
+                        help='rule to start for the grammar')
+
     args = parser.parse_args()
 
     if args.p:
         pyparsing_parser(args.description)
     else:
-        hgvs_parser(args.description, args.t, args.s, args.g)
+        hgvs_parser(args.description, args.t, args.s, args.g, args.r)
 
 
 if __name__ == '__main__':

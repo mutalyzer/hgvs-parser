@@ -2,6 +2,15 @@ import json
 from lark import Tree
 
 
+class MultipleEntries(Exception):
+    pass
+
+
+def update_model(tree_model, content, content_key):
+    if content:
+        tree_model[content_key] = content
+
+
 def transform(parse_tree):
     """
     Builds the equivalent nested dictionary model from the lark parse tree.
@@ -9,10 +18,22 @@ def transform(parse_tree):
     :param parse_tree: Lark based parse tree.
     :return: Nested dictionary equivalent for the parse tree.
     """
-    tree_model = {
-        'reference': get_reference(parse_tree),
-        'coordinate_system': extract_value(parse_tree, 'coordinatesystem', 'COORD'),
-    }
+    tree_model = {}
+    notes = []
+
+    reference, nts = get_reference(parse_tree)
+    notes.extend(nts)
+
+    specific_locus, nts = get_specific_locus(parse_tree)
+
+    coordinate_system = extract_value(parse_tree, 'coordinatesystem', 'COORD')
+
+    update_model(tree_model, reference, 'reference')
+    update_model(tree_model, specific_locus, 'specific_locus')
+    update_model(tree_model, coordinate_system, 'coordinate_system')
+
+    update_model(tree_model, notes, 'notes')
+
     return tree_model
 
 
@@ -32,66 +53,72 @@ def extract_value(parse_tree, rule_name, token_name):
                     return token.value
 
 
+def get_specific_locus(parse_tree):
+    specific_locus = {}
+    notes = []
+
+    # get the specific locus
+    spec_loc_tree = extract_subtree(parse_tree, 'specificlocus')
+    tokens = {
+        'ACCESSION': 'id',
+        'VERSION': 'selector'}
+    specific_locus.update(extract_tokens(spec_loc_tree, tokens))
+    if specific_locus:
+        specific_locus['type'] = 'accession'
+    else:
+        tokens = {
+            'GENENAME': 'id',
+            'SELECTOR': 'selector',
+        }
+        specific_locus.update(extract_tokens(spec_loc_tree, tokens))
+        if specific_locus:
+            selector = specific_locus.get('selector')
+            if selector:
+                if selector.startswith('_v'):
+                    specific_locus['type'] = 'gene protein'
+                    specific_locus['selector'] = selector[2:]
+                elif specific_locus.get('selector').startswith('_i'):
+                    specific_locus['type'] = 'gene protein'
+                    specific_locus['selector'] = selector[2:]
+                else:
+                    notes.append('selector not proper specified')
+            else:
+                specific_locus['type'] = 'gene'
+        else:
+            tokens = {
+                'LRGSPECIFICLOCUS': 'id'
+            }
+            specific_locus.update(extract_tokens(spec_loc_tree, tokens))
+            if specific_locus:
+                specific_locus['type'] = 'lrg'
+
+    return specific_locus, notes
+
+
 def get_reference(parse_tree):
     """
     Convert the reference information from the parse tree.
     """
     reference = {}
-    specific_locus = {}
+    notes = []
 
-    genbank_ref_tree = get_subtree(parse_tree, 'genbankref')
-    print(genbank_ref_tree)
-    if isinstance(genbank_ref_tree, Tree):
-        # get the accession and the version
-        reference['type'] = 'genbank'
-        genbank_tokens = {
+    refid_tree = extract_subtree_child(parse_tree, parent='reference', child='refid')
+    if isinstance(refid_tree, Tree):
+        tokens = {
             'ACCESSION': 'id',
             'VERSION': 'version',
         }
-        reference.update(extract_tokens(genbank_ref_tree, genbank_tokens))
+        reference.update(extract_tokens(refid_tree, tokens))
 
-        # get the spcific locus
-        specific_locus_tree = get_subtree(genbank_ref_tree, 'specificlocus')
-        specific_locus.update(extract_tokens(specific_locus_tree,
-                                             genbank_tokens))
-        if specific_locus:
-            specific_locus['type'] = 'accession'
-        else:
-            genbank_specific_locus = {
-                'GENENAME': 'id',
-                'TRANSVAR': 'selector',
-            }
-            specific_locus.update(extract_tokens(specific_locus_tree,
-                                                 genbank_specific_locus))
-            if specific_locus.get('selector'):
-                specific_locus['type'] = 'gene transcript'
+        if reference.get('id') and reference.get('id').startswith('LRG'):
+            if reference.get('version'):
+                notes.append('version supplied for LRG reference')
             else:
-                specific_locus.update(extract_tokens(specific_locus_tree,
-                                                     {'PROTISO': 'selector'}))
-                if specific_locus.get('selector'):
-                    specific_locus['type'] = 'gene protein'
+                reference['type'] = 'lrg'
+        else:
+            reference['type'] = 'genbank'
 
-    lrg_ref_tree = get_subtree(parse_tree, 'lrgref')
-    if isinstance(lrg_ref_tree, Tree):
-        reference['type'] = 'lrg'
-        lrg_token_types = {
-            'LRGREF': 'id',
-        }
-        reference.update(extract_tokens(lrg_ref_tree, lrg_token_types))
-        lrg_specific_locus = {
-            'LRGSPECIFICLOCUS': 'id'
-        }
-        specific_locus.update(extract_tokens(lrg_ref_tree, lrg_specific_locus))
-        if specific_locus:
-            if 't' in specific_locus['id']:
-                specific_locus['type'] = 'transcript'
-            elif specific_locus and 'p' in specific_locus['id']:
-                specific_locus['type'] = 'protein'
-
-    if specific_locus:
-        reference['specific_locus'] = specific_locus
-
-    return reference
+    return reference, notes
 
 
 def extract_tokens(parse_tree, token_types):
@@ -111,16 +138,39 @@ def extract_tokens(parse_tree, token_types):
     return tokens
 
 
-def get_subtree(parse_tree, rule_name):
+def extract_subtree_child(parse_tree, parent, child):
+    """
+    Returns the subtree child for the corresponding rule name.
+    Note: It assumes that there is only one such subtree.
+
+    :param parse_tree:
+    :param parent: Rule name for which we search the children.
+    :param child: The child to be extracted.
+    :return: Found child subtree or None.
+    """
+    sub_tree_filter = parse_tree.find_data(parent)
+    sub_tree_list = list(sub_tree_filter)
+    if sub_tree_list and len(sub_tree_list) == 1:
+        for sub_tree in sub_tree_list[0].children:
+            if sub_tree.data == child:
+                return sub_tree
+    else:
+        raise MultipleEntries('Multiple trees for rule "%".' % parent)
+
+
+def extract_subtree(parse_tree, rule_name):
     """
     Returns the subtree for the corresponding rule name.
-
     Note: It assumes that there is only one such subtree.
+
     :param parse_tree: Parent tree in which to search for the subtree.
     :param rule_name: The name of the rule to search subtree for.
-    :return: found subtree or None
+    :return: Found subtree or None.
     """
     sub_tree_filter = parse_tree.find_data(rule_name)
     sub_tree_list = list(sub_tree_filter)
-    if sub_tree_list and len(sub_tree_list) == 1:
-        return sub_tree_list[0]
+    if sub_tree_list:
+        if len(sub_tree_list) == 1:
+            return sub_tree_list[0]
+        else:
+            raise MultipleEntries('Multiple trees for rule "%s".' % rule_name)
