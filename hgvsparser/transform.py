@@ -6,9 +6,14 @@ class MultipleEntries(Exception):
     pass
 
 
-def update_model(tree_model, content, content_key):
-    if content:
-        tree_model[content_key] = content
+def update_dict(dictionary, value, key):
+    """
+    Update a dictionary only if value is not None.
+    """
+    if value:
+        dictionary[key] = value
+    if value is False:
+        dictionary[key] = value
 
 
 def transform(parse_tree):
@@ -24,15 +29,24 @@ def transform(parse_tree):
     reference, nts = get_reference(parse_tree)
     notes.extend(nts)
 
-    specific_locus, nts = get_specific_locus(parse_tree)
+    specloc, nts = get_specific_locus(parse_tree)
+    notes.extend(nts)
 
-    coordinate_system = extract_value(parse_tree, 'coordinatesystem', 'COORD')
+    update_dict(tree_model, reference, 'reference')
+    update_dict(tree_model, specloc, 'specific_locus')
 
-    update_model(tree_model, reference, 'reference')
-    update_model(tree_model, specific_locus, 'specific_locus')
-    update_model(tree_model, coordinate_system, 'coordinate_system')
+    if reference.get('type') == 'genbank':
+        if specloc.get('type') and specloc.get('type').startswith('lrg'):
+            notes.append('lrg locus provided for genbank reference')
 
-    update_model(tree_model, notes, 'notes')
+    if reference.get('type') == 'lrg':
+        if specloc.get('type') and not specloc.get('type').startswith('lrg'):
+            notes.append('genbank locus provided for lrg reference')
+
+    coord_sys = extract_value(parse_tree, 'coordinatesystem', 'COORD')
+    update_dict(tree_model, coord_sys, 'coordinate_system')
+
+    update_dict(tree_model, notes, 'notes')
 
     return tree_model
 
@@ -75,12 +89,13 @@ def get_specific_locus(parse_tree):
             selector = specific_locus.get('selector')
             if selector:
                 if selector.startswith('_v'):
-                    specific_locus['type'] = 'gene protein'
+                    specific_locus['type'] = 'gene transcript'
                     specific_locus['selector'] = selector[2:]
                 elif specific_locus.get('selector').startswith('_i'):
                     specific_locus['type'] = 'gene protein'
                     specific_locus['selector'] = selector[2:]
                 else:
+                    # The grammar should not allow to reach this step.
                     notes.append('selector not proper specified')
             else:
                 specific_locus['type'] = 'gene'
@@ -90,7 +105,14 @@ def get_specific_locus(parse_tree):
             }
             specific_locus.update(extract_tokens(spec_loc_tree, tokens))
             if specific_locus:
-                specific_locus['type'] = 'lrg'
+                if specific_locus.get('id').startswith('t'):
+                    specific_locus['type'] = 'lrg transcript'
+                elif specific_locus.get('id').startswith('p'):
+                    specific_locus['type'] = 'lrg protein'
+                else:
+                    # The grammar should not allow to reach this step.
+                    specific_locus['type'] = 'lrg'
+                    notes.append('selector not proper specified')
 
     return specific_locus, notes
 

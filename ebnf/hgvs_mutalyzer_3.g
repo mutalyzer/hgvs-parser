@@ -32,9 +32,7 @@ VERSION: NUMBER
 
 specificlocus: genbanklocus | LRGSPECIFICLOCUS
 
-genbanklocus: "(" (refid | geneproductid) ")"
-
-geneproductid: GENENAME SELECTOR?
+genbanklocus: "(" ((ACCESSION "." VERSION) | GENENAME SELECTOR?) ")"
 
 GENENAME: (LETTER | NUMBER | "-")+
 
