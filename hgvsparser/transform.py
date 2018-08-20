@@ -51,31 +51,19 @@ def transform(parse_tree):
     return tree_model
 
 
-def extract_value(parse_tree, rule_name, token_name):
-    """
-    Extracts the token value from a parse tree, given the rule name and the
-    token name.
-    :return: The token value or None, if not found.
-    """
-    rule_tree = parse_tree.find_data(rule_name)
-    if rule_tree:
-        rule_tree_list = list(rule_tree)
-        if rule_tree_list:
-            token_list = rule_tree_list[0].children
-            for token in token_list:
-                if token.type == token_name:
-                    return token.value
-
-
 def get_specific_locus(parse_tree):
+    """
+    Convert the specific locus information from the parse tree.
+    """
     specific_locus = {}
     notes = []
 
     # get the specific locus
     spec_loc_tree = extract_subtree(parse_tree, 'specificlocus')
+
     tokens = {
         'ACCESSION': 'id',
-        'VERSION': 'selector'}
+        'VERSION': 'version'}
     specific_locus.update(extract_tokens(spec_loc_tree, tokens))
     if specific_locus:
         specific_locus['type'] = 'accession'
@@ -88,12 +76,13 @@ def get_specific_locus(parse_tree):
         if specific_locus:
             selector = specific_locus.get('selector')
             if selector:
+                specific_locus.pop('selector')
                 if selector.startswith('_v'):
-                    specific_locus['type'] = 'gene transcript'
-                    specific_locus['selector'] = selector[2:]
-                elif specific_locus.get('selector').startswith('_i'):
-                    specific_locus['type'] = 'gene protein'
-                    specific_locus['selector'] = selector[2:]
+                    specific_locus['type'] = 'gene'
+                    specific_locus['transcript variant'] = selector[2:]
+                elif selector.startswith('_i'):
+                    specific_locus['type'] = 'gene'
+                    specific_locus['protein isoform'] = selector[2:]
                 else:
                     # The grammar should not allow to reach this step.
                     notes.append('selector not proper specified')
@@ -126,21 +115,40 @@ def get_reference(parse_tree):
 
     refid_tree = extract_subtree_child(parse_tree, parent='reference', child='refid')
     if isinstance(refid_tree, Tree):
-        tokens = {
-            'ACCESSION': 'id',
-            'VERSION': 'version',
-        }
-        reference.update(extract_tokens(refid_tree, tokens))
+        accession = extract_value(refid_tree, 'refid', 'ACCESSION')
+        version = extract_value(refid_tree, 'refid', 'VERSION')
 
-        if reference.get('id') and reference.get('id').startswith('LRG'):
-            if reference.get('version'):
+        if accession and accession.startswith('LRG'):
+            reference['type'] = 'lrg'
+            reference['id'] = accession
+            if version:
                 notes.append('version supplied for LRG reference')
-            else:
-                reference['type'] = 'lrg'
         else:
             reference['type'] = 'genbank'
+            reference['accession'] = accession
+        if version:
+            reference['version'] = version
 
     return reference, notes
+
+
+def extract_value(parse_tree, rule_name, token_name):
+    """
+    Extracts the token value from a parse tree, given the rule name and the
+    token name.
+    :return: The token value or None, if not found.
+    """
+    print(rule_name)
+    rule_tree = parse_tree.find_data(rule_name)
+    if rule_tree:
+        rule_tree_list = list(rule_tree)
+        print(rule_tree_list)
+        if rule_tree_list:
+            token_list = rule_tree_list[0].children
+            print(token_list)
+            for token in token_list:
+                if token.type == token_name:
+                    return token.value
 
 
 def extract_tokens(parse_tree, token_types):

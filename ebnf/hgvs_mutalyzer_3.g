@@ -24,7 +24,7 @@ reference: refid specificlocus? ":" coordinatesystem?
 
 refid: ACCESSION ("." VERSION)?
 
-ACCESSION: (LETTER | NUMBER | "_")+ ((DIGIT DIGIT) | ("_" DIGIT))
+ACCESSION: LETTER (LETTER | NUMBER | "_")+ ((DIGIT DIGIT) | ("_" DIGIT))
 
 VERSION: NUMBER
 
