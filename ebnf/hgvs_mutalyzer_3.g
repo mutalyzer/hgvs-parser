@@ -15,7 +15,7 @@ NT: "a" | "c" | "g" | "t" | "u" | "r" | "y" | "k"
 // Top rule
 // --------
 
-var: reference OPERATIONS?
+var: reference variant
 
 // References
 // ----------
@@ -46,6 +46,52 @@ COORDINATE: ("c" | "g" | "m" | "n" | "r")
 
 coordinatesystem: COORDINATE "."
 
-// Operations
+// Variants
 
-OPERATIONS: (LETTER | NUMBER | "-" | "_")+
+variant: subst | del | dup | varssr | ins | indel | inv | conv
+
+subst: ptloc NT ">" NT
+
+del: loc "del" (NT+ | NUMBER)?
+
+dup: loc "dup" (NT+ | NUMBER)?
+
+abrssr: ptloc NT+ "(" NUMBER "_" NUMBER ")"
+
+varssr: (ptloc NT+ "[" NUMBER "]") | (rangeloc "[" NUMBER "]") | abrssr
+
+seq: (NT+ | NUMBER | rangeloc "inv"? | farloc)
+
+seqlist: seq (";" seq)*
+
+simpleseqlist: ("[" seqlist "]") | seq
+
+ins: rangeloc "ins" simpleseqlist
+
+indel: (rangeloc | ptloc) "del" (NT+ | NUMBER)? "ins" simpleseqlist
+
+inv: rangeloc "inv" (NT+ | NUMBER)?
+
+conv: rangeloc "con" farloc
+
+transloc: "t" chromcoords "(" farloc ")"
+
+// Locations
+
+OFFSET: ("+" | "-") ("u" | "d")? (NUMBER | "?")
+
+ptloc: (("-" | "*")? NUMBER OFFSET?) | "?"
+
+extent: ptloc "_" ("o"? (refid | GENENAME) ":")? coordinatesystem? ptloc
+
+rangeloc: extent | "(" extent | ")"
+
+loc: ptloc | rangeloc
+
+farloc: (refid | GENENAME) (":" coordinatesystem? extent)?
+
+chromband: ("p" | "q") NUMBER "." NUMBER
+
+chromcoords: "(" chrom ";" chrom ")" "(" chromband ";" chromband ")"
+
+chrom: NAME
