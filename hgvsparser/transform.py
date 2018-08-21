@@ -44,8 +44,8 @@ def transform(parse_tree):
         if specloc.get('type') and not specloc.get('type').startswith('lrg'):
             notes.append('genbank locus provided for lrg reference')
 
-    coord_sys = extract_value(parse_tree, 'coordinatesystem', 'COORD')
-    update_dict(tree_model, coord_sys, 'coordinate_system')
+    coordinate = extract_value(parse_tree, 'coordinatesystem', 'COORDINATE')
+    update_dict(tree_model, coordinate, 'coordinate_system')
 
     update_dict(tree_model, notes, 'notes')
 
@@ -67,7 +67,7 @@ def get_specific_locus(parse_tree):
         version = extract_value(spec_loc_tree, 'genbanklocus', 'VERSION')
         gene_name = extract_value(spec_loc_tree, 'genbanklocus', 'GENENAME')
         selector = extract_value(spec_loc_tree, 'genbanklocus', 'SELECTOR')
-        lrglocus = extract_value(spec_loc_tree, 'specificlocus', 'LRGSPECIFICLOCUS')
+        lrglocus = extract_value(spec_loc_tree, 'specificlocus', 'LRGLOCUS')
 
         # Accession type, e.g., 'NG_012337.1(NM_012459.2)'
         if accession:

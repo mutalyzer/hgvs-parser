@@ -30,7 +30,7 @@ VERSION: NUMBER
 
 // Specific locus
 
-specificlocus: genbanklocus | LRGSPECIFICLOCUS
+specificlocus: genbanklocus | LRGLOCUS
 
 genbanklocus: "(" ((ACCESSION "." VERSION) | GENENAME SELECTOR?) ")"
 
@@ -38,13 +38,13 @@ GENENAME: (LETTER | NUMBER | "-")+
 
 SELECTOR: ("_v" | "_i") NUMBER
 
-LRGSPECIFICLOCUS: ("t" | "p") NUMBER
+LRGLOCUS: ("t" | "p") NUMBER
 
 // Coordinate system
 
-COORD: ("c" | "g" | "m" | "n" | "r")
+COORDINATE: ("c" | "g" | "m" | "n" | "r")
 
-coordinatesystem: COORD "."
+coordinatesystem: COORDINATE "."
 
 // Operations
 
