@@ -181,7 +181,7 @@ test_cases = [
             },
             'specific_locus': {
                 'type': 'accession',
-                'id': 'NM_012459',
+                'accession': 'NM_012459',
                 'version': '2',
             }
         }
@@ -195,7 +195,7 @@ test_cases = [
             },
             'specific_locus': {
                 'type': 'lrg transcript',
-                'id': 't1',
+                'transcript variant': 't1',
             }
         }
     ),
@@ -207,11 +207,25 @@ test_cases = [
             },
             'specific_locus': {
                 'type': 'lrg protein',
-                'id': 'p1',
+                'protein isoform': 'p1',
             }
         }
     ),
     # - mix
+    (
+        'NC_000001.1t1:', {
+            'reference': {
+                'type': 'genbank',
+                'accession': 'NC_000001',
+                'version': '1',
+            },
+            'specific_locus': {
+                'type': 'lrg transcript',
+                'transcript variant': 't1',
+            },
+            'notes': ['lrg locus provided for genbank reference']
+        }
+    ),
     (
         'NC_000001.1p1:', {
             'reference': {
@@ -221,7 +235,7 @@ test_cases = [
             },
             'specific_locus': {
                 'type': 'lrg protein',
-                'id': 'p1',
+                'protein isoform': 'p1',
             },
             'notes': ['lrg locus provided for genbank reference']
         }

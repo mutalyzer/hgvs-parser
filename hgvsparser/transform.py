@@ -1,5 +1,6 @@
 import json
 from lark import Tree
+from lark.lexer import Token
 
 
 class MultipleEntries(Exception):
@@ -61,47 +62,45 @@ def get_specific_locus(parse_tree):
     # get the specific locus
     spec_loc_tree = extract_subtree(parse_tree, 'specificlocus')
 
-    tokens = {
-        'ACCESSION': 'id',
-        'VERSION': 'version'}
-    specific_locus.update(extract_tokens(spec_loc_tree, tokens))
-    if specific_locus:
-        specific_locus['type'] = 'accession'
-    else:
-        tokens = {
-            'GENENAME': 'id',
-            'SELECTOR': 'selector',
-        }
-        specific_locus.update(extract_tokens(spec_loc_tree, tokens))
-        if specific_locus:
-            selector = specific_locus.get('selector')
+    if isinstance(spec_loc_tree, Tree):
+        accession = extract_value(spec_loc_tree, 'genbanklocus', 'ACCESSION')
+        version = extract_value(spec_loc_tree, 'genbanklocus', 'VERSION')
+        gene_name = extract_value(spec_loc_tree, 'genbanklocus', 'GENENAME')
+        selector = extract_value(spec_loc_tree, 'genbanklocus', 'SELECTOR')
+        lrglocus = extract_value(spec_loc_tree, 'specificlocus', 'LRGSPECIFICLOCUS')
+
+        # Accession type, e.g., 'NG_012337.1(NM_012459.2)'
+        if accession:
+            specific_locus['type'] = 'accession'
+            specific_locus['accession'] = accession
+        if version:
+            specific_locus['version'] = version
+
+        # Gene type, e.g., 'NC_012920.1(MT-TL1_i001)'
+        if gene_name:
+            specific_locus['type'] = 'gene'
+            specific_locus['id'] = gene_name
             if selector:
-                specific_locus.pop('selector')
                 if selector.startswith('_v'):
-                    specific_locus['type'] = 'gene'
                     specific_locus['transcript variant'] = selector[2:]
                 elif selector.startswith('_i'):
-                    specific_locus['type'] = 'gene'
                     specific_locus['protein isoform'] = selector[2:]
                 else:
                     # The grammar should not allow to reach this step.
                     notes.append('selector not proper specified')
+
+        # LRG type, e.g., 'LRG_24t1'
+        if lrglocus:
+            if lrglocus.startswith('t'):
+                specific_locus['type'] = 'lrg transcript'
+                specific_locus['transcript variant'] = lrglocus
+            elif lrglocus.startswith('p'):
+                specific_locus['type'] = 'lrg protein'
+                specific_locus['protein isoform'] = lrglocus
             else:
-                specific_locus['type'] = 'gene'
-        else:
-            tokens = {
-                'LRGSPECIFICLOCUS': 'id'
-            }
-            specific_locus.update(extract_tokens(spec_loc_tree, tokens))
-            if specific_locus:
-                if specific_locus.get('id').startswith('t'):
-                    specific_locus['type'] = 'lrg transcript'
-                elif specific_locus.get('id').startswith('p'):
-                    specific_locus['type'] = 'lrg protein'
-                else:
-                    # The grammar should not allow to reach this step.
-                    specific_locus['type'] = 'lrg'
-                    notes.append('selector not proper specified')
+                # The grammar should not allow to reach this step.
+                specific_locus['type'] = 'lrg'
+                notes.append('selector not proper specified')
 
     return specific_locus, notes
 
@@ -138,16 +137,13 @@ def extract_value(parse_tree, rule_name, token_name):
     token name.
     :return: The token value or None, if not found.
     """
-    print(rule_name)
     rule_tree = parse_tree.find_data(rule_name)
     if rule_tree:
         rule_tree_list = list(rule_tree)
-        print(rule_tree_list)
         if rule_tree_list:
             token_list = rule_tree_list[0].children
-            print(token_list)
             for token in token_list:
-                if token.type == token_name:
+                if isinstance(token, Token) and token.type == token_name:
                     return token.value
 
 
