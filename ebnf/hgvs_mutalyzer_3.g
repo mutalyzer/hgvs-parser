@@ -1,21 +1,7 @@
-// Common
-
-LCASE_LETTER: "a".."z"
-UCASE_LETTER: "A".."Z"
-NAME: ((LCASE_LETTER) | (UCASE_LETTER) | (NUMBER))+
-LETTER: UCASE_LETTER | LCASE_LETTER
-DIGIT: "0".."9"
-NUMBER: DIGIT+
-
-NT: "a" | "c" | "g" | "t" | "u" | "r" | "y" | "k"
-  | "m" | "s" | "w" | "b" | "d" | "h" | "v" | "n"
-  | "A" | "C" | "G" | "T" | "U" | "R" | "Y" | "K"
-  | "M" | "S" | "W" | "B" | "D" | "H" | "V" | "N"
-
 // Top rule
 // --------
 
-var: reference variant
+var: reference (variant | "[" variant (";" variant)* "]")
 
 // References
 // ----------
@@ -47,6 +33,7 @@ COORDINATE: ("c" | "g" | "m" | "n" | "r")
 coordinatesystem: COORDINATE "."
 
 // Variants
+// --------
 
 variant: subst | del | dup | varssr | ins | indel | inv | conv
 
@@ -77,21 +64,69 @@ conv: rangeloc "con" farloc
 transloc: "t" chromcoords "(" farloc ")"
 
 // Locations
-
-OFFSET: ("+" | "-") ("u" | "d")? (NUMBER | "?")
-
-ptloc: (("-" | "*")? NUMBER OFFSET?) | "?"
-
-extent: ptloc "_" ("o"? (refid | GENENAME) ":")? coordinatesystem? ptloc
-
-rangeloc: extent | "(" extent | ")"
+// ---------
 
 loc: ptloc | rangeloc
 
-farloc: (refid | GENENAME) (":" coordinatesystem? extent)?
+// Positions
+
+ptloc: (OUTSIDETRANSLATION? POSITION OFFSET?)
+     | "IVS" INTRON OFFSET
+
+POSITION: NUMBER | "?"
+
+OFFSET: ("+" | "-") (NUMBER | "?")
+
+OUTSIDETRANSLATION: "-" | "*"
+
+INTRON: NUMBER
+
+// Ranges
+
+rangeloc: exloc
+        | start_location "_" end_location
+        | "(" start_range ")" "_" "(" end_range ")"
+
+exloc: "EX" STARTEX ("-" ENDEX)?
+
+STARTEX: NUMBER
+
+ENDEX: NUMBER
+
+start_location: ptloc | ((ACCESSION "." VERSION | GENENAME SELECTOR?) ":")? coordinatesystem? ptloc
+
+end_location: ptloc | ((ACCESSION "." VERSION | GENENAME SELECTOR?) ":")? coordinatesystem? ptloc
+
+start_range: start_location "_" end_location
+
+end_range: start_location "_" end_location
+
+// Other
+
+farloc: (ACCESSION "." VERSION | GENENAME SELECTOR?) (":" coordinatesystem? rangeloc)?
 
 chromband: ("p" | "q") NUMBER "." NUMBER
 
 chromcoords: "(" chrom ";" chrom ")" "(" chromband ";" chromband ")"
 
 chrom: NAME
+
+// Commons
+// -------
+
+LCASE_LETTER: "a".."z"
+
+UCASE_LETTER: "A".."Z"
+
+NAME: ((LCASE_LETTER) | (UCASE_LETTER) | (NUMBER))+
+
+LETTER: UCASE_LETTER | LCASE_LETTER
+
+DIGIT: "0".."9"
+
+NUMBER: DIGIT+
+
+NT: "a" | "c" | "g" | "t" | "u" | "r" | "y" | "k"
+  | "m" | "s" | "w" | "b" | "d" | "h" | "v" | "n"
+  | "A" | "C" | "G" | "T" | "U" | "R" | "Y" | "K"
+  | "M" | "S" | "W" | "B" | "D" | "H" | "V" | "N"
