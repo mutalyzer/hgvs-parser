@@ -1,7 +1,7 @@
 // Top rule
 // --------
 
-var: reference (variant | "[" variant (";" variant)* "]")
+description: reference variants
 
 // References
 // ----------
@@ -35,17 +35,23 @@ coordinatesystem: COORDINATE "."
 // Variants
 // --------
 
+variants: (variant | "[" variant (";" variant)* "]")
+
 variant: subst | del | dup | varssr | ins | indel | inv | conv
 
 subst: ptloc NT ">" NT
 
-del: loc "del" (NT+ | NUMBER)?
+del: loc "del" (SEQ | NUMBER)?
 
-dup: loc "dup" (NT+ | NUMBER)?
+dup: loc "dup" (SEQ | NUMBER)?
 
 abrssr: ptloc NT+ "(" NUMBER "_" NUMBER ")"
 
 varssr: (ptloc NT+ "[" NUMBER "]") | (rangeloc "[" NUMBER "]") | abrssr
+
+ins: rangeloc "ins" simpleseqlist
+
+indel: (rangeloc | ptloc) "del" (NT+ | NUMBER)? "ins" simpleseqlist
 
 seq: (NT+ | NUMBER | rangeloc "inv"? | farloc)
 
@@ -53,15 +59,13 @@ seqlist: seq (";" seq)*
 
 simpleseqlist: ("[" seqlist "]") | seq
 
-ins: rangeloc "ins" simpleseqlist
-
-indel: (rangeloc | ptloc) "del" (NT+ | NUMBER)? "ins" simpleseqlist
-
 inv: rangeloc "inv" (NT+ | NUMBER)?
 
 conv: rangeloc "con" farloc
 
 transloc: "t" chromcoords "(" farloc ")"
+
+SEQ: NT+
 
 // Locations
 // ---------
@@ -70,7 +74,7 @@ loc: ptloc | rangeloc
 
 // Positions
 
-ptloc: (OUTSIDETRANSLATION? POSITION OFFSET?)
+ptloc: OUTSIDETRANSLATION? POSITION OFFSET?
      | "IVS" INTRON OFFSET
 
 POSITION: NUMBER | "?"

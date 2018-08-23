@@ -8,7 +8,7 @@ import json
 from . import usage, version
 from hgvsparser.hgvs_parser import HgvsParser
 from lark import ParseError
-from hgvsparser.transform import transform, extract_tokens, get_reference
+from hgvsparser.transform import transform, extract_tokens_to_dict, get_reference
 from lark.tree import pydot__tree_to_png
 
 
@@ -35,7 +35,7 @@ def hgvs_parser(description, transform_to_model, save_png, grammar_file, start_r
     """
     print(description)
     if grammar_file:
-        parser = HgvsParser(grammar_path=grammar_file)
+        parser = HgvsParser(grammar_path=grammar_file, start_rule=start_rule)
     else:
         parser = HgvsParser()
     parser.status()
@@ -50,11 +50,11 @@ def hgvs_parser(description, transform_to_model, save_png, grammar_file, start_r
             print(parse_tree.pretty())
             print(parse_tree)
             if transform_to_model:
-                try:
+                # try:
                     model = transform(parse_tree)
                     print(json.dumps(model, indent=2))
-                except Exception as e:
-                    print("Transform error: \n %s\n" % str(e))
+                # except Exception as e:
+                #     print("Transform error: \n %s\n" % str(e))
 
             if save_png:
                 pydot__tree_to_png(parse_tree, 'test.png')

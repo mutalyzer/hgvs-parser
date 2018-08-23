@@ -47,6 +47,9 @@ def transform(parse_tree):
     coordinate = extract_value(parse_tree, 'coordinatesystem', 'COORDINATE')
     update_dict(tree_model, coordinate, 'coordinate_system')
 
+    # variants = get_variants(parse_tree)
+    # update_dict(tree_model, variants, 'variants')
+
     update_dict(tree_model, notes, 'notes')
 
     return tree_model
@@ -131,6 +134,68 @@ def get_reference(parse_tree):
     return reference, notes
 
 
+def get_variants(parse_tree):
+    variants = []
+    variants_tree = extract_subtree(parse_tree, 'variants')
+    for variant_tree in variants_tree.children:
+        variant = get_variant(variant_tree.children[0])
+        variants.append(variant)
+    return variants
+
+
+def get_variant(variant_tree):
+    if not isinstance(variant_tree, Tree):
+        return None
+    variant = {'type': variant_tree.data}
+
+    if variant_tree.data == 'del':
+        variant['location'] = get_location(extract_subtree(variant_tree,'loc'))
+        seq = extract_value(variant_tree, 'del', 'SEQ')
+        length = extract_value(variant_tree, 'del', 'NUMBER')
+        if seq or length:
+            deleted = {'source': 'description'}
+            if seq:
+                deleted['sequence'] = seq
+            if length:
+                deleted['length'] = length
+            variant['deleted'] = deleted
+    return variant
+
+
+def get_location(location_tree):
+    if location_tree.data == 'loc':
+        location_tree = location_tree.children[0]
+    if location_tree.data == 'ptloc':
+        return get_ptloc(location_tree)
+    elif location_tree.data == 'rangeloc':
+        return get_rangeloc()
+    else:
+        raise Exception
+
+
+def get_ptloc(location_tree):
+    location = {}
+    position = extract_value(location_tree, 'ptloc', 'POSITION')
+    outsidetranslation = extract_value(location_tree, 'ptloc', 'OUTSIDETRANSLATION')
+    offset = extract_value(location_tree, 'ptloc', 'OFFSET')
+    position = int(position) if position and position != '?' else position
+    if position:
+        location = {'position': position}
+    if offset:
+        location['offset'] = int(offset)
+    if outsidetranslation:
+        if outsidetranslation == '-':
+            location['downstream'] = True
+        if outsidetranslation == '*':
+            location['upstream'] = True
+    return location
+
+
+def get_rangeloc():
+    return
+
+
+
 def extract_value(parse_tree, rule_name, token_name):
     """
     Extracts the token value from a parse tree, given the rule name and the
@@ -147,7 +212,7 @@ def extract_value(parse_tree, rule_name, token_name):
                     return token.value
 
 
-def extract_tokens(parse_tree, token_types):
+def extract_tokens_to_dict(parse_tree, token_types):
     """
     Extract the token_types from a parse_tree.
 
