@@ -24,6 +24,16 @@ def transform(parse_tree):
     :param parse_tree: Lark based parse tree.
     :return: Nested dictionary equivalent for the parse tree.
     """
+    tree_model = get_reference_information(parse_tree)
+
+    variants_tree = extract_subtree_child(parse_tree, 'description', 'variants')
+    variants = get_variants(variants_tree)
+    update_dict(tree_model, variants, 'variants')
+
+    return tree_model
+
+
+def get_reference_information(parse_tree):
     tree_model = {}
     notes = []
 
@@ -45,14 +55,37 @@ def transform(parse_tree):
             notes.append('genbank locus provided for lrg reference')
 
     coordinate = extract_value(parse_tree, 'coordinatesystem', 'COORDINATE')
-    update_dict(tree_model, coordinate, 'coordinate_system')
-
-    # variants = get_variants(parse_tree)
-    # update_dict(tree_model, variants, 'variants')
+    update_dict(tree_model, coordinate, 'coordinate_system')\
 
     update_dict(tree_model, notes, 'notes')
 
     return tree_model
+
+
+def get_reference(parse_tree):
+    """
+    Convert the reference information from the parse tree.
+    """
+    reference = {}
+    notes = []
+
+    refid_tree = extract_subtree_child(parse_tree, parent='reference', child='refid')
+    if isinstance(refid_tree, Tree):
+        accession = extract_value(refid_tree, 'refid', 'ACCESSION')
+        version = extract_value(refid_tree, 'refid', 'VERSION')
+
+        if accession and accession.startswith('LRG'):
+            reference['type'] = 'lrg'
+            reference['id'] = accession
+            if version:
+                notes.append('version supplied for LRG reference')
+        else:
+            reference['type'] = 'genbank'
+            reference['accession'] = accession
+        if version:
+            reference['version'] = version
+
+    return reference, notes
 
 
 def get_specific_locus(parse_tree):
@@ -108,92 +141,73 @@ def get_specific_locus(parse_tree):
     return specific_locus, notes
 
 
-def get_reference(parse_tree):
-    """
-    Convert the reference information from the parse tree.
-    """
-    reference = {}
-    notes = []
-
-    refid_tree = extract_subtree_child(parse_tree, parent='reference', child='refid')
-    if isinstance(refid_tree, Tree):
-        accession = extract_value(refid_tree, 'refid', 'ACCESSION')
-        version = extract_value(refid_tree, 'refid', 'VERSION')
-
-        if accession and accession.startswith('LRG'):
-            reference['type'] = 'lrg'
-            reference['id'] = accession
-            if version:
-                notes.append('version supplied for LRG reference')
-        else:
-            reference['type'] = 'genbank'
-            reference['accession'] = accession
-        if version:
-            reference['version'] = version
-
-    return reference, notes
-
-
 def get_variants(parse_tree):
-    variants = []
-    variants_tree = extract_subtree(parse_tree, 'variants')
-    for variant_tree in variants_tree.children:
-        variant = get_variant(variant_tree.children[0])
-        variants.append(variant)
+
+    variants = {}
+
+    def to_dict(parse_tree, to):
+        if isinstance(parse_tree, Token):
+            if isinstance(to, dict):
+                if parse_tree.type == 'POSITION':
+                    if parse_tree.value != '?':
+                        to['position'] = int(parse_tree.value)
+                    else:
+                        to['position'] = parse_tree.value
+                elif parse_tree.type == 'OFFSET':
+                    to['offset'] = int(parse_tree.value)
+                elif parse_tree.type == 'OUTSIDETRANSLATION':
+                    if parse_tree.value == '*':
+                        to['outside_translation'] = 'upstream'
+                    if parse_tree.value == '-':
+                        to['outside_translation'] = 'downstream'
+                elif parse_tree.type in ['INSERTED']:
+                    to['inserted'] = [
+                        {
+                            'source': 'description',
+                            'sequence': parse_tree.value,
+                        }
+                    ]
+                elif parse_tree.type in ['DELETED', 'DELETEDSEQ']:
+                    to['deleted'] = [
+                        {
+                            'source': 'description',
+                            'sequence': parse_tree.value,
+                        }
+                    ]
+                elif parse_tree.type == 'DELETEDLENGTH':
+                    to['deleted'] = [
+                        {
+                            'source': 'description',
+                            'length': parse_tree.value,
+                        }
+                    ]
+                else:
+                    to[parse_tree.type] = parse_tree.value
+            # TODO: raise exception.
+        elif isinstance(parse_tree, Tree):
+            new_to = {}
+            if parse_tree.data == 'variants':
+                new_to = []
+            for child in parse_tree.children:
+                to_dict(child, new_to)
+            if isinstance(to, dict):
+                if parse_tree.data == 'ptloc':
+                    to['location'] = new_to
+                elif parse_tree.data == 'range':
+                        to['range_location'] = new_to
+                elif parse_tree.data == 'start_location':
+                    to['start'] = new_to
+                elif parse_tree.data == 'end_location':
+                    to['end'] = new_to
+                else:
+                    to[parse_tree.data] = new_to
+            elif isinstance(to, list):
+                to.append(new_to)
+            # TODO: raise exception.
+
+    to_dict(parse_tree, variants)
+
     return variants
-
-
-def get_variant(variant_tree):
-    if not isinstance(variant_tree, Tree):
-        return None
-    variant = {'type': variant_tree.data}
-
-    if variant_tree.data == 'del':
-        variant['location'] = get_location(extract_subtree(variant_tree,'loc'))
-        seq = extract_value(variant_tree, 'del', 'SEQ')
-        length = extract_value(variant_tree, 'del', 'NUMBER')
-        if seq or length:
-            deleted = {'source': 'description'}
-            if seq:
-                deleted['sequence'] = seq
-            if length:
-                deleted['length'] = length
-            variant['deleted'] = deleted
-    return variant
-
-
-def get_location(location_tree):
-    if location_tree.data == 'loc':
-        location_tree = location_tree.children[0]
-    if location_tree.data == 'ptloc':
-        return get_ptloc(location_tree)
-    elif location_tree.data == 'rangeloc':
-        return get_rangeloc()
-    else:
-        raise Exception
-
-
-def get_ptloc(location_tree):
-    location = {}
-    position = extract_value(location_tree, 'ptloc', 'POSITION')
-    outsidetranslation = extract_value(location_tree, 'ptloc', 'OUTSIDETRANSLATION')
-    offset = extract_value(location_tree, 'ptloc', 'OFFSET')
-    position = int(position) if position and position != '?' else position
-    if position:
-        location = {'position': position}
-    if offset:
-        location['offset'] = int(offset)
-    if outsidetranslation:
-        if outsidetranslation == '-':
-            location['downstream'] = True
-        if outsidetranslation == '*':
-            location['upstream'] = True
-    return location
-
-
-def get_rangeloc():
-    return
-
 
 
 def extract_value(parse_tree, rule_name, token_name):

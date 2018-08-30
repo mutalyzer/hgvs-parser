@@ -5,7 +5,7 @@ Checking the lark tree transformation.
 import pytest
 
 from hgvsparser.hgvs_parser import HgvsParser
-from hgvsparser.transform import transform
+from hgvsparser.transform import transform, get_variants, get_reference_information
 
 
 test_cases = [
@@ -263,4 +263,328 @@ def test_reference_part(description, model):
     """
     parser = HgvsParser(grammar_path='ebnf/hgvs_mutalyzer_3.g', start_rule='reference')
 
-    assert transform(parser.parse(description)) == model
+    assert get_reference_information(parser.parse(description)) == model
+
+
+test_variants = [
+    # # No change
+    # (
+    #     '=',
+    #     # The entire reference sequence was analysed and no change was identified.
+    #     {
+    #
+    #     }
+    # ),
+    # (
+    #     '123=',
+    #     # A screen was performed showing that nucleotide 123 was not changed.
+    #     {
+    #
+    #     }
+    # ),
+    # Substitutions
+    (
+        '100C>A',
+        {
+            'variants': [
+                {
+                    'subst': {
+                        'location': {
+                            'position': 100
+                        },
+                        'inserted': [
+                            {
+                                'sequence': 'A',
+                                'source': 'description'
+                            }
+                        ],
+                        'deleted': [
+                            {
+                                'sequence': 'C',
+                                'source': 'description'
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ),
+    (
+        '100+3C>A',
+        {
+            'variants': [
+                {
+                    'subst': {
+                        'location': {
+                            'position': 100,
+                            'offset': 3
+                        },
+                        'inserted': [
+                            {
+                                'sequence': 'A',
+                                'source': 'description'
+                            }
+                        ],
+                        'deleted': [
+                            {
+                                'sequence': 'C',
+                                'source': 'description'
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ),
+    (
+        '*100C>A',
+        {
+            'variants': [
+                {
+                    'subst': {
+                        'location': {
+                            'outside_translation': 'upstream',
+                            'position': 100
+                        },
+                        'inserted': [
+                            {
+                                'sequence': 'A',
+                                'source': 'description'
+                            }
+                        ],
+                        'deleted': [
+                            {
+                                'sequence': 'C',
+                                'source': 'description'
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ),
+    (
+        '*1-3C>A',
+        {
+            'variants': [
+                {
+                    'subst': {
+                        'location': {
+                            'outside_translation': 'upstream',
+                            'offset': -3,
+                            'position': 1
+                        },
+                        'inserted': [
+                            {
+                                'source': 'description',
+                                'sequence': 'A'
+                            }
+                        ],
+                        'deleted': [
+                            {
+                                'source': 'description',
+                                'sequence': 'C'
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ),
+    (
+        '-1+3C>A',
+        {
+            'variants': [
+                {
+                    'subst': {
+                        'location': {
+                            'outside_translation': 'downstream',
+                            'offset': 3,
+                            'position': 1
+                        },
+                        'inserted': [
+                            {
+                                'source': 'description',
+                                'sequence': 'A'
+                            }
+                        ],
+                        'deleted': [
+                            {
+                                'source': 'description',
+                                'sequence': 'C'
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ),
+    # (
+    #     '-401C>T',
+    #     {
+    #
+    #     }
+    # ),
+    # (
+    #     '93+1G>T',
+    #     {
+    #
+    #     }
+    # ),
+    # # Deletions
+    # (
+    #     '19del',
+    #     {
+    #
+    #     }
+    # ),
+    # (
+    #     '704+1del',
+    #     {
+    #
+    #     }
+    # ),
+    # (
+    #     '19_21del',
+    #     {
+    #
+    #     }
+    # ),
+    # (
+    #     '183_186+48del',
+    #     # From NG_012232.1(NM_004006.1):c.183_186+48del a deletion of
+    #     # nucleotides 183 to 186+48 (coding DNA reference sequence), crossing
+    #     # an exon/intron border.
+    #     {
+    #
+    #     }
+    # ),
+    # (
+    #     '4072-1234_5155-246del',
+    #     # From NG_012232.1(NM_004006.1):c.4072-1234_5155-246del
+    #     {
+    #
+    #     }
+    # ),
+    # (
+    #     '(4071+1_4072-1)_(5154+1_5155-1)del',
+    #     # From NG_012232.1(NM_004006.1):c.(4071+1_4072-1)_(5154+1_5155-1)del
+    #     {
+    #
+    #     }
+    # ),
+    # (
+    #     '(?_-245)_(31+1_32-1)del',
+    #     {
+    #
+    #     }
+    # ),
+    # (
+    #     '(?_-1)_(*1_?)del',
+    #     {
+    #
+    #     }
+    # ),
+    # # Duplications
+    # (
+    #     '20dup',
+    #     {
+    #
+    #     }
+    # ),
+    # (
+    #     '1704+1dup',
+    #     {
+    #
+    #     }
+    # ),
+    # (
+    #     '20_23dup',
+    #     {
+    #
+    #     }
+    # ),
+    # (
+    #     '260_264+48dup',
+    #     {
+    #
+    #     }
+    # ),
+    # (
+    #     '4072-1234_5155-246dup',
+    #     {
+    #
+    #     }
+    # ),
+    # (
+    #     '(4071+1_4072-1)_(5154+1_5155-1)dup',
+    #     {
+    #
+    #     }
+    # ),
+    # (
+    #     '(?_-127)_(31+1_32-1)dup',
+    #     {
+    #
+    #     }
+    # ),
+    # (
+    #     '(?_-1)_(*1_?)dup',
+    #     {
+    #
+    #     }
+    # ),
+    # # Insertions
+    # (
+    #     '32867861_32867862insT',
+    #     {
+    #
+    #     }
+    # ),
+    # # Mosaic cases.
+    # (
+    #     '85=/T>C',
+    #     {
+    #
+    #     }
+    # ),
+    # (
+    #     '19_21=/del',
+    #     {
+    #
+    #     }
+    # ),
+    # (
+    #     '19_21=/dup',
+    #     {
+    #
+    #     }
+    # ),
+    # # Chimeric cases.
+    # (
+    #     '85=//T>C',
+    #     {
+    #
+    #     }
+    # ),
+    # (
+    #     '19_21=//del',
+    #     {
+    #
+    #     }
+    # ),
+    # (
+    #     '19_21=//dup',
+    #     {
+    #
+    #     }
+    # ),
+
+]
+
+
+@pytest.mark.parametrize('description,model', test_variants)
+def test_variants(description, model):
+    parser = HgvsParser(grammar_path='ebnf/hgvs_mutalyzer_3.g', start_rule='variants')
+
+    assert get_variants(parser.parse(description)) == model

@@ -39,11 +39,19 @@ variants: (variant | "[" variant (";" variant)* "]")
 
 variant: subst | del | dup | varssr | ins | indel | inv | conv
 
-subst: ptloc NT ">" NT
+subst: ptloc DELETED ">" INSERTED
 
-del: loc "del" (SEQ | NUMBER)?
+DELETED: NT
 
-dup: loc "dup" (SEQ | NUMBER)?
+INSERTED: NT
+
+del: (ptloc | rangeloc) "del" (DELETEDSEQ | DELETEDLENGTH)?
+
+DELETEDSEQ: NT+
+
+DELETEDLENGTH: NUMBER
+
+dup: (ptloc | rangeloc) "dup" (SEQ | NUMBER)?
 
 abrssr: ptloc NT+ "(" NUMBER "_" NUMBER ")"
 
@@ -53,17 +61,18 @@ ins: rangeloc "ins" simpleseqlist
 
 indel: (rangeloc | ptloc) "del" (NT+ | NUMBER)? "ins" simpleseqlist
 
+simpleseqlist: ("[" seqlist "]") | seq
+
 seq: (NT+ | NUMBER | rangeloc "inv"? | farloc)
 
 seqlist: seq (";" seq)*
-
-simpleseqlist: ("[" seqlist "]") | seq
 
 inv: rangeloc "inv" (NT+ | NUMBER)?
 
 conv: rangeloc "con" farloc
 
 transloc: "t" chromcoords "(" farloc ")"
+
 
 SEQ: NT+
 
@@ -97,9 +106,9 @@ STARTEX: NUMBER
 
 ENDEX: NUMBER
 
-start_location: ptloc | ((ACCESSION "." VERSION | GENENAME SELECTOR?) ":")? coordinatesystem? ptloc
+start_location: ptloc | ((ACCESSION "." VERSION | GENENAME SELECTOR?) ":")? (COORDINATE ".")? ptloc
 
-end_location: ptloc | ((ACCESSION "." VERSION | GENENAME SELECTOR?) ":")? coordinatesystem? ptloc
+end_location: ptloc | ((ACCESSION "." VERSION | GENENAME SELECTOR?) ":")? (COORDINATE ".")? ptloc
 
 start_range: start_location "_" end_location
 
@@ -107,7 +116,7 @@ end_range: start_location "_" end_location
 
 // Other
 
-farloc: (ACCESSION "." VERSION | GENENAME SELECTOR?) (":" coordinatesystem? rangeloc)?
+farloc: (ACCESSION "." VERSION | GENENAME SELECTOR?) (":" (COORDINATE ".")? rangeloc)?
 
 chromband: ("p" | "q") NUMBER "." NUMBER
 
