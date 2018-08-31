@@ -40,27 +40,23 @@ variants: (variant | "[" variant (";" variant)* "]")
 variant: substitution | deletion | duplication | insertion | inversion
        | conversion | deletion_insertion | varssr
 
-substitution: ptloc DELETED ">" INSERTED
+substitution: position DELETED ">" INSERTED
 
 DELETED: NT
 
 INSERTED: NT
 
-deletion: (ptloc | range_location | uncertain_range) "del" (DELETED_SEQUENCE | DELETED_LENGTH)?
+deletion: (position | range_location | uncertain_range) "del" (DELETED_SEQUENCE | DELETED_LENGTH)?
 
 DELETED_SEQUENCE: NT+
 
 DELETED_LENGTH: NUMBER
 
-duplication: (ptloc | range_location) "dup" (SEQ | NUMBER)?
-
-abrssr: ptloc NT+ "(" NUMBER "_" NUMBER ")"
-
-varssr: (ptloc NT+ "[" NUMBER "]") | (range_location "[" NUMBER "]") | abrssr
+duplication: (position | range_location) "dup" (SEQ | NUMBER)?
 
 insertion: range_location "ins" simpleseqlist
 
-deletion_insertion: (range_location | ptloc) "del" (NT+ | NUMBER)? "ins" simpleseqlist
+deletion_insertion: (range_location | position) "del" (NT+ | NUMBER)? "ins" simpleseqlist
 
 simpleseqlist: ("[" seqlist "]") | sequence
 
@@ -74,16 +70,18 @@ conversion: range_location "con" farloc
 
 transloc: "t" chromcoords "(" farloc ")"
 
+abrssr: position NT+ "(" NUMBER "_" NUMBER ")"
+
+varssr: (position NT+ "[" NUMBER "]") | (range_location "[" NUMBER "]") | abrssr
+
 SEQ: NT+
 
 // Locations
 // ---------
 
-loc: ptloc | range_location | uncertain_range
-
 // Positions
 
-ptloc: OUTSIDETRANSLATION? POSITION OFFSET?
+position: OUTSIDETRANSLATION? POSITION OFFSET?
      | "IVS" INTRON OFFSET
 
 POSITION: NUMBER | "?"
@@ -105,9 +103,9 @@ STARTEX: NUMBER
 
 ENDEX: NUMBER
 
-start_location: ptloc
+start_location: position
 
-end_location: ptloc
+end_location: position
 
 start_range: start_location "_" end_location
 

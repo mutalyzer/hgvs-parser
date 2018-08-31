@@ -191,7 +191,7 @@ def to_dict(parse_tree, to):
         for child in parse_tree.children:
             to_dict(child, new_to)
         if isinstance(to, dict):
-            if parse_tree.data == 'ptloc':
+            if parse_tree.data == 'position':
                 to['location'] = new_to
             elif parse_tree.data == 'range_location':
                 to['location'] = {'range': new_to}
