@@ -288,7 +288,7 @@ test_variants = [
         {
             'variants': [
                 {
-                    'subst': {
+                    'substitution': {
                         'location': {
                             'position': 100
                         },
@@ -314,7 +314,7 @@ test_variants = [
         {
             'variants': [
                 {
-                    'subst': {
+                    'substitution': {
                         'location': {
                             'position': 100,
                             'offset': 3
@@ -341,7 +341,7 @@ test_variants = [
         {
             'variants': [
                 {
-                    'subst': {
+                    'substitution': {
                         'location': {
                             'outside_translation': 'upstream',
                             'position': 100
@@ -368,7 +368,7 @@ test_variants = [
         {
             'variants': [
                 {
-                    'subst': {
+                    'substitution': {
                         'location': {
                             'outside_translation': 'upstream',
                             'offset': -3,
@@ -396,7 +396,7 @@ test_variants = [
         {
             'variants': [
                 {
-                    'subst': {
+                    'substitution': {
                         'location': {
                             'outside_translation': 'downstream',
                             'offset': 3,

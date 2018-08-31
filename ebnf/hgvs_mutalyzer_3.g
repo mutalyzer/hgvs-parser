@@ -6,9 +6,9 @@ description: reference variants
 // References
 // ----------
 
-reference: refid specificlocus? ":" coordinatesystem?
+reference: reference_id specific_locus? ":" coordinate_system?
 
-refid: ACCESSION ("." VERSION)?
+reference_id: ACCESSION ("." VERSION)?
 
 ACCESSION: LETTER (LETTER | NUMBER | "_")+ ((DIGIT DIGIT) | ("_" DIGIT))
 
@@ -16,70 +16,70 @@ VERSION: NUMBER
 
 // Specific locus
 
-specificlocus: genbanklocus | LRGLOCUS
+specific_locus: genbank_locus | LRG_LOCUS
 
-genbanklocus: "(" ((ACCESSION "." VERSION) | GENENAME SELECTOR?) ")"
+genbank_locus: "(" ((ACCESSION "." VERSION) | GENE_NAME SELECTOR?) ")"
 
-GENENAME: (LETTER | NUMBER | "-")+
+GENE_NAME: (LETTER | NUMBER | "-")+
 
 SELECTOR: ("_v" | "_i") NUMBER
 
-LRGLOCUS: ("t" | "p") NUMBER
+LRG_LOCUS: ("t" | "p") NUMBER
 
 // Coordinate system
 
 COORDINATE: ("c" | "g" | "m" | "n" | "r")
 
-coordinatesystem: COORDINATE "."
+coordinate_system: COORDINATE "."
 
 // Variants
 // --------
 
 variants: (variant | "[" variant (";" variant)* "]")
 
-variant: subst | del | dup | varssr | ins | indel | inv | conv
+variant: substitution | deletion | duplication | insertion | inversion
+       | conversion | deletion_insertion | varssr
 
-subst: ptloc DELETED ">" INSERTED
+substitution: ptloc DELETED ">" INSERTED
 
 DELETED: NT
 
 INSERTED: NT
 
-del: (ptloc | rangeloc) "del" (DELETEDSEQ | DELETEDLENGTH)?
+deletion: (ptloc | range_location | uncertain_range) "del" (DELETED_SEQUENCE | DELETED_LENGTH)?
 
-DELETEDSEQ: NT+
+DELETED_SEQUENCE: NT+
 
-DELETEDLENGTH: NUMBER
+DELETED_LENGTH: NUMBER
 
-dup: (ptloc | rangeloc) "dup" (SEQ | NUMBER)?
+duplication: (ptloc | range_location) "dup" (SEQ | NUMBER)?
 
 abrssr: ptloc NT+ "(" NUMBER "_" NUMBER ")"
 
-varssr: (ptloc NT+ "[" NUMBER "]") | (rangeloc "[" NUMBER "]") | abrssr
+varssr: (ptloc NT+ "[" NUMBER "]") | (range_location "[" NUMBER "]") | abrssr
 
-ins: rangeloc "ins" simpleseqlist
+insertion: range_location "ins" simpleseqlist
 
-indel: (rangeloc | ptloc) "del" (NT+ | NUMBER)? "ins" simpleseqlist
+deletion_insertion: (range_location | ptloc) "del" (NT+ | NUMBER)? "ins" simpleseqlist
 
-simpleseqlist: ("[" seqlist "]") | seq
+simpleseqlist: ("[" seqlist "]") | sequence
 
-seq: (NT+ | NUMBER | rangeloc "inv"? | farloc)
+sequence: (NT+ | NUMBER | range_location "inv"? | farloc)
 
-seqlist: seq (";" seq)*
+seqlist: sequence (";" sequence)*
 
-inv: rangeloc "inv" (NT+ | NUMBER)?
+inversion: range_location "inv" (NT+ | NUMBER)?
 
-conv: rangeloc "con" farloc
+conversion: range_location "con" farloc
 
 transloc: "t" chromcoords "(" farloc ")"
-
 
 SEQ: NT+
 
 // Locations
 // ---------
 
-loc: ptloc | rangeloc
+loc: ptloc | range_location | uncertain_range
 
 // Positions
 
@@ -96,9 +96,8 @@ INTRON: NUMBER
 
 // Ranges
 
-rangeloc: exloc
+range_location: exloc
         | start_location "_" end_location
-        | "(" start_range ")" "_" "(" end_range ")"
 
 exloc: "EX" STARTEX ("-" ENDEX)?
 
@@ -106,17 +105,22 @@ STARTEX: NUMBER
 
 ENDEX: NUMBER
 
-start_location: ptloc | ((ACCESSION "." VERSION | GENENAME SELECTOR?) ":")? (COORDINATE ".")? ptloc
+start_location: ptloc
 
-end_location: ptloc | ((ACCESSION "." VERSION | GENENAME SELECTOR?) ":")? (COORDINATE ".")? ptloc
+end_location: ptloc
 
 start_range: start_location "_" end_location
 
 end_range: start_location "_" end_location
 
+// Uncertain
+
+uncertain_range: "(" range_location ")"
+               | "(" start_range ")" "_" "(" end_range ")"
+
 // Other
 
-farloc: (ACCESSION "." VERSION | GENENAME SELECTOR?) (":" (COORDINATE ".")? rangeloc)?
+farloc: (ACCESSION "." VERSION | GENE_NAME SELECTOR?) (":" (COORDINATE ".")? range_location)?
 
 chromband: ("p" | "q") NUMBER "." NUMBER
 

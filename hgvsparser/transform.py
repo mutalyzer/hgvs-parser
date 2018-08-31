@@ -54,7 +54,7 @@ def get_reference_information(parse_tree):
         if specloc.get('type') and not specloc.get('type').startswith('lrg'):
             notes.append('genbank locus provided for lrg reference')
 
-    coordinate = extract_value(parse_tree, 'coordinatesystem', 'COORDINATE')
+    coordinate = extract_value(parse_tree, 'coordinate_system', 'COORDINATE')
     update_dict(tree_model, coordinate, 'coordinate_system')\
 
     update_dict(tree_model, notes, 'notes')
@@ -69,10 +69,10 @@ def get_reference(parse_tree):
     reference = {}
     notes = []
 
-    refid_tree = extract_subtree_child(parse_tree, parent='reference', child='refid')
+    refid_tree = extract_subtree_child(parse_tree, parent='reference', child='reference_id')
     if isinstance(refid_tree, Tree):
-        accession = extract_value(refid_tree, 'refid', 'ACCESSION')
-        version = extract_value(refid_tree, 'refid', 'VERSION')
+        accession = extract_value(refid_tree, 'reference_id', 'ACCESSION')
+        version = extract_value(refid_tree, 'reference_id', 'VERSION')
 
         if accession and accession.startswith('LRG'):
             reference['type'] = 'lrg'
@@ -96,14 +96,14 @@ def get_specific_locus(parse_tree):
     notes = []
 
     # get the specific locus
-    spec_loc_tree = extract_subtree(parse_tree, 'specificlocus')
+    spec_loc_tree = extract_subtree(parse_tree, 'specific_locus')
 
     if isinstance(spec_loc_tree, Tree):
-        accession = extract_value(spec_loc_tree, 'genbanklocus', 'ACCESSION')
-        version = extract_value(spec_loc_tree, 'genbanklocus', 'VERSION')
-        gene_name = extract_value(spec_loc_tree, 'genbanklocus', 'GENENAME')
-        selector = extract_value(spec_loc_tree, 'genbanklocus', 'SELECTOR')
-        lrglocus = extract_value(spec_loc_tree, 'specificlocus', 'LRGLOCUS')
+        accession = extract_value(spec_loc_tree, 'genbank_locus', 'ACCESSION')
+        version = extract_value(spec_loc_tree, 'genbank_locus', 'VERSION')
+        gene_name = extract_value(spec_loc_tree, 'genbank_locus', 'GENE_NAME')
+        selector = extract_value(spec_loc_tree, 'genbank_locus', 'SELECTOR')
+        lrglocus = extract_value(spec_loc_tree, 'specific_locus', 'LRG_LOCUS')
 
         # Accession type, e.g., 'NG_012337.1(NM_012459.2)'
         if accession:
@@ -141,69 +141,74 @@ def get_specific_locus(parse_tree):
     return specific_locus, notes
 
 
+def add_tokens(where_to, token_type, token_value):
+    if isinstance(where_to, dict):
+        if token_type == 'POSITION':
+            if token_value != '?':
+                where_to['position'] = int(token_value)
+            else:
+                where_to['position'] = token_value
+        elif token_type == 'OFFSET':
+            where_to['offset'] = int(token_value)
+        elif token_type == 'OUTSIDETRANSLATION':
+            if token_value == '*':
+                where_to['outside_translation'] = 'upstream'
+            if token_value == '-':
+                where_to['outside_translation'] = 'downstream'
+        elif token_type in ['INSERTED']:
+            where_to['inserted'] = [
+                {
+                    'source': 'description',
+                    'sequence': token_value,
+                }
+            ]
+        elif token_type in ['DELETED', 'DELETED_SEQUENCE']:
+            where_to['deleted'] = [
+                {
+                    'source': 'description',
+                    'sequence': token_value,
+                }
+            ]
+        elif token_type == 'DELETED_LENGTH':
+            where_to['deleted'] = [
+                {
+                    'source': 'description',
+                    'length': token_value,
+                }
+            ]
+        else:
+            where_to[token_type] = token_value
+    # TODO: raise exception.
+
+
+def to_dict(parse_tree, to):
+    if isinstance(parse_tree, Token):
+        add_tokens(to, parse_tree.type, parse_tree.value)
+    elif isinstance(parse_tree, Tree):
+        new_to = {}
+        if parse_tree.data == 'variants':
+            new_to = []
+        for child in parse_tree.children:
+            to_dict(child, new_to)
+        if isinstance(to, dict):
+            if parse_tree.data == 'ptloc':
+                to['location'] = new_to
+            elif parse_tree.data == 'range_location':
+                to['location'] = {'range': new_to}
+            elif parse_tree.data == 'start_location':
+                to['start'] = new_to['location']
+            elif parse_tree.data == 'end_location':
+                to['end'] = new_to['location']
+            else:
+                to[parse_tree.data] = new_to
+        elif isinstance(to, list):
+            to.append(new_to)
+        # TODO: raise exception.
+
+
 def get_variants(parse_tree):
 
     variants = {}
-
-    def to_dict(parse_tree, to):
-        if isinstance(parse_tree, Token):
-            if isinstance(to, dict):
-                if parse_tree.type == 'POSITION':
-                    if parse_tree.value != '?':
-                        to['position'] = int(parse_tree.value)
-                    else:
-                        to['position'] = parse_tree.value
-                elif parse_tree.type == 'OFFSET':
-                    to['offset'] = int(parse_tree.value)
-                elif parse_tree.type == 'OUTSIDETRANSLATION':
-                    if parse_tree.value == '*':
-                        to['outside_translation'] = 'upstream'
-                    if parse_tree.value == '-':
-                        to['outside_translation'] = 'downstream'
-                elif parse_tree.type in ['INSERTED']:
-                    to['inserted'] = [
-                        {
-                            'source': 'description',
-                            'sequence': parse_tree.value,
-                        }
-                    ]
-                elif parse_tree.type in ['DELETED', 'DELETEDSEQ']:
-                    to['deleted'] = [
-                        {
-                            'source': 'description',
-                            'sequence': parse_tree.value,
-                        }
-                    ]
-                elif parse_tree.type == 'DELETEDLENGTH':
-                    to['deleted'] = [
-                        {
-                            'source': 'description',
-                            'length': parse_tree.value,
-                        }
-                    ]
-                else:
-                    to[parse_tree.type] = parse_tree.value
-            # TODO: raise exception.
-        elif isinstance(parse_tree, Tree):
-            new_to = {}
-            if parse_tree.data == 'variants':
-                new_to = []
-            for child in parse_tree.children:
-                to_dict(child, new_to)
-            if isinstance(to, dict):
-                if parse_tree.data == 'ptloc':
-                    to['location'] = new_to
-                elif parse_tree.data == 'range':
-                        to['range_location'] = new_to
-                elif parse_tree.data == 'start_location':
-                    to['start'] = new_to
-                elif parse_tree.data == 'end_location':
-                    to['end'] = new_to
-                else:
-                    to[parse_tree.data] = new_to
-            elif isinstance(to, list):
-                to.append(new_to)
-            # TODO: raise exception.
 
     to_dict(parse_tree, variants)
 
