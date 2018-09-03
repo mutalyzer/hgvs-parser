@@ -52,17 +52,23 @@ DELETED_SEQUENCE: NT+
 
 DELETED_LENGTH: NUMBER
 
-duplication: (position | range_location) "dup" (SEQ | NUMBER)?
+duplication: (position | range_location) "dup" (DUPLICATED_SEQUENCE | DUPLICATED_LENGTH)?
 
-insertion: range_location "ins" simpleseqlist
+DUPLICATED_SEQUENCE: NT+
 
-deletion_insertion: (range_location | position) "del" (NT+ | NUMBER)? "ins" simpleseqlist
+DUPLICATED_LENGTH: NUMBER
 
-simpleseqlist: ("[" seqlist "]") | sequence
+insertion: range_location "ins" insertions
 
-sequence: (NT+ | NUMBER | range_location "inv"? | farloc)
+deletion_insertion: (range_location | position) "del" (NT+ | NUMBER)? "ins" insertions
 
-seqlist: sequence (";" sequence)*
+insertions: ("[" inserted (";" inserted)* "]") | inserted
+
+inserted: (SEQUENCE | range_location INVERTED? | farloc)
+
+INVERTED: "inv"
+
+SEQUENCE: NT+
 
 inversion: range_location "inv" (NT+ | NUMBER)?
 
@@ -74,7 +80,6 @@ abrssr: position NT+ "(" NUMBER "_" NUMBER ")"
 
 varssr: (position NT+ "[" NUMBER "]") | (range_location "[" NUMBER "]") | abrssr
 
-SEQ: NT+
 
 // Locations
 // ---------
@@ -118,7 +123,7 @@ uncertain_range: "(" range_location ")"
 
 // Other
 
-farloc: (ACCESSION "." VERSION | GENE_NAME SELECTOR?) (":" (COORDINATE ".")? range_location)?
+farloc: (ACCESSION "." VERSION) (":" (COORDINATE ".")? range_location)?
 
 chromband: ("p" | "q") NUMBER "." NUMBER
 

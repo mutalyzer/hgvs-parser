@@ -28,7 +28,7 @@ def transform(parse_tree):
 
     variants_tree = extract_subtree_child(parse_tree, 'description', 'variants')
     variants = get_variants(variants_tree)
-    update_dict(tree_model, variants, 'variants')
+    tree_model.update(variants)
 
     return tree_model
 
@@ -141,68 +141,76 @@ def get_specific_locus(parse_tree):
     return specific_locus, notes
 
 
-def add_tokens(where_to, token_type, token_value):
-    if isinstance(where_to, dict):
+def add_tokens(parent, token_type, token_value):
+    """
+    Adds tree tokens to the parent dictionary.
+    """
+    if isinstance(parent, dict):
         if token_type == 'POSITION':
             if token_value != '?':
-                where_to['position'] = int(token_value)
+                parent['position'] = int(token_value)
             else:
-                where_to['position'] = token_value
+                parent['position'] = token_value
         elif token_type == 'OFFSET':
-            where_to['offset'] = int(token_value)
+            parent['offset'] = int(token_value)
         elif token_type == 'OUTSIDETRANSLATION':
             if token_value == '*':
-                where_to['outside_translation'] = 'upstream'
+                parent['outside_translation'] = 'upstream'
             if token_value == '-':
-                where_to['outside_translation'] = 'downstream'
+                parent['outside_translation'] = 'downstream'
         elif token_type in ['INSERTED']:
-            where_to['inserted'] = [
+            parent['inserted'] = [
                 {
                     'source': 'description',
                     'sequence': token_value,
                 }
             ]
         elif token_type in ['DELETED', 'DELETED_SEQUENCE']:
-            where_to['deleted'] = [
+            parent['deleted'] = [
                 {
                     'source': 'description',
                     'sequence': token_value,
                 }
             ]
         elif token_type == 'DELETED_LENGTH':
-            where_to['deleted'] = [
+            parent['deleted'] = [
                 {
                     'source': 'description',
                     'length': token_value,
                 }
             ]
         else:
-            where_to[token_type] = token_value
+            parent[token_type.lower()] = token_value
     # TODO: raise exception.
 
 
-def to_dict(parse_tree, to):
+def to_variant_model(parse_tree, model):
+    """
+
+    :param parse_tree:
+    :param model:
+    """
     if isinstance(parse_tree, Token):
-        add_tokens(to, parse_tree.type, parse_tree.value)
+        add_tokens(model, parse_tree.type, parse_tree.value)
     elif isinstance(parse_tree, Tree):
-        new_to = {}
-        if parse_tree.data == 'variants':
-            new_to = []
-        for child in parse_tree.children:
-            to_dict(child, new_to)
-        if isinstance(to, dict):
+        sub_model = {}
+        if parse_tree.data in ['variants', 'insertions']:
+            sub_model = []
+        for child_tree in parse_tree.children:
+            to_variant_model(child_tree, sub_model)
+        if isinstance(model, dict):
             if parse_tree.data == 'position':
-                to['location'] = new_to
+                model['location'] = sub_model
             elif parse_tree.data == 'range_location':
-                to['location'] = {'range': new_to}
+                model['location'] = {'range': sub_model}
             elif parse_tree.data == 'start_location':
-                to['start'] = new_to['location']
+                model['start'] = sub_model['location']
             elif parse_tree.data == 'end_location':
-                to['end'] = new_to['location']
+                model['end'] = sub_model['location']
             else:
-                to[parse_tree.data] = new_to
-        elif isinstance(to, list):
-            to.append(new_to)
+                model[parse_tree.data] = sub_model
+        elif isinstance(model, list):
+            model.append(sub_model)
         # TODO: raise exception.
 
 
@@ -210,7 +218,7 @@ def get_variants(parse_tree):
 
     variants = {}
 
-    to_dict(parse_tree, variants)
+    to_variant_model(parse_tree, variants)
 
     return variants
 
@@ -284,3 +292,47 @@ def extract_subtree(parse_tree, rule_name):
             return sub_tree_list[0]
         else:
             raise MultipleEntries('Multiple trees for rule "%s".' % rule_name)
+
+
+def reference_to_description(d):
+    reference = ''
+    if isinstance(d, dict):
+        reference_type = d.get('type')
+        if reference_type == 'genbank':
+            reference += d.get('accession')
+            if d.get('version'):
+                reference += '.' + d.get('version')
+        if reference_type == 'lrg':
+            reference += d.get('id')
+    return reference
+
+
+def specific_locus_to_description(d):
+    if isinstance(d, dict):
+        specific_locus = ''
+        specific_locus_type = d.get('type')
+        if specific_locus_type == 'accession':
+            specific_locus = '(' + d.get('accession') + '.' + d.get('version') + ')'
+        elif specific_locus_type == 'gene':
+            specific_locus += '(' + d.get('id')
+            if d.get('transcript variant'):
+                specific_locus += '_v' + d.get('transcript variant') + ')'
+            if d.get('protein isoform'):
+                specific_locus += '_i' + d.get('protein isoform') + ')'
+        elif specific_locus_type == 'lrg transcript':
+            specific_locus = d.get('transcript variant')
+        elif specific_locus_type == 'lrg protein':
+            specific_locus = d.get('protein isoform')
+        return specific_locus
+    else:
+        return ''
+
+
+def model_to_description(model):
+    reference = reference_to_description(model.get('reference'))
+    description = reference
+    description += specific_locus_to_description(model.get('specific_locus'))
+    description += ':'
+    if model.get('coordinate_system'):
+        description += model.get('coordinate_system') + '.'
+    return description
