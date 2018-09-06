@@ -288,23 +288,22 @@ test_variants = [
         {
             'variants': [
                 {
-                    'substitution': {
-                        'location': {
-                            'position': 100
-                        },
-                        'inserted': [
-                            {
-                                'sequence': 'A',
-                                'source': 'description'
-                            }
-                        ],
-                        'deleted': [
-                            {
-                                'sequence': 'C',
-                                'source': 'description'
-                            }
-                        ]
-                    }
+                    'type': 'substitution',
+                    'location': {
+                        'position': 100
+                    },
+                    'inserted': [
+                        {
+                            'sequence': 'A',
+                            'source': 'description'
+                        }
+                    ],
+                    'deleted': [
+                        {
+                            'sequence': 'C',
+                            'source': 'description'
+                        }
+                    ]
                 }
             ]
         }
@@ -314,24 +313,23 @@ test_variants = [
         {
             'variants': [
                 {
-                    'substitution': {
-                        'location': {
-                            'position': 100,
-                            'offset': 3
-                        },
-                        'inserted': [
-                            {
-                                'sequence': 'A',
-                                'source': 'description'
-                            }
-                        ],
-                        'deleted': [
-                            {
-                                'sequence': 'C',
-                                'source': 'description'
-                            }
-                        ]
-                    }
+                    'type': 'substitution',
+                    'location': {
+                        'position': 100,
+                        'offset': 3
+                    },
+                    'inserted': [
+                        {
+                            'sequence': 'A',
+                            'source': 'description'
+                        }
+                    ],
+                    'deleted': [
+                        {
+                            'sequence': 'C',
+                            'source': 'description'
+                        }
+                    ]
                 }
             ]
         }
@@ -341,24 +339,23 @@ test_variants = [
         {
             'variants': [
                 {
-                    'substitution': {
-                        'location': {
-                            'outside_translation': 'upstream',
-                            'position': 100
-                        },
-                        'inserted': [
-                            {
-                                'sequence': 'A',
-                                'source': 'description'
-                            }
-                        ],
-                        'deleted': [
-                            {
-                                'sequence': 'C',
-                                'source': 'description'
-                            }
-                        ]
-                    }
+                    'type': 'substitution',
+                    'location': {
+                        'position': 100,
+                        'outside_translation': 'upstream'
+                    },
+                    'inserted': [
+                        {
+                            'sequence': 'A',
+                            'source': 'description'
+                        }
+                    ],
+                    'deleted': [
+                        {
+                            'sequence': 'C',
+                            'source': 'description'
+                        }
+                    ]
                 }
             ]
         }
@@ -368,25 +365,24 @@ test_variants = [
         {
             'variants': [
                 {
-                    'substitution': {
-                        'location': {
-                            'outside_translation': 'upstream',
-                            'offset': -3,
-                            'position': 1
-                        },
-                        'inserted': [
-                            {
-                                'source': 'description',
-                                'sequence': 'A'
-                            }
-                        ],
-                        'deleted': [
-                            {
-                                'source': 'description',
-                                'sequence': 'C'
-                            }
-                        ]
-                    }
+                    'type': 'substitution',
+                    'location': {
+                        'position': 1,
+                        'offset': -3,
+                        'outside_translation': 'upstream'
+                    },
+                    'inserted': [
+                        {
+                            'sequence': 'A',
+                            'source': 'description'
+                        }
+                    ],
+                    'deleted': [
+                        {
+                            'sequence': 'C',
+                            'source': 'description'
+                        }
+                    ]
                 }
             ]
         }
@@ -396,25 +392,24 @@ test_variants = [
         {
             'variants': [
                 {
-                    'substitution': {
-                        'location': {
-                            'outside_translation': 'downstream',
-                            'offset': 3,
-                            'position': 1
-                        },
-                        'inserted': [
-                            {
-                                'source': 'description',
-                                'sequence': 'A'
-                            }
-                        ],
-                        'deleted': [
-                            {
-                                'source': 'description',
-                                'sequence': 'C'
-                            }
-                        ]
-                    }
+                    'type': 'substitution',
+                    'location': {
+                        'position': 1,
+                        'offset': 3,
+                        'outside_translation': 'downstream'
+                    },
+                    'inserted': [
+                        {
+                            'sequence': 'A',
+                            'source': 'description'
+                        }
+                    ],
+                    'deleted': [
+                        {
+                            'sequence': 'C',
+                            'source': 'description'
+                        }
+                    ]
                 }
             ]
         }
