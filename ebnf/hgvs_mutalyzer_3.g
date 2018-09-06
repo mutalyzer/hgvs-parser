@@ -37,8 +37,7 @@ coordinate_system: COORDINATE "."
 
 variants: (variant | "[" variant (";" variant)* "]")
 
-variant: substitution | deletion | duplication | insertion | inversion
-       | conversion | deletion_insertion | varssr
+variant: substitution | del | dup | ins | inv | con | delins | varssr
 
 substitution: position DELETED ">" INSERTED
 
@@ -46,21 +45,21 @@ DELETED: NT
 
 INSERTED: NT
 
-deletion: (position | range_location | uncertain_range) "del" (DELETED_SEQUENCE | DELETED_LENGTH)?
+del: location "del" (DELETED_SEQUENCE | DELETED_LENGTH)?
 
 DELETED_SEQUENCE: NT+
 
 DELETED_LENGTH: NUMBER
 
-duplication: (position | range_location) "dup" (DUPLICATED_SEQUENCE | DUPLICATED_LENGTH)?
+dup: location "dup" (DUPLICATED_SEQUENCE | DUPLICATED_LENGTH)?
 
 DUPLICATED_SEQUENCE: NT+
 
 DUPLICATED_LENGTH: NUMBER
 
-insertion: range_location "ins" insertions
+ins: range_location "ins" insertions
 
-deletion_insertion: (range_location | position) "del" (NT+ | NUMBER)? "ins" insertions
+delins: location "del" (NT+ | NUMBER)? "ins" insertions
 
 insertions: ("[" inserted (";" inserted)* "]") | inserted
 
@@ -70,19 +69,24 @@ INVERTED: "inv"
 
 SEQUENCE: NT+
 
-inversion: range_location "inv" (NT+ | NUMBER)?
+inv: range_location "inv" (NT+ | NUMBER)?
 
-conversion: range_location "con" farloc
+con: range_location "con" (range_location | farloc)
 
 transloc: "t" chromcoords "(" farloc ")"
 
-abrssr: position NT+ "(" NUMBER "_" NUMBER ")"
+abrssr: position SEQUENCE "(" NUMBER "_" NUMBER ")"
 
-varssr: (position NT+ "[" NUMBER "]") | (range_location "[" NUMBER "]") | abrssr
+varssr: (position SEQUENCE "[" REPEAT_LENGTH "]")
+      | (range_location "[" REPEAT_LENGTH "]")
+      | abrssr
 
+REPEAT_LENGTH: NUMBER
 
 // Locations
 // ---------
+
+location: position | range_location | uncertain
 
 // Positions
 
@@ -108,18 +112,17 @@ STARTEX: NUMBER
 
 ENDEX: NUMBER
 
-start_location: position
+start_location: position | uncertain
 
-end_location: position
-
-start_range: start_location "_" end_location
-
-end_range: start_location "_" end_location
+end_location: position | uncertain
 
 // Uncertain
 
-uncertain_range: "(" range_location ")"
-               | "(" start_range ")" "_" "(" end_range ")"
+uncertain: "(" uncertain_start "_" uncertain_end ")"
+
+uncertain_start: position
+
+uncertain_end: position
 
 // Other
 
