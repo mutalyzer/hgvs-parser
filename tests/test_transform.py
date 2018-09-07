@@ -414,79 +414,257 @@ test_variants = [
             ]
         }
     ),
-    # (
-    #     '-401C>T',
-    #     {
-    #
-    #     }
-    # ),
-    # (
-    #     '93+1G>T',
-    #     {
-    #
-    #     }
-    # ),
-    # # Deletions
-    # (
-    #     '19del',
-    #     {
-    #
-    #     }
-    # ),
-    # (
-    #     '704+1del',
-    #     {
-    #
-    #     }
-    # ),
-    # (
-    #     '19_21del',
-    #     {
-    #
-    #     }
-    # ),
-    # (
-    #     '183_186+48del',
-    #     # From NG_012232.1(NM_004006.1):c.183_186+48del a deletion of
-    #     # nucleotides 183 to 186+48 (coding DNA reference sequence), crossing
-    #     # an exon/intron border.
-    #     {
-    #
-    #     }
-    # ),
-    # (
-    #     '4072-1234_5155-246del',
-    #     # From NG_012232.1(NM_004006.1):c.4072-1234_5155-246del
-    #     {
-    #
-    #     }
-    # ),
-    # (
-    #     '(4071+1_4072-1)_(5154+1_5155-1)del',
-    #     # From NG_012232.1(NM_004006.1):c.(4071+1_4072-1)_(5154+1_5155-1)del
-    #     {
-    #
-    #     }
-    # ),
-    # (
-    #     '(?_-245)_(31+1_32-1)del',
-    #     {
-    #
-    #     }
-    # ),
-    # (
-    #     '(?_-1)_(*1_?)del',
-    #     {
-    #
-    #     }
-    # ),
-    # # Duplications
-    # (
-    #     '20dup',
-    #     {
-    #
-    #     }
-    # ),
+    # Deletions
+    (
+        '10del',
+        {
+            'variants': [
+                {
+                    'type': 'del',
+                    'location': {
+                        'position': 10,
+                    },
+                }
+            ]
+        }
+    ),
+    (
+        # Note: the addition of 'A' is not HGVS.
+        '10delA',
+        {
+            'variants': [
+                {
+                    'type': 'del',
+                    'location': {
+                        'position': 10,
+                    },
+                    'deleted': [
+                        {
+                            'sequence': 'A',
+                            'source': 'description'
+                        }
+                    ],
+                }
+            ]
+        }
+    ),
+    (
+        '100+1del',
+        {
+            'variants': [
+                {
+                    'type': 'del',
+                    'location': {
+                        'position': 100,
+                        'offset': 1,
+                    },
+                }
+            ]
+        }
+    ),
+    (
+        '10_20del',
+        {
+            'variants': [
+                {
+                    'type': 'del',
+                    'location': {
+                        'start': {
+                            'position': 10,
+                        },
+                        'end': {
+                            'position': 20,
+                        }
+                    },
+                }
+            ]
+        }
+    ),
+    (
+        '10-1_20-3del',
+        {
+            'variants': [
+                {
+                    'type': 'del',
+                    'location': {
+                        'start': {
+                            'position': 10,
+                            'offset': -1
+                        },
+                        'end': {
+                            'position': 20,
+                            'offset': -3
+                        }
+                    },
+                }
+            ]
+        }
+    ),
+    (
+        # Note: the addition of '5' is not HGVS.
+        '10_15del5',
+        {
+            'variants': [
+                {
+                    'type': 'del',
+                    'location': {
+                        'start': {
+                            'position': 10,
+                        },
+                        'end': {
+                            'position': 15,
+                        }
+                    },
+                    'deleted': [
+                        {
+                            'source': 'description',
+                            'length': 5
+                        }
+                    ],
+                }
+            ]
+        }
+    ),
+    (
+        '(10_20)_30del',
+        {
+            'variants': [
+                {
+                    'type': 'del',
+                    'location': {
+                        'start': {
+                            'uncertain': {
+                                'start': {
+                                    'position': 10,
+                                },
+                                'end': {
+                                    'position': 20,
+                                }
+                            },
+                        },
+                        'end': {
+                            'position': 30,
+                        }
+                    },
+                }
+            ]
+        }
+    ),
+    (
+        '(10_20)_(30_40)del',
+        {
+            'variants': [
+                {
+                    'type': 'del',
+                    'location': {
+                        'start': {
+                            'uncertain': {
+                                'start': {
+                                    'position': 10,
+                                },
+                                'end': {
+                                    'position': 20,
+                                }
+                            },
+                        },
+                        'end': {
+                            'uncertain': {
+                                'start': {
+                                    'position': 30,
+                                },
+                                'end': {
+                                    'position': 40,
+                                }
+                            },
+                        }
+                    },
+                }
+            ]
+        }
+    ),
+    (
+        '(?_-20)_(30+1_30-1)del',
+        {
+            'variants': [
+                {
+                    'type': 'del',
+                    'location': {
+                        'start': {
+                            'uncertain': {
+                                'start': {
+                                    'position': '?',
+                                },
+                                'end': {
+                                    'position': 20,
+                                    'outside_translation': 'downstream',
+                                }
+                            },
+                        },
+                        'end': {
+                            'uncertain': {
+                                'start': {
+                                    'position': 30,
+                                    'offset': 1,
+                                },
+                                'end': {
+                                    'position': 30,
+                                    'offset': -1,
+                                }
+                            },
+                        }
+                    },
+                }
+            ]
+        }
+    ),
+    (
+        '(?_-1)_(*1_?)del',
+        {
+            'variants': [
+                {
+                    'type': 'del',
+                    'location': {
+                        'start': {
+                            'uncertain': {
+                                'start': {
+                                    'position': '?',
+                                },
+                                'end': {
+                                    'position': 1,
+                                    'outside_translation': 'downstream',
+                                }
+                            },
+                        },
+                        'end': {
+                            'uncertain': {
+                                'start': {
+                                    'position': 1,
+                                    'outside_translation': 'upstream',
+                                },
+                                'end': {
+                                    'position': '?',
+                                }
+                            },
+                        }
+                    },
+                }
+            ]
+        }
+    ),
+    # Duplications
+    (
+        '10dup',
+        {
+            'variants': [
+                {
+                    'type': 'dup',
+                    'location': {
+                        'position': 10,
+                    },
+                }
+            ]
+        }
+    ),
     # (
     #     '1704+1dup',
     #     {
@@ -529,13 +707,120 @@ test_variants = [
     #
     #     }
     # ),
-    # # Insertions
-    # (
-    #     '32867861_32867862insT',
-    #     {
-    #
-    #     }
-    # ),
+    # Insertions
+    (
+        '11_12insT',
+        {
+            'variants': [
+                {
+                    'type': 'ins',
+                    'location': {
+                        'start': {
+                            'position': 11,
+                        },
+                        'end': {
+                            'position': 12,
+                        }
+                    },
+                    'insertions': [
+                        {
+                            'sequence': 'T'
+                        }
+                    ]
+                }
+            ]
+        }
+    ),
+    (
+        '11_12ins[T]',
+        {
+            'variants': [
+                {
+                    'type': 'ins',
+                    'location': {
+                        'start': {
+                            'position': 11,
+                        },
+                        'end': {
+                            'position': 12,
+                        }
+                    },
+                    'insertions': [
+                        {
+                            'sequence': 'T'
+                        }
+                    ]
+                }
+            ]
+        }
+    ),
+    (
+        '11_12ins[T;10_20]',
+        {
+            'variants': [
+                {
+                    'type': 'ins',
+                    'location': {
+                        'start': {
+                            'position': 11,
+                        },
+                        'end': {
+                            'position': 12,
+                        }
+                    },
+                    'insertions': [
+                        {
+                            'sequence': 'T'
+                        },
+                        {
+                            'location': {
+                                'start': {
+                                    'position': 10
+                                },
+                                'end': {
+                                    'position': 20
+                                }
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ),
+    (
+        '11_12ins[T;10_20inv]',
+        {
+            'variants': [
+                {
+                    'type': 'ins',
+                    'location': {
+                        'start': {
+                            'position': 11,
+                        },
+                        'end': {
+                            'position': 12,
+                        }
+                    },
+                    'insertions': [
+                        {
+                            'sequence': 'T'
+                        },
+                        {
+                            'location': {
+                                'start': {
+                                    'position': 10
+                                },
+                                'end': {
+                                    'position': 20
+                                }
+                            },
+                            'inverted': 'inv'
+                        }
+                    ]
+                }
+            ]
+        }
+    ),
     # # Mosaic cases.
     # (
     #     '85=/T>C',

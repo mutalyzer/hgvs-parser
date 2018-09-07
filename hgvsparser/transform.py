@@ -152,7 +152,7 @@ def add_tokens(parent, token_type, token_value):
             else:
                 parent['position'] = token_value
         elif token_type == 'OFFSET':
-            # TODO: decide what to do with the check the +/-0 offset.
+            # TODO: decide what to do with the check of the +/-0 offset.
             parent['offset'] = int(token_value)
         elif token_type == 'OUTSIDETRANSLATION':
             if token_value == '*':
@@ -177,7 +177,8 @@ def add_tokens(parent, token_type, token_value):
             parent['deleted'] = [
                 {
                     'source': 'description',
-                    'length': token_value,
+                    'length': int(token_value),
+                    # TODO: Check if the int conversion works.
                 }
             ]
         else:
@@ -205,13 +206,25 @@ def to_variant_model(parse_tree, model):
             elif parse_tree.data == 'range_location':
                 model['location'] = sub_model
             elif parse_tree.data == 'start_location':
-                model['start'] = sub_model
+                if sub_model.get('location'):
+                    model['start'] = sub_model['location']
+                else:
+                    model['start'] = sub_model
             elif parse_tree.data == 'end_location':
-                model['end'] = sub_model
+                if sub_model.get('location'):
+                    model['end'] = sub_model['location']
+                else:
+                    model['end'] = sub_model
             elif parse_tree.data == 'uncertain_start':
-                model['start'] = sub_model
+                if sub_model.get('location'):
+                    model['start'] = sub_model['location']
+                else:
+                    model['start'] = sub_model
             elif parse_tree.data == 'uncertain_end':
-                model['end'] = sub_model
+                if sub_model.get('location'):
+                    model['end'] = sub_model['location']
+                else:
+                    model['end'] = sub_model
             elif parse_tree.data in ['substitution', 'del', 'dup', 'ins',
                                      'inv', 'con', 'delins']:
                 model['type'] = parse_tree.data
