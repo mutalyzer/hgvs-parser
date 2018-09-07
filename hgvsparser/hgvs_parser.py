@@ -19,7 +19,6 @@ class HgvsParser:
                                               '../ebnf/hgvs_mutalyzer.g')
         else:
             self._grammar_path = grammar_path
-            print(self._grammar_path)
         self._parser_type = parser_type
         self._start_rule = start_rule
         if parser_type == 'lark':
@@ -36,7 +35,6 @@ class HgvsParser:
 
         parser = None
         try:
-            print(self._start_rule)
             parser = Lark(grammar, parser='earley',
                           start=self._start_rule, ambiguity='resolve')
             # parser = Lark(grammar, parser='lalr', start='var', lexer="contextual")

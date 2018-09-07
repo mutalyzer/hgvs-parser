@@ -5,13 +5,14 @@ Checking the lark tree transformation.
 import pytest
 
 from hgvsparser.hgvs_parser import HgvsParser
-from hgvsparser.transform import transform, get_variants, get_reference_information
+from hgvsparser.to_model import parse_tree_to_model, get_variants, get_reference_information
 
 
 test_cases = [
     # No specific locus
     # - genbank reference with no version
-    (
+    (            # print("parse_tree")
+
         'NC_000001:', {
             'reference': {
                 'type': 'genbank',
