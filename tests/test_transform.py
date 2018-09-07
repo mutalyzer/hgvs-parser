@@ -265,7 +265,6 @@ def test_reference_part(description, model):
 
     assert get_reference_information(parser.parse(description)) == model
 
-
 test_variants = [
     # # No change
     # (
@@ -666,25 +665,7 @@ test_variants = [
         }
     ),
     # (
-    #     '1704+1dup',
-    #     {
-    #
-    #     }
-    # ),
-    # (
-    #     '20_23dup',
-    #     {
-    #
-    #     }
-    # ),
-    # (
     #     '260_264+48dup',
-    #     {
-    #
-    #     }
-    # ),
-    # (
-    #     '4072-1234_5155-246dup',
     #     {
     #
     #     }
@@ -821,6 +802,316 @@ test_variants = [
             ]
         }
     ),
+    (
+        '11_12ins[T;10_20inv;NM_000001.1:c.100_200]',
+        {
+            'variants': [
+                {
+                    'type': 'ins',
+                    'location': {
+                        'start': {
+                            'position': 11,
+                        },
+                        'end': {
+                            'position': 12,
+                        }
+                    },
+                    'insertions': [
+                        {
+                            'sequence': 'T'
+                        },
+                        {
+                            'location': {
+                                'start': {
+                                    'position': 10
+                                },
+                                'end': {
+                                    'position': 20
+                                }
+                            },
+                            'inverted': 'inv'
+                        },
+                        {
+                            'reference_location': {
+                                'reference': {
+                                    'accession': 'NM_000001',
+                                    'version': '1'
+                                },
+                                'coordinate': 'c',
+                                'location': {
+                                    'start': {
+                                        'position': 100
+                                    },
+                                    'end': {
+                                        'position': 200
+                                    }
+                                },
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ),
+    (
+        '11_12insNM_000001.1:c.100_200',
+        {
+            'variants': [
+                {
+                    'type': 'ins',
+                    'location': {
+                        'start': {
+                            'position': 11,
+                        },
+                        'end': {
+                            'position': 12,
+                        }
+                    },
+                    'insertions': [
+                        {
+                            'reference_location': {
+                                'reference': {
+                                    'accession': 'NM_000001',
+                                    'version': '1'
+                                },
+                                'coordinate': 'c',
+                                'location': {
+                                    'start': {
+                                        'position': 100
+                                    },
+                                    'end': {
+                                        'position': 200
+                                    }
+                                },
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ),
+    (
+        '11_12insNM_000001.1',
+        {
+            'variants': [
+                {
+                    'type': 'ins',
+                    'location': {
+                        'start': {
+                            'position': 11,
+                        },
+                        'end': {
+                            'position': 12,
+                        }
+                    },
+                    'insertions': [
+                        {
+                            'reference_location': {
+                                'reference': {
+                                    'accession': 'NM_000001',
+                                    'version': '1'
+                                },
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ),
+    # Inversions
+    (
+        '11_12inv',
+        {
+            'variants': [
+                {
+                    'type': 'inv',
+                    'location': {
+                        'start': {
+                            'position': 11,
+                        },
+                        'end': {
+                            'position': 12,
+                        }
+                    },
+                }
+            ]
+        }
+    ),
+    # Conversions
+    (
+        '10_20con30_40',
+        {
+            'variants': [
+                {
+                    'type': 'con',
+                    'location': {
+                        'start': {
+                            'position': 10,
+                        },
+                        'end': {
+                            'position': 20,
+                        }
+                    },
+                    'insertions': [
+                        {
+                            'location': {
+                                'start': {
+                                    'position': 30,
+                                },
+                                'end': {
+                                    'position': 40,
+                                }
+                            },
+                        }
+                    ]
+                }
+            ]
+        }
+    ),
+    # Deletion-insertions
+    (
+        '10delinsGA',
+        {
+            'variants': [
+                {
+                    'type': 'delins',
+                    'location': {
+                        'position': 10,
+                    },
+                    'insertions': [
+                        {
+                            'sequence': 'GA'
+                        }
+                    ]
+                }
+            ]
+        }
+    ),
+    # Deletion-insertions
+    (
+        '10delinsGA',
+        {
+            'variants': [
+                {
+                    'type': 'delins',
+                    'location': {
+                        'position': 10,
+                    },
+                    'insertions': [
+                        {
+                            'sequence': 'GA'
+                        }
+                    ]
+                }
+            ]
+        }
+    ),
+    (
+        '10_20delinsGA',
+        {
+            'variants': [
+                {
+                    'type': 'delins',
+                    'location': {
+                        'start': {
+                            'position': 10,
+                        },
+                        'end': {
+                            'position': 20,
+                        },
+                    },
+                    'insertions': [
+                        {
+                            'sequence': 'GA'
+                        }
+                    ]
+                }
+            ]
+        }
+    ),
+    # Repeats
+    # (
+    #     '10GA[20]',
+    #     {
+    #         'variants': [
+    #             {
+    #                 'type': 'repeat',
+    #                 'location': {
+    #                     'position': 10,
+    #                 },
+    #                 'insertions': [
+    #                     {
+    #                         'sequence': 'GA',
+    #                         'length': 4
+    #                     }
+    #                 ]
+    #             }
+    #         ]
+    #     }
+    # ),
+    # (
+    #     '123_191CAG[19]CAA[4]',
+    #     {
+    #         'variants': [
+    #             {
+    #                 'type': 'repeat',
+    #                 'location': {
+    #                     'start': {
+    #                         'position': 123,
+    #                     },
+    #                     'end': {
+    #                         'position': 191,
+    #
+    #                     }
+    #                 },
+    #                 'insertions': [
+    #                     {
+    #                         'sequence': 'CAG',
+    #                         'length': 19
+    #                     },
+    #                     {
+    #                         'sequence': 'CAA',
+    #                         'length': 4
+    #                     }
+    #                 ]
+    #             }
+    #         ]
+    #     }
+    # ),
+
+    # No changes (equal)
+    # TODO: Should we enforce exact positions for the range?
+    (
+        '10=',
+        {
+            'variants': [
+                {
+                    'type': 'equal',
+                    'location': {
+                        'position': 10
+                        }
+                }
+            ]
+        }
+    ),
+    (
+        '10_20=',
+        {
+            'variants': [
+                {
+                    'type': 'equal',
+                    'location': {
+                        'start': {
+                            'position': 10,
+                        },
+                        'end': {
+                            'position': 20,
+                        }
+                    },
+                }
+            ]
+        }
+    ),
     # # Mosaic cases.
     # (
     #     '85=/T>C',
@@ -861,6 +1152,7 @@ test_variants = [
     # ),
 
 ]
+
 
 
 @pytest.mark.parametrize('description,model', test_variants)

@@ -37,7 +37,7 @@ coordinate_system: COORDINATE "."
 
 variants: (variant | "[" variant (";" variant)* "]")
 
-variant: substitution | del | dup | ins | inv | con | delins | varssr
+variant: substitution | del | dup | ins | inv | con | delins | varssr | equal
 
 substitution: position DELETED ">" INSERTED
 
@@ -63,7 +63,7 @@ delins: location "del" (NT+ | NUMBER)? "ins" insertions
 
 insertions: ("[" inserted (";" inserted)* "]") | inserted
 
-inserted: (SEQUENCE | range_location INVERTED? | farloc)
+inserted: SEQUENCE | range_location INVERTED? | reference_location INVERTED?
 
 INVERTED: "inv"
 
@@ -71,15 +71,19 @@ SEQUENCE: NT+
 
 inv: range_location "inv" (NT+ | NUMBER)?
 
-con: range_location "con" (range_location | farloc)
+con: range_location "con" inserted_location
 
-transloc: "t" chromcoords "(" farloc ")"
+inserted_location: range_location | reference_location
+
+transloc: "t" chromcoords "(" reference_location ")"
 
 abrssr: position SEQUENCE "(" NUMBER "_" NUMBER ")"
 
 varssr: (position SEQUENCE "[" REPEAT_LENGTH "]")
       | (range_location "[" REPEAT_LENGTH "]")
       | abrssr
+
+equal: (position | range_location) "="
 
 REPEAT_LENGTH: NUMBER
 
@@ -103,18 +107,17 @@ INTRON: NUMBER
 
 // Ranges
 
-range_location: exloc
-        | start_location "_" end_location
+range_location: start_location "_" end_location | exloc
+
+start_location: position | uncertain
+
+end_location: position | uncertain
 
 exloc: "EX" STARTEX ("-" ENDEX)?
 
 STARTEX: NUMBER
 
 ENDEX: NUMBER
-
-start_location: position | uncertain
-
-end_location: position | uncertain
 
 // Uncertain
 
@@ -126,7 +129,7 @@ uncertain_end: position
 
 // Other
 
-farloc: (ACCESSION "." VERSION) (":" (COORDINATE ".")? range_location)?
+reference_location: reference_id specific_locus? (":" (COORDINATE ".")? range_location)?
 
 chromband: ("p" | "q") NUMBER "." NUMBER
 

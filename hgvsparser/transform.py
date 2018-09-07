@@ -24,7 +24,8 @@ def transform(parse_tree):
     :param parse_tree: Lark based parse tree.
     :return: Nested dictionary equivalent for the parse tree.
     """
-    tree_model = get_reference_information(parse_tree)
+    reference_tree = extract_subtree_child(parse_tree, 'description', 'reference')
+    tree_model = get_reference_information(reference_tree)
 
     variants_tree = extract_subtree_child(parse_tree, 'description', 'variants')
     variants = get_variants(variants_tree)
@@ -225,10 +226,13 @@ def to_variant_model(parse_tree, model):
                     model['end'] = sub_model['location']
                 else:
                     model['end'] = sub_model
+            elif parse_tree.data == 'inserted_location':
+                    model['insertions'] = [sub_model]
+            elif parse_tree.data == 'reference_id':
+                model['reference'] = sub_model
             elif parse_tree.data in ['substitution', 'del', 'dup', 'ins',
-                                     'inv', 'con', 'delins']:
+                                     'inv', 'con', 'delins', 'equal']:
                 model['type'] = parse_tree.data
-                print(sub_model)
                 if sub_model.get('location'):
                     if 'location' in sub_model['location'].keys():
                         sub_model['location'] = sub_model['location']['location']
