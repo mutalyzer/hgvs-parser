@@ -201,7 +201,7 @@ def to_variant_model(parse_tree, model):
             to_variant_model(child_tree, sub_model)
         if isinstance(model, dict):
             if parse_tree.data == 'position':
-                model.update(sub_model)
+                model['location'] = sub_model
             elif parse_tree.data == 'range_location':
                 model['location'] = sub_model
             elif parse_tree.data == 'start_location':
@@ -215,8 +215,10 @@ def to_variant_model(parse_tree, model):
             elif parse_tree.data in ['substitution', 'del', 'dup', 'ins',
                                      'inv', 'con', 'delins']:
                 model['type'] = parse_tree.data
-                if 'location' in sub_model['location'].keys():
-                    sub_model['location'] = sub_model['location']['location']
+                print(sub_model)
+                if sub_model.get('location'):
+                    if 'location' in sub_model['location'].keys():
+                        sub_model['location'] = sub_model['location']['location']
                 model.update(sub_model)
             else:
                 model[parse_tree.data] = sub_model
