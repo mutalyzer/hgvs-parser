@@ -94,30 +94,21 @@ location: position | range_location | uncertain
 
 // Positions
 
-position: OUTSIDETRANSLATION? POSITION OFFSET?
-     | "IVS" INTRON OFFSET
+position: OUTSIDECDS? POSITION OFFSET?
 
 POSITION: NUMBER | "?"
 
 OFFSET: ("+" | "-") (NUMBER | "?")
 
-OUTSIDETRANSLATION: "-" | "*"
-
-INTRON: NUMBER
+OUTSIDECDS: "-" | "*"
 
 // Ranges
 
-range_location: start_location "_" end_location | exloc
+range_location: start_location "_" end_location
 
 start_location: position | uncertain
 
 end_location: position | uncertain
-
-exloc: "EX" STARTEX ("-" ENDEX)?
-
-STARTEX: NUMBER
-
-ENDEX: NUMBER
 
 // Uncertain
 

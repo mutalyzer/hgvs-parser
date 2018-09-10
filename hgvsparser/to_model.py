@@ -158,11 +158,11 @@ def add_tokens(parent, token_type, token_value):
         elif token_type == 'OFFSET':
             # TODO: decide what to do with the check of the +/-0 offset.
             parent['offset'] = int(token_value)
-        elif token_type == 'OUTSIDETRANSLATION':
+        elif token_type == 'OUTSIDECDS':
             if token_value == '*':
-                parent['outside_translation'] = 'upstream'
+                parent['outside_cds'] = 'upstream'
             if token_value == '-':
-                parent['outside_translation'] = 'downstream'
+                parent['outside_cds'] = 'downstream'
         elif token_type in ['INSERTED']:
             parent['inserted'] = [
                 {
@@ -208,7 +208,7 @@ def to_variant_model(parse_tree, model):
             if parse_tree.data == 'position':
                 model['location'] = sub_model
             elif parse_tree.data == 'range_location':
-                model['location'] = sub_model
+                model['range'] = sub_model
             elif parse_tree.data == 'start_location':
                 if sub_model.get('location'):
                     model['start'] = sub_model['location']

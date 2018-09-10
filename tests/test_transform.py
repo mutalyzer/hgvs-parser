@@ -342,7 +342,7 @@ test_variants = [
                     'type': 'substitution',
                     'location': {
                         'position': 100,
-                        'outside_translation': 'upstream'
+                        'outside_cds': 'upstream'
                     },
                     'inserted': [
                         {
@@ -369,7 +369,7 @@ test_variants = [
                     'location': {
                         'position': 1,
                         'offset': -3,
-                        'outside_translation': 'upstream'
+                        'outside_cds': 'upstream'
                     },
                     'inserted': [
                         {
@@ -396,7 +396,7 @@ test_variants = [
                     'location': {
                         'position': 1,
                         'offset': 3,
-                        'outside_translation': 'downstream'
+                        'outside_cds': 'downstream'
                     },
                     'inserted': [
                         {
@@ -596,7 +596,7 @@ test_variants = [
                                 },
                                 'end': {
                                     'position': 20,
-                                    'outside_translation': 'downstream',
+                                    'outside_cds': 'downstream',
                                 }
                             },
                         },
@@ -631,7 +631,7 @@ test_variants = [
                                 },
                                 'end': {
                                     'position': 1,
-                                    'outside_translation': 'downstream',
+                                    'outside_cds': 'downstream',
                                 }
                             },
                         },
@@ -639,7 +639,7 @@ test_variants = [
                             'uncertain': {
                                 'start': {
                                     'position': 1,
-                                    'outside_translation': 'upstream',
+                                    'outside_cds': 'upstream',
                                 },
                                 'end': {
                                     'position': '?',
