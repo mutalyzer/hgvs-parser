@@ -75,8 +75,6 @@ con: range "con" inserted_location
 
 inserted_location: range | reference_location
 
-transloc: "t" chromcoords "(" reference_location ")"
-
 abrssr: (point | uncertain)  SEQUENCE "(" NUMBER "_" NUMBER ")"
 
 varssr: (point SEQUENCE "[" REPEAT_LENGTH "]")
@@ -121,10 +119,6 @@ uncertain_end: point
 // Other
 
 reference_location: reference_id specific_locus? (":" (COORDINATE ".")? range)?
-
-chromband: ("p" | "q") NUMBER "." NUMBER
-
-chromcoords: "(" chrom ";" chrom ")" "(" chromband ";" chromband ")"
 
 chrom: NAME
 
