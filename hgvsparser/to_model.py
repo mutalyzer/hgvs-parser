@@ -158,11 +158,11 @@ def add_tokens(parent, token_type, token_value):
         elif token_type == 'OFFSET':
             # TODO: decide what to do with the check of the +/-0 offset.
             parent['offset'] = int(token_value)
-        elif token_type == 'OUTSIDECDS':
+        elif token_type == 'OUTSIDE_CDS':
             if token_value == '*':
-                parent['outside_cds'] = 'upstream'
-            if token_value == '-':
                 parent['outside_cds'] = 'downstream'
+            if token_value == '-':
+                parent['outside_cds'] = 'upstream'
         elif token_type in ['INSERTED']:
             parent['inserted'] = [
                 {
@@ -185,6 +185,8 @@ def add_tokens(parent, token_type, token_value):
                     # TODO: Check if the int conversion works.
                 }
             ]
+        elif token_type == 'INVERTED':
+            parent['inverted'] = True
         else:
             parent[token_type.lower()] = token_value
     # TODO: raise exception.
@@ -205,29 +207,12 @@ def to_variant_model(parse_tree, model):
         for child_tree in parse_tree.children:
             to_variant_model(child_tree, sub_model)
         if isinstance(model, dict):
-            if parse_tree.data == 'position':
-                model['location'] = sub_model
-            elif parse_tree.data == 'range_location':
+            if parse_tree.data == 'uncertain':
+                sub_model['uncertain'] = True
                 model['range'] = sub_model
-            elif parse_tree.data == 'start_location':
-                if sub_model.get('location'):
-                    model['start'] = sub_model['location']
-                else:
-                    model['start'] = sub_model
-            elif parse_tree.data == 'end_location':
-                if sub_model.get('location'):
-                    model['end'] = sub_model['location']
-                else:
-                    model['end'] = sub_model
             elif parse_tree.data == 'uncertain_start':
-                if sub_model.get('location'):
-                    model['start'] = sub_model['location']
-                else:
                     model['start'] = sub_model
             elif parse_tree.data == 'uncertain_end':
-                if sub_model.get('location'):
-                    model['end'] = sub_model['location']
-                else:
                     model['end'] = sub_model
             elif parse_tree.data == 'inserted_location':
                     model['insertions'] = [sub_model]
@@ -236,10 +221,26 @@ def to_variant_model(parse_tree, model):
             elif parse_tree.data in ['substitution', 'del', 'dup', 'ins',
                                      'inv', 'con', 'delins', 'equal']:
                 model['type'] = parse_tree.data
-                if sub_model.get('location'):
-                    if 'location' in sub_model['location'].keys():
-                        sub_model['location'] = sub_model['location']['location']
-                model.update(sub_model)
+                print(sub_model)
+                if parse_tree.data == 'substitution':
+                    model['deleted'] = sub_model['deleted']
+                    model['inserted'] = sub_model['inserted']
+                    if sub_model.get('point'):
+                        model['location'] = {'point': sub_model['point']}
+                    elif sub_model.get('range'):
+                        model['location'] = {'range': sub_model['range']}
+                elif parse_tree.data in ['ins', 'con']:
+                    model['location'] = {'range': sub_model['range']}
+                    model['insertions'] = sub_model['insertions']
+                elif parse_tree.data == 'inv':
+                    model['location'] = {'range': sub_model['range']}
+                elif parse_tree.data == 'equal':
+                    if sub_model.get('point'):
+                        model['location'] = {'point': sub_model['point']}
+                    elif sub_model.get('range'):
+                        model['location'] = {'range': sub_model['range']}
+                else:
+                    model.update(sub_model)
             else:
                 model[parse_tree.data] = sub_model
         elif isinstance(model, list):

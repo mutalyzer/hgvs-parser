@@ -39,7 +39,7 @@ variants: (variant | "[" variant (";" variant)* "]")
 
 variant: substitution | del | dup | ins | inv | con | delins | varssr | equal
 
-substitution: position DELETED ">" INSERTED
+substitution: (point | uncertain) DELETED ">" INSERTED
 
 DELETED: NT
 
@@ -57,70 +57,70 @@ DUPLICATED_SEQUENCE: NT+
 
 DUPLICATED_LENGTH: NUMBER
 
-ins: range_location "ins" insertions
+ins: range "ins" insertions
 
 delins: location "del" (NT+ | NUMBER)? "ins" insertions
 
 insertions: ("[" inserted (";" inserted)* "]") | inserted
 
-inserted: SEQUENCE | range_location INVERTED? | reference_location INVERTED?
+inserted: SEQUENCE | range INVERTED? | reference_location INVERTED?
 
 INVERTED: "inv"
 
 SEQUENCE: NT+
 
-inv: range_location "inv" (NT+ | NUMBER)?
+inv: range "inv" (NT+ | NUMBER)?
 
-con: range_location "con" inserted_location
+con: range "con" inserted_location
 
-inserted_location: range_location | reference_location
+inserted_location: range | reference_location
 
 transloc: "t" chromcoords "(" reference_location ")"
 
-abrssr: position SEQUENCE "(" NUMBER "_" NUMBER ")"
+abrssr: (point | uncertain)  SEQUENCE "(" NUMBER "_" NUMBER ")"
 
-varssr: (position SEQUENCE "[" REPEAT_LENGTH "]")
-      | (range_location "[" REPEAT_LENGTH "]")
+varssr: (point SEQUENCE "[" REPEAT_LENGTH "]")
+      | (range "[" REPEAT_LENGTH "]")
       | abrssr
 
-equal: (position | range_location) "="
+equal: (point | range) "="
 
 REPEAT_LENGTH: NUMBER
 
 // Locations
 // ---------
 
-location: position | range_location | uncertain
+location: point | range | uncertain
 
 // Positions
 
-position: OUTSIDECDS? POSITION OFFSET?
+point: OUTSIDE_CDS? POSITION OFFSET?
 
 POSITION: NUMBER | "?"
 
 OFFSET: ("+" | "-") (NUMBER | "?")
 
-OUTSIDECDS: "-" | "*"
+OUTSIDE_CDS: "-" | "*"
 
 // Ranges
 
-range_location: start_location "_" end_location
+range: start "_" end
 
-start_location: position | uncertain
+start: point | uncertain
 
-end_location: position | uncertain
+end: point | uncertain
 
 // Uncertain
 
 uncertain: "(" uncertain_start "_" uncertain_end ")"
 
-uncertain_start: position
+uncertain_start: point
 
-uncertain_end: position
+uncertain_end: point
 
 // Other
 
-reference_location: reference_id specific_locus? (":" (COORDINATE ".")? range_location)?
+reference_location: reference_id specific_locus? (":" (COORDINATE ".")? range)?
 
 chromband: ("p" | "q") NUMBER "." NUMBER
 
