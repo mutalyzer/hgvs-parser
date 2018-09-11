@@ -154,7 +154,7 @@ def add_tokens(parent, token_type, token_value):
             if token_value != '?':
                 parent['position'] = int(token_value)
             else:
-                parent['position'] = token_value
+                parent['uncertain'] = True
         elif token_type == 'OFFSET':
             # TODO: decide what to do with the check of the +/-0 offset.
             parent['offset'] = int(token_value)

@@ -635,7 +635,7 @@ test_variants = [
                                 'range': {
                                     'start': {
                                         'point': {
-                                            'position': '?',
+                                            'uncertain': True,
                                         }
                                     },
                                     'end': {
@@ -682,7 +682,7 @@ test_variants = [
                                 'range': {
                                     'start': {
                                         'point': {
-                                            'position': '?',
+                                            'uncertain': True,
                                         }
                                     },
                                     'end': {
@@ -704,7 +704,7 @@ test_variants = [
                                     },
                                     'end': {
                                         'point': {
-                                            'position': '?',
+                                            'uncertain': True,
                                         }
                                     },
                                     'uncertain': True
