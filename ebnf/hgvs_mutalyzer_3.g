@@ -1,12 +1,12 @@
 // Top rule
 // --------
 
-description: reference variants
+description: reference ":" ( COORDINATE_SYSTEM ".")? variants
 
 // References
 // ----------
 
-reference: reference_id specific_locus? ":" coordinate_system?
+reference: reference_id specific_locus?
 
 reference_id: ACCESSION ("." VERSION)?
 
@@ -18,19 +18,17 @@ VERSION: NUMBER
 
 specific_locus: genbank_locus | LRG_LOCUS
 
-genbank_locus: "(" ((ACCESSION "." VERSION) | GENE_NAME SELECTOR?) ")"
+genbank_locus: "(" ((ACCESSION "." VERSION) | GENE_NAME ("_" SELECTOR)?) ")"
 
 GENE_NAME: (LETTER | NUMBER | "-")+
 
-SELECTOR: ("_v" | "_i") NUMBER
+SELECTOR: ("v" | "i") NUMBER
 
 LRG_LOCUS: ("t" | "p") NUMBER
 
 // Coordinate system
 
-COORDINATE: ("c" | "g" | "m" | "n" | "r")
-
-coordinate_system: COORDINATE "."
+COORDINATE_SYSTEM: ("c" | "g" | "m" | "n" | "r")
 
 // Variants
 // --------
@@ -120,7 +118,7 @@ uncertain_end: point
 
 // Other
 
-reference_location: reference_id specific_locus? (":" (COORDINATE ".")? range)?
+reference_location: reference_id specific_locus? (":" (COORDINATE_SYSTEM ".")? range)?
 
 chrom: NAME
 

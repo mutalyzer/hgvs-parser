@@ -13,7 +13,7 @@ test_cases = [
     # - genbank reference with no version
     (            # print("parse_tree")
 
-        'NC_000001:', {
+        'NC_000001', {
             'reference': {
                 'type': 'genbank',
                 'accession': 'NC_000001',
@@ -22,7 +22,7 @@ test_cases = [
     ),
     # - genbank reference with accession and version
     (
-        'NC_000001.10:', {
+        'NC_000001.10', {
             'reference': {
                 'type': 'genbank',
                 'accession': 'NC_000001',
@@ -32,7 +32,7 @@ test_cases = [
     ),
     # - lrg reference
     (
-        'LRG_1:', {
+        'LRG_1', {
             'reference': {
                 'type': 'lrg',
                 'id': 'LRG_1',
@@ -41,19 +41,19 @@ test_cases = [
     ),
     # - lrg reference with version - should not be possible
     (
-        'LRG_1.1:', {
+        'LRG_1.1', {
             'reference': {
                 'type': 'lrg',
                 'id': 'LRG_1',
                 'version': '1',
             },
-            'notes': ['version supplied for LRG reference']
+            # 'notes': ['version supplied for LRG reference']
         }
     ),
     # Specific locus present
     # - with gene names only
     (
-        'NC_000001(SDHD):', {
+        'NC_000001(SDHD)', {
             'reference': {
                 'type': 'genbank',
                 'accession': 'NC_000001',
@@ -65,7 +65,7 @@ test_cases = [
         }
     ),
     (
-        'NC_012920.1(MT-TL1):', {
+        'NC_012920.1(MT-TL1)', {
             'reference': {
                 'type': 'genbank',
                 'accession': 'NC_012920',
@@ -78,7 +78,7 @@ test_cases = [
         }
     ),
     (
-        'NG_012337.1(TIMM8B):', {
+        'NG_012337.1(TIMM8B)', {
             'reference': {
                 'type': 'genbank',
                 'accession': 'NG_012337',
@@ -91,7 +91,7 @@ test_cases = [
         }
     ),
     (
-        'NC_000001(SDHD_v001):', {
+        'NC_000001(SDHD_v001)', {
             'reference': {
                 'type': 'genbank',
                 'accession': 'NC_000001',
@@ -104,7 +104,7 @@ test_cases = [
         }
     ),
     (
-        'NC_000001(SDHD_i001):', {
+        'NC_000001(SDHD_i001)', {
             'reference': {
                 'type': 'genbank',
                 'accession': 'NC_000001',
@@ -117,7 +117,7 @@ test_cases = [
         }
     ),
     (
-        'NG_012337.1(TIMM8B_v001):', {
+        'NG_012337.1(TIMM8B_v001)', {
             'reference': {
                 'type': 'genbank',
                 'accession': 'NG_012337',
@@ -131,7 +131,7 @@ test_cases = [
         }
     ),
     (
-        'NG_012337.1(TIMM8B_i001):', {
+        'NG_012337.1(TIMM8B_i001)', {
             'reference': {
                 'type': 'genbank',
                 'accession': 'NG_012337',
@@ -145,7 +145,7 @@ test_cases = [
         }
     ),
     (
-        'NC_012920.1(MT-TL1_v001):', {
+        'NC_012920.1(MT-TL1_v001)', {
             'reference': {
                 'type': 'genbank',
                 'accession': 'NC_012920',
@@ -159,7 +159,7 @@ test_cases = [
         }
     ),
     (
-        'NC_012920.1(MT-TL1_i001):', {
+        'NC_012920.1(MT-TL1_i001)', {
             'reference': {
                 'type': 'genbank',
                 'accession': 'NC_012920',
@@ -174,14 +174,14 @@ test_cases = [
     ),
     # - with accession and version
     (
-        'NG_012337.1(NM_012459.2):', {
+        'NG_012337.1(NM_012459.2)', {
             'reference': {
                 'type': 'genbank',
                 'accession': 'NG_012337',
                 'version': '1',
             },
             'specific_locus': {
-                'type': 'accession',
+                'type': 'genbank',
                 'accession': 'NM_012459',
                 'version': '2',
             }
@@ -189,32 +189,32 @@ test_cases = [
     ),
     # - LRG ones
     (
-        'LRG_24t1:', {
+        'LRG_24t1', {
             'reference': {
                 'type': 'lrg',
                 'id': 'LRG_24',
             },
             'specific_locus': {
                 'type': 'lrg transcript',
-                'transcript variant': 't1',
+                'transcript_variant': 't1',
             }
         }
     ),
     (
-        'LRG_24p1:', {
+        'LRG_24p1', {
             'reference': {
                 'type': 'lrg',
                 'id': 'LRG_24',
             },
             'specific_locus': {
                 'type': 'lrg protein',
-                'protein isoform': 'p1',
+                'protein_isoform': 'p1',
             }
         }
     ),
     # - mix
     (
-        'NC_000001.1t1:', {
+        'NC_000001.1t1', {
             'reference': {
                 'type': 'genbank',
                 'accession': 'NC_000001',
@@ -222,13 +222,13 @@ test_cases = [
             },
             'specific_locus': {
                 'type': 'lrg transcript',
-                'transcript variant': 't1',
+                'transcript_variant': 't1',
             },
-            'notes': ['lrg locus provided for genbank reference']
+            # 'notes': ['lrg locus provided for genbank reference']
         }
     ),
     (
-        'NC_000001.1p1:', {
+        'NC_000001.1p1', {
             'reference': {
                 'type': 'genbank',
                 'accession': 'NC_000001',
@@ -236,13 +236,13 @@ test_cases = [
             },
             'specific_locus': {
                 'type': 'lrg protein',
-                'protein isoform': 'p1',
+                'protein_isoform': 'p1',
             },
-            'notes': ['lrg locus provided for genbank reference']
+            # 'notes': ['lrg locus provided for genbank reference']
         }
     ),
     (
-        'LRG_24(SDHD):', {
+        'LRG_24(SDHD)', {
             'reference': {
                 'id': 'LRG_24',
                 'type': 'lrg'
@@ -251,7 +251,7 @@ test_cases = [
                 'type': 'gene',
                 'id': 'SDHD',
             },
-            'notes': ['genbank locus provided for lrg reference']
+            # 'notes': ['genbank locus provided for lrg reference']
         }
     ),
 ]
@@ -264,7 +264,7 @@ def test_reference_part(description, model):
     """
     parser = HgvsParser(grammar_path='ebnf/hgvs_mutalyzer_3.g', start_rule='reference')
 
-    assert get_reference_information(parser.parse(description)) == model
+    assert get_variants(parser.parse(description)) == model
 
 
 test_variants = [
@@ -864,9 +864,10 @@ test_variants = [
                             'reference_location': {
                                 'reference': {
                                     'accession': 'NM_000001',
-                                    'version': '1'
+                                    'version': '1',
+                                    'type': 'genbank'
                                 },
-                                'coordinate': 'c',
+                                'coordinate_system': 'c',
                                 'location': {
                                     'type': 'range',
                                     'start': {
@@ -907,9 +908,10 @@ test_variants = [
                             'reference_location': {
                                 'reference': {
                                     'accession': 'NM_000001',
-                                    'version': '1'
+                                    'version': '1',
+                                    'type': 'genbank'
                                 },
-                                'coordinate': 'c',
+                                'coordinate_system': 'c',
                                 'location': {
                                     'type': 'range',
                                     'start': {
@@ -950,7 +952,8 @@ test_variants = [
                             'reference_location': {
                                 'reference': {
                                     'accession': 'NM_000001',
-                                    'version': '1'
+                                    'version': '1',
+                                    'type': 'genbank'
                                 },
                             }
                         }

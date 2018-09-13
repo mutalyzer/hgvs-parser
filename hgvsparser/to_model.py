@@ -27,12 +27,7 @@ def parse_tree_to_model(parse_tree):
     :param parse_tree: Lark based parse tree.
     :return: Nested dictionary equivalent for the parse tree.
     """
-    reference_tree = extract_subtree_child(parse_tree, 'description', 'reference')
-    tree_model = get_reference_information(reference_tree)
-
-    variants_tree = extract_subtree_child(parse_tree, 'description', 'variants')
-    variants = get_variants(variants_tree)
-    tree_model.update(variants)
+    tree_model = get_variants(parse_tree)
 
     return tree_model
 
@@ -192,6 +187,24 @@ def add_tokens(parent, token_type, token_value):
             ]
         elif token_type == 'INVERTED':
             parent['inverted'] = True
+        elif token_type == 'ACCESSION':
+            if token_value.startswith('LRG'):
+                parent['id'] = token_value
+                parent['type'] = 'lrg'
+            else:
+                parent[token_type.lower()] = token_value
+                parent['type'] = 'genbank'
+        elif token_type == 'GENE_NAME':
+            parent['id'] = token_value
+            parent['type']\
+                = 'gene'
+        elif token_type == 'LRG_LOCUS':
+            if token_value.startswith('t'):
+                parent['type'] = 'lrg transcript'
+                parent['transcript_variant'] = token_value
+            elif token_value.startswith('p'):
+                parent['type'] = 'lrg protein'
+                parent['protein_isoform'] = token_value
         else:
             parent[token_type.lower()] = token_value
     # TODO: raise exception.
@@ -229,6 +242,13 @@ def to_variant_model(parse_tree, model):
                 model['insertions'] = [sub_model]
             elif parse_tree.data == 'reference_id':
                 model['reference'] = sub_model
+            elif parse_tree.data == 'specific_locus':
+                if sub_model.get('genbank_locus'):
+                    model['specific_locus'] = sub_model['genbank_locus']
+                else:
+                    model['specific_locus'] = sub_model
+            elif parse_tree.data == 'reference':
+                model.update(sub_model)
             elif parse_tree.data in ['substitution', 'del', 'dup', 'ins',
                                      'inv', 'con', 'delins', 'equal']:
                 model['type'] = parse_tree.data

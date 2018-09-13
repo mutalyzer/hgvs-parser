@@ -2,6 +2,7 @@
 Convert from the nested dictionary based variant model to a string description.
 """
 
+
 def model_to_description(model):
     """
     Convert the variant description model to string.
@@ -30,16 +31,15 @@ def reference_to_description(r):
     :param r: Dictionary holding the reference model.
     :return: Equivalent reference string representation.
     """
-    reference = ''
+    version = ''
     if isinstance(r, dict):
-        reference_type = r.get('type')
-        if reference_type == 'genbank':
-            reference += r.get('accession')
+        if r.get('type') == 'genbank':
+            accession = r.get('accession')
             if r.get('version'):
-                reference += '.' + r.get('version')
-        if reference_type == 'lrg':
-            reference += r.get('id')
-    return reference
+                version = '.%s' % r['version']
+        elif r.get('type') == 'lrg':
+            accession = r.get('id')
+    return '%s%s' % (accession, version)
 
 
 def specific_locus_to_description(s):
@@ -52,13 +52,16 @@ def specific_locus_to_description(s):
         specific_locus = ''
         specific_locus_type = s.get('type')
         if specific_locus_type == 'accession':
-            specific_locus = '(' + s.get('accession') + '.' + s.get('version') + ')'
+            specific_locus = '(%s.%s)' % (s['accession'], s['version'])
         elif specific_locus_type == 'gene':
-            specific_locus += '(' + s.get('id')
             if s.get('transcript variant'):
-                specific_locus += '_v' + s.get('transcript variant') + ')'
-            if s.get('protein isoform'):
-                specific_locus += '_i' + s.get('protein isoform') + ')'
+                selector = '_v%s' % s.get('transcript variant')
+            elif s.get('protein isoform'):
+                selector = '_i%s' % s.get('protein isoform')
+            else:
+                selector = ''
+            specific_locus = '(%s%s)' % (s.get('id'), selector)
+
         elif specific_locus_type == 'lrg transcript':
             specific_locus = s.get('transcript variant')
         elif specific_locus_type == 'lrg protein':
@@ -74,10 +77,12 @@ def variant_to_description(v):
     :param p: Variant dictionary.
     :return: Equivalent variant string representation.
     """
-    location = ''
+    location = insertions = ''
     if v.get('location'):
         location = location_to_description(v.get('location'))
-    variant = '%s%s' %(location, v.get('type'))
+    if v.get('insertions'):
+        insertions = insertions_to_description(v['insertions'])
+    variant = '%s%s%s' %(location, v.get('type'), insertions)
     return variant
 
 
@@ -87,26 +92,16 @@ def location_to_description(l):
     :param l: Location dictionary.
     :return: Equivalent location string representation.
     """
-    if l.get('position'):
+    if l['type'] == 'point':
         return position_to_description(l)
-    if l.get('start'):
-        if l.get('start').get('uncertain'):
-            start = '(%s_%s)' %(position_to_description(l.get('start').get('uncertain').get('start')),
-                                position_to_description(l.get('start').get('uncertain').get('end')))
+    elif l['type'] == 'range':
+        if l.get('uncertain'):
+            return '(%s_%s)' %(position_to_description(l.get('start')),
+                               position_to_description(l.get('end')))
         else:
-            start = position_to_description(l.get('start'))
-        if l.get('end'):
-            if l.get('end').get('uncertain'):
-                end = '(%s_%s)' % (position_to_description(l.get('end').get('uncertain').get('start')),
-                                   position_to_description(l.get('end').get('uncertain').get('end')))
-            else:
-                end = position_to_description(l.get('end'))
+            start = location_to_description(l.get('start'))
+            end = location_to_description(l.get('end'))
             return '%s_%s' %(start, end)
-        else:
-            return start
-    if l.get('uncertain'):
-        return '(%s_%s)' %(position_to_description(l.get('uncertain').get('start')),
-                           position_to_description(l.get('uncertain').get('end')))
 
 
 def position_to_description(p):
@@ -115,16 +110,39 @@ def position_to_description(p):
     :param p: Position dictionary.
     :return: Equivalent position string representation.
     """
-    if p.get('outside_translation'):
-        if p.get('outside_translation') == 'upstream':
-            outside_translation = '*'
-        if p.get('outside_translation') == 'downstream':
-            outside_translation = '-'
+    outside_cds = offset = ''
+    if p.get('outside_cds'):
+        if p['outside_cds'] == 'downstream':
+            outside_cds = '*'
+        elif p['outside_cds'] == 'upstream':
+            outside_cds = '-'
+    if p.get('uncertain'):
+        position = '?'
     else:
-        outside_translation = ''
-    position = str(p.get('position'))
+        position = str(p.get('position'))
     if p.get('offset'):
         offset = str(p.get('offset'))
+    return '%s%s%s' %(outside_cds, position, offset)
+
+
+def insertions_to_description(insertions):
+    """
+    Convert the insertions dictionary model to string.
+    :param insertions: Insertions dictionary.
+    :return: Equivalent insertions string representation.
+    """
+    output = ''
+    insertions_list = []
+    for i in insertions:
+        if i.get('sequence'):
+            insertions_list.append(i.get('sequence'))
+        elif i.get('location'):
+            insertions_list.append(location_to_description(i['location']))
+            if i.get('inverted'):
+                insertions_list[-1] += 'inv'
+        elif i.get('reference_location'):
+            insertions_list.append(model_to_description(i))
+    if len(insertions) > 1:
+        return '[%s]' % ';'.join(insertions_list)
     else:
-        offset = ''
-    return '%s%s%s' %(outside_translation, position, offset)
+        return insertions_list[0]
