@@ -156,8 +156,10 @@ def add_tokens(parent, token_type, token_value):
             else:
                 parent['uncertain'] = True
         elif token_type == 'OFFSET':
-            # TODO: decide what to do with the check of the +/-0 offset.
-            parent['offset'] = int(token_value)
+            if token_value == '?':
+                parent['uncertain_offset'] = True
+            else:
+                parent['offset'] = int(token_value)
         elif token_type == 'OUTSIDE_CDS':
             if token_value == '*':
                 parent['outside_cds'] = 'downstream'
@@ -170,6 +172,9 @@ def add_tokens(parent, token_type, token_value):
                     'sequence': token_value,
                 }
             ]
+        elif token_type in ['INSERTED_SEQUENCE']:
+            parent['source'] = 'description'
+            parent['sequence'] = token_value
         elif token_type in ['DELETED', 'DELETED_SEQUENCE']:
             parent['deleted'] = [
                 {
@@ -207,40 +212,27 @@ def to_variant_model(parse_tree, model):
         for child_tree in parse_tree.children:
             to_variant_model(child_tree, sub_model)
         if isinstance(model, dict):
-            if parse_tree.data == 'uncertain':
+            if parse_tree.data in ['point', 'range']:
+                sub_model['type'] = parse_tree.data
+                model['location'] = sub_model
+            elif parse_tree.data == 'uncertain':
                 sub_model['uncertain'] = True
-                model['range'] = sub_model
+                sub_model['type'] = 'range'
+                model['location'] = sub_model
+            elif parse_tree.data in ['start', 'end', 'location']:
+                model[parse_tree.data] = sub_model['location']
             elif parse_tree.data == 'uncertain_start':
-                    model['start'] = sub_model
+                model['start'] = sub_model['location']
             elif parse_tree.data == 'uncertain_end':
-                    model['end'] = sub_model
+                model['end'] = sub_model['location']
             elif parse_tree.data == 'inserted_location':
-                    model['insertions'] = [sub_model]
+                model['insertions'] = [sub_model]
             elif parse_tree.data == 'reference_id':
                 model['reference'] = sub_model
             elif parse_tree.data in ['substitution', 'del', 'dup', 'ins',
                                      'inv', 'con', 'delins', 'equal']:
                 model['type'] = parse_tree.data
-                print(sub_model)
-                if parse_tree.data == 'substitution':
-                    model['deleted'] = sub_model['deleted']
-                    model['inserted'] = sub_model['inserted']
-                    if sub_model.get('point'):
-                        model['location'] = {'point': sub_model['point']}
-                    elif sub_model.get('range'):
-                        model['location'] = {'range': sub_model['range']}
-                elif parse_tree.data in ['ins', 'con']:
-                    model['location'] = {'range': sub_model['range']}
-                    model['insertions'] = sub_model['insertions']
-                elif parse_tree.data == 'inv':
-                    model['location'] = {'range': sub_model['range']}
-                elif parse_tree.data == 'equal':
-                    if sub_model.get('point'):
-                        model['location'] = {'point': sub_model['point']}
-                    elif sub_model.get('range'):
-                        model['location'] = {'range': sub_model['range']}
-                else:
-                    model.update(sub_model)
+                model.update(sub_model)
             else:
                 model[parse_tree.data] = sub_model
         elif isinstance(model, list):

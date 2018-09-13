@@ -276,9 +276,8 @@ test_variants = [
                 {
                     'type': 'substitution',
                     'location': {
-                        'point': {
-                            'position': 100
-                        }
+                        'type': 'point',
+                        'position': 100
                     },
                     'inserted': [
                         {
@@ -303,10 +302,9 @@ test_variants = [
                 {
                     'type': 'substitution',
                     'location': {
-                        'point': {
-                            'position': 100,
-                            'offset': 3
-                        }
+                        'type': 'point',
+                        'position': 100,
+                        'offset': 3
                     },
                     'inserted': [
                         {
@@ -331,10 +329,9 @@ test_variants = [
                 {
                     'type': 'substitution',
                     'location': {
-                        'point': {
-                            'position': 100,
-                            'outside_cds': 'downstream'
-                        }
+                        'type': 'point',
+                        'position': 100,
+                        'outside_cds': 'downstream'
                     },
                     'inserted': [
                         {
@@ -359,11 +356,10 @@ test_variants = [
                 {
                     'type': 'substitution',
                     'location': {
-                        'point': {
-                            'position': 1,
-                            'offset': -3,
-                            'outside_cds': 'downstream'
-                        }
+                        'type': 'point',
+                        'position': 1,
+                        'offset': -3,
+                        'outside_cds': 'downstream'
                     },
                     'inserted': [
                         {
@@ -388,11 +384,10 @@ test_variants = [
                 {
                     'type': 'substitution',
                     'location': {
-                        'point': {
-                            'position': 1,
-                            'offset': 3,
-                            'outside_cds': 'upstream'
-                        }
+                        'type': 'point',
+                        'position': 1,
+                        'offset': 3,
+                        'outside_cds': 'upstream'
                     },
                     'inserted': [
                         {
@@ -418,10 +413,9 @@ test_variants = [
                 {
                     'type': 'del',
                     'location': {
-                        'point': {
-                            'position': 10,
-                        }
-                    },
+                        'type': 'point',
+                        'position': 10
+                    }
                 }
             ]
         }
@@ -434,16 +428,15 @@ test_variants = [
                 {
                     'type': 'del',
                     'location': {
-                        'point': {
-                            'position': 10,
-                        }
+                        'type': 'point',
+                        'position': 10
                     },
                     'deleted': [
                         {
                             'sequence': 'A',
                             'source': 'description'
                         }
-                    ],
+                    ]
                 }
             ]
         }
@@ -455,11 +448,10 @@ test_variants = [
                 {
                     'type': 'del',
                     'location': {
-                        'point': {
-                            'position': 100,
-                            'offset': 1,
-                        }
-                    },
+                        'type': 'point',
+                        'position': 100,
+                        'offset': 1
+                    }
                 }
             ]
         }
@@ -471,19 +463,16 @@ test_variants = [
                 {
                     'type': 'del',
                     'location': {
-                        'range': {
-                            'start': {
-                                'point': {
-                                    'position': 10,
-                                }
-                            },
-                            'end': {
-                                'point': {
-                                    'position': 20,
-                                }
-                            }
+                        'type': 'range',
+                        'start': {
+                            'type': 'point',
+                            'position': 10
+                        },
+                        'end': {
+                            'type': 'point',
+                            'position': 20
                         }
-                    },
+                    }
                 }
             ]
         }
@@ -495,21 +484,18 @@ test_variants = [
                 {
                     'type': 'del',
                     'location': {
-                        'range': {
-                            'start': {
-                                'point': {
-                                    'position': 10,
-                                    'offset': -1
-                                }
-                            },
-                            'end': {
-                                'point': {
-                                    'position': 20,
-                                    'offset': -3
-                                }
-                            }
+                        'type': 'range',
+                        'start': {
+                            'type': 'point',
+                            'position': 10,
+                            'offset': -1
+                        },
+                        'end': {
+                            'type': 'point',
+                            'position': 20,
+                            'offset': -3
                         }
-                    },
+                    }
                 }
             ]
         }
@@ -522,17 +508,14 @@ test_variants = [
                 {
                     'type': 'del',
                     'location': {
-                        'range': {
-                            'start': {
-                                'point': {
-                                    'position': 10,
-                                }
-                            },
-                            'end': {
-                                'point': {
-                                    'position': 15,
-                                }
-                            }
+                        'type': 'range',
+                        'start': {
+                            'type': 'point',
+                            'position': 10
+                        },
+                        'end': {
+                            'type': 'point',
+                            'position': 15
                         }
                     },
                     'deleted': [
@@ -540,7 +523,7 @@ test_variants = [
                             'source': 'description',
                             'length': 5
                         }
-                    ],
+                    ]
                 }
             ]
         }
@@ -552,29 +535,24 @@ test_variants = [
                 {
                     'type': 'del',
                     'location': {
-                        'range': {
+                        'type': 'range',
+                        'start': {
+                            'type': 'range',
                             'start': {
-                                'range': {
-                                    'start': {
-                                        'point': {
-                                            'position': 10,
-                                        }
-                                    },
-                                    'end': {
-                                        'point': {
-                                            'position': 20,
-                                        }
-                                    },
-                                    'uncertain': True
-                                },
+                                'type': 'point',
+                                'position': 10
                             },
                             'end': {
-                                'point': {
-                                    'position': 30,
-                                }
-                            }
+                                'type': 'point',
+                                'position': 20
+                            },
+                            'uncertain': True
+                        },
+                        'end': {
+                            'type': 'point',
+                            'position': 30
                         }
-                    },
+                    }
                 }
             ]
         }
@@ -586,39 +564,32 @@ test_variants = [
                 {
                     'type': 'del',
                     'location': {
-                        'range': {
+                        'type': 'range',
+                        'start': {
+                            'type': 'range',
                             'start': {
-                                'range': {
-                                    'start': {
-                                        'point': {
-                                            'position': 10,
-                                        }
-                                    },
-                                    'end': {
-                                        'point': {
-                                            'position': 20,
-                                        }
-                                    },
-                                    'uncertain': True
-                                },
+                                'type': 'point',
+                                'position': 10
                             },
                             'end': {
-                                'range': {
-                                    'start': {
-                                        'point': {
-                                            'position': 30,
-                                        }
-                                    },
-                                    'end': {
-                                        'point': {
-                                            'position': 40,
-                                        }
-                                    },
-                                    'uncertain': True
-                                },
-                            }
+                                'type': 'point',
+                                'position': 20
+                            },
+                            'uncertain': True
+                        },
+                        'end': {
+                            'type': 'range',
+                            'start': {
+                                'type': 'point',
+                                'position': 30
+                            },
+                            'end': {
+                                'type': 'point',
+                                'position': 40
+                            },
+                            'uncertain': True
                         }
-                    },
+                    }
                 }
             ]
         }
@@ -630,40 +601,33 @@ test_variants = [
                 {
                     'type': 'del',
                     'location': {
-                        'range': {
+                        'type': 'range',
+                        'start': {
+                            'type': 'range',
                             'start': {
-                                'range': {
-                                    'start': {
-                                        'point': {
-                                            'uncertain': True,
-                                        }
-                                    },
-                                    'end': {
-                                        'point': {
-                                            'position': 20,
-                                            'outside_cds': 'upstream',
-                                        }
-                                    },
-                                    'uncertain': True
-                                },
+                                'type': 'point',
+                                'uncertain': True
                             },
                             'end': {
-                                'range': {
-                                    'start': {
-                                        'point': {
-                                            'position': 30,
-                                            'offset': 1,
-                                        }
-                                    },
-                                    'end': {
-                                        'point': {
-                                            'position': 30,
-                                            'offset': -1,
-                                        }
-                                    },
-                                    'uncertain': True
-                                },
-                            }
+                                'type': 'point',
+                                'position': 20,
+                                'outside_cds': 'upstream'
+                            },
+                            'uncertain': True
+                        },
+                        'end': {
+                            'type': 'range',
+                            'start': {
+                                'type': 'point',
+                                'position': 30,
+                                'offset': 1
+                            },
+                            'end': {
+                                'type': 'point',
+                                'position': 30,
+                                'offset': -1
+                            },
+                            'uncertain': True
                         }
                     },
                 }
@@ -677,41 +641,34 @@ test_variants = [
                 {
                     'type': 'del',
                     'location': {
-                        'range': {
+                        'type': 'range',
+                        'start': {
+                            'type': 'range',
+                            'uncertain': True,
                             'start': {
-                                'range': {
-                                    'start': {
-                                        'point': {
-                                            'uncertain': True,
-                                        }
-                                    },
-                                    'end': {
-                                        'point': {
-                                            'position': 1,
-                                            'outside_cds': 'upstream',
-                                        }
-                                    },
-                                    'uncertain': True
-                                },
+                                'type': 'point',
+                                'uncertain': True
                             },
                             'end': {
-                                'range': {
-                                    'start': {
-                                        'point': {
-                                            'position': 1,
-                                            'outside_cds': 'downstream',
-                                        }
-                                    },
-                                    'end': {
-                                        'point': {
-                                            'uncertain': True,
-                                        }
-                                    },
-                                    'uncertain': True
-                                },
+                                'type': 'point',
+                                'position': 1,
+                                'outside_cds': 'upstream'
+                            }
+                        },
+                        'end': {
+                            'type': 'range',
+                            'uncertain': True,
+                            'start': {
+                                'type': 'point',
+                                'position': 1,
+                                'outside_cds': 'downstream'
                             },
+                            'end': {
+                                'type': 'point',
+                                'uncertain': True
+                            }
                         }
-                    },
+                    }
                 }
             ]
         }
@@ -724,9 +681,8 @@ test_variants = [
                 {
                     'type': 'dup',
                     'location': {
-                        'point': {
-                            'position': 10,
-                        }
+                        'type': 'point',
+                        'position': 10
                     },
                 }
             ]
@@ -740,22 +696,20 @@ test_variants = [
                 {
                     'type': 'ins',
                     'location': {
-                        'range': {
-                            'start': {
-                                'point': {
-                                    'position': 11,
-                                }
-                            },
-                            'end': {
-                                'point': {
-                                    'position': 12,
-                                }
-                            }
+                        'type': 'range',
+                        'start': {
+                            'type': 'point',
+                                'position': 11
+                        },
+                        'end': {
+                            'type': 'point',
+                            'position': 12
                         }
                     },
                     'insertions': [
                         {
-                            'sequence': 'T'
+                            'sequence': 'T',
+                            'source': 'description'
                         }
                     ]
                 }
@@ -769,22 +723,20 @@ test_variants = [
                 {
                     'type': 'ins',
                     'location': {
-                        'range': {
-                            'start': {
-                                'point': {
-                                    'position': 11,
-                                }
-                            },
-                            'end': {
-                                'point': {
-                                    'position': 12,
-                                }
-                            }
+                        'type': 'range',
+                        'start': {
+                            'type': 'point',
+                            'position': 11
+                        },
+                        'end': {
+                            'type': 'point',
+                            'position': 12
                         }
                     },
                     'insertions': [
                         {
-                            'sequence': 'T'
+                            'sequence': 'T',
+                            'source': 'description'
                         }
                     ]
                 }
@@ -798,34 +750,31 @@ test_variants = [
                 {
                     'type': 'ins',
                     'location': {
-                        'range': {
-                            'start': {
-                                'point': {
-                                    'position': 11,
-                                }
-                            },
-                            'end': {
-                                'point': {
-                                    'position': 12,
-                                }
-                            }
+                        'type': 'range',
+                        'start': {
+                            'type': 'point',
+                            'position': 11
+                        },
+                        'end': {
+                            'type': 'point',
+                            'position': 12
                         }
                     },
                     'insertions': [
                         {
-                            'sequence': 'T'
+                            'sequence': 'T',
+                            'source': 'description'
                         },
                         {
-                            'range': {
+                            'location': {
+                                'type': 'range',
                                 'start': {
-                                    'point': {
-                                        'position': 10
-                                    }
+                                    'type': 'point',
+                                    'position': 10
                                 },
                                 'end': {
-                                    'point': {
-                                        'position': 20
-                                    }
+                                    'type': 'point',
+                                    'position': 20
                                 }
                             }
                         }
@@ -841,34 +790,31 @@ test_variants = [
                 {
                     'type': 'ins',
                     'location': {
-                        'range': {
-                            'start': {
-                                'point': {
-                                    'position': 11,
-                                }
-                            },
-                            'end': {
-                                'point': {
-                                    'position': 12,
-                                }
-                            }
+                        'type': 'range',
+                        'start': {
+                            'type': 'point',
+                            'position': 11
+                        },
+                        'end': {
+                            'type': 'point',
+                            'position': 12
                         }
                     },
                     'insertions': [
                         {
-                            'sequence': 'T'
+                            'sequence': 'T',
+                            'source': 'description'
                         },
                         {
-                            'range': {
+                            'location': {
+                                'type': 'range',
                                 'start': {
-                                    'point': {
-                                        'position': 10,
-                                    }
+                                    'type': 'point',
+                                    'position': 10
                                 },
                                 'end': {
-                                    'point': {
-                                        'position': 20,
-                                    }
+                                    'type': 'point',
+                                    'position': 20
                                 }
                             },
                             'inverted': True
@@ -885,37 +831,34 @@ test_variants = [
                 {
                     'type': 'ins',
                     'location': {
-                        'range': {
-                            'start': {
-                                'point': {
-                                    'position': 11,
-                                }
-                            },
-                            'end': {
-                                'point': {
-                                    'position': 12,
-                                }
-                            }
+                        'type': 'range',
+                        'start': {
+                            'type': 'point',
+                            'position': 11
+                        },
+                        'end': {
+                            'type': 'point',
+                            'position': 12
                         }
                     },
                     'insertions': [
                         {
-                            'sequence': 'T'
+                            'sequence': 'T',
+                            'source': 'description'
                         },
                         {
-                            'range': {
+                            'location': {
+                                'type': 'range',
                                 'start': {
-                                    'point': {
-                                        'position': 10,
-                                    }
+                                    'type': 'point',
+                                    'position': 10
                                 },
                                 'end': {
-                                    'point': {
-                                        'position': 20,
-                                    }
+                                    'type': 'point',
+                                    'position': 20
                                 }
                             },
-                            'inverted': True,
+                            'inverted': True
                         },
                         {
                             'reference_location': {
@@ -924,18 +867,17 @@ test_variants = [
                                     'version': '1'
                                 },
                                 'coordinate': 'c',
-                                'range': {
+                                'location': {
+                                    'type': 'range',
                                     'start': {
-                                        'point': {
-                                            'position': 100,
-                                        }
+                                        'type': 'point',
+                                        'position': 100
                                     },
                                     'end': {
-                                        'point': {
-                                            'position': 200,
-                                        }
+                                        'type': 'point',
+                                        'position': 200
                                     }
-                                },
+                                }
                             }
                         }
                     ]
@@ -950,17 +892,14 @@ test_variants = [
                 {
                     'type': 'ins',
                     'location': {
-                        'range': {
-                            'start': {
-                                'point': {
-                                    'position': 11,
-                                }
-                            },
-                            'end': {
-                                'point': {
-                                    'position': 12,
-                                }
-                            }
+                        'type': 'range',
+                        'start': {
+                            'type': 'point',
+                            'position': 11
+                        },
+                        'end': {
+                            'type': 'point',
+                            'position': 12
                         }
                     },
                     'insertions': [
@@ -971,18 +910,17 @@ test_variants = [
                                     'version': '1'
                                 },
                                 'coordinate': 'c',
-                                'range': {
+                                'location': {
+                                    'type': 'range',
                                     'start': {
-                                        'point': {
-                                            'position': 100,
-                                        }
+                                        'type': 'point',
+                                        'position': 100
                                     },
                                     'end': {
-                                        'point': {
-                                            'position': 200,
-                                        }
+                                        'type': 'point',
+                                        'position': 200
                                     }
-                                },
+                                }
                             }
                         }
                     ]
@@ -997,17 +935,14 @@ test_variants = [
                 {
                     'type': 'ins',
                     'location': {
-                        'range': {
-                            'start': {
-                                'point': {
-                                    'position': 11,
-                                }
-                            },
-                            'end': {
-                                'point': {
-                                    'position': 12,
-                                }
-                            }
+                        'type': 'range',
+                        'start': {
+                            'type': 'point',
+                            'position': 11
+                        },
+                        'end': {
+                            'type': 'point',
+                            'position': 12
                         }
                     },
                     'insertions': [
@@ -1032,19 +967,16 @@ test_variants = [
                 {
                     'type': 'inv',
                     'location': {
-                        'range': {
-                            'start': {
-                                'point': {
-                                    'position': 11,
-                                }
-                            },
-                            'end': {
-                                'point': {
-                                    'position': 12,
-                                }
-                            }
+                        'type': 'range',
+                        'start': {
+                            'type': 'point',
+                            'position': 11
+                        },
+                        'end': {
+                            'type': 'point',
+                            'position': 12
                         }
-                    },
+                    }
                 }
             ]
         }
@@ -1057,34 +989,30 @@ test_variants = [
                 {
                     'type': 'con',
                     'location': {
-                        'range': {
-                            'start': {
-                                'point': {
-                                    'position': 10,
-                                }
-                            },
-                            'end': {
-                                'point': {
-                                    'position': 20,
+                        'type': 'range',
+                        'start': {
+                            'type': 'point',
+                            'position': 10
+                        },
+                        'end': {
+                            'type': 'point',
+                            'position': 20
+                        }
+                    },
+                    'insertions': [
+                        {
+                            'location': {
+                                'type': 'range',
+                                'start': {
+                                    'type': 'point',
+                                    'position': 30
+                                },
+                                'end': {
+                                    'type': 'point',
+                                    'position': 40
                                 }
                             }
                         }
-                    },
-                    'insertions': [
-                        {
-                            'range': {
-                                'start': {
-                                    'point': {
-                                        'position': 30,
-                                    }
-                                },
-                                'end': {
-                                    'point': {
-                                        'position': 40,
-                                    }
-                                }
-                            },
-                        }
                     ]
                 }
             ]
@@ -1098,34 +1026,13 @@ test_variants = [
                 {
                     'type': 'delins',
                     'location': {
-                        'point': {
-                            'position': 10,
-                        }
+                        'type': 'point',
+                        'position': 10
                     },
                     'insertions': [
                         {
-                            'sequence': 'GA'
-                        }
-                    ]
-                }
-            ]
-        }
-    ),
-    # Deletion-insertions
-    (
-        '10delinsGA',
-        {
-            'variants': [
-                {
-                    'type': 'delins',
-                    'location': {
-                        'point': {
-                            'position': 10,
-                        }
-                    },
-                    'insertions': [
-                        {
-                            'sequence': 'GA'
+                            'sequence': 'GA',
+                            'source': 'description'
                         }
                     ]
                 }
@@ -1139,22 +1046,20 @@ test_variants = [
                 {
                     'type': 'delins',
                     'location': {
-                        'range': {
-                            'start': {
-                                'point': {
-                                    'position': 10,
-                                }
-                            },
-                            'end': {
-                                'point': {
-                                    'position': 20,
-                                }
-                            },
+                        'type': 'range',
+                        'start': {
+                            'type': 'point',
+                            'position': 10
+                        },
+                        'end': {
+                            'type': 'point',
+                            'position': 20
                         }
                     },
                     'insertions': [
                         {
-                            'sequence': 'GA'
+                            'sequence': 'GA',
+                            'source': 'description'
                         }
                     ]
                 }
@@ -1220,9 +1125,8 @@ test_variants = [
                 {
                     'type': 'equal',
                     'location': {
-                        'point': {
-                            'position': 10
-                        }
+                        'type': 'point',
+                        'position': 10
                     }
                 }
             ]
@@ -1235,19 +1139,16 @@ test_variants = [
                 {
                     'type': 'equal',
                     'location': {
-                        'range': {
-                            'start': {
-                                'point': {
-                                    'position': 10,
-                                }
-                            },
-                            'end': {
-                                'point': {
-                                    'position': 20,
-                                }
-                            }
+                        'type': 'range',
+                        'start': {
+                            'type': 'point',
+                            'position': 10
+                        },
+                        'end': {
+                            'type': 'point',
+                            'position': 20
                         }
-                    },
+                    }
                 }
             ]
         }

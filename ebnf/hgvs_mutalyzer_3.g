@@ -63,11 +63,11 @@ delins: location "del" (NT+ | NUMBER)? "ins" insertions
 
 insertions: ("[" inserted (";" inserted)* "]") | inserted
 
-inserted: SEQUENCE | range INVERTED? | reference_location INVERTED?
+inserted: INSERTED_SEQUENCE | (range | reference_location) INVERTED?
 
 INVERTED: "inv"
 
-SEQUENCE: NT+
+INSERTED_SEQUENCE: NT+
 
 inv: range "inv" (NT+ | NUMBER)?
 
@@ -75,11 +75,13 @@ con: range "con" inserted_location
 
 inserted_location: range | reference_location
 
-abrssr: (point | uncertain)  SEQUENCE "(" NUMBER "_" NUMBER ")"
+abrssr: (point | uncertain)  INSERTED_SEQUENCE "(" NUMBER "_" NUMBER ")"
 
 varssr: (point SEQUENCE "[" REPEAT_LENGTH "]")
       | (range "[" REPEAT_LENGTH "]")
       | abrssr
+
+SEQUENCE: NT+
 
 equal: (point | range) "="
 
