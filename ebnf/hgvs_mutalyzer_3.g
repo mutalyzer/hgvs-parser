@@ -18,11 +18,12 @@ VERSION: NUMBER
 
 specific_locus: genbank_locus | LRG_LOCUS
 
-genbank_locus: "(" ((ACCESSION "." VERSION) | GENE_NAME ("_" SELECTOR)?) ")"
+genbank_locus: "(" ((ACCESSION "." VERSION)
+             | GENE_NAME ("_" GENBANK_LOCUS_SELECTOR)?) ")"
 
 GENE_NAME: (LETTER | NUMBER | "-")+
 
-SELECTOR: ("v" | "i") NUMBER
+GENBANK_LOCUS_SELECTOR: ("v" | "i") NUMBER
 
 LRG_LOCUS: ("t" | "p") NUMBER
 
@@ -118,7 +119,7 @@ uncertain_end: point
 
 // Other
 
-reference_location: reference_id specific_locus? (":" (COORDINATE_SYSTEM ".")? range)?
+reference_location: reference (":" (COORDINATE_SYSTEM ".")? range)?
 
 chrom: NAME
 

@@ -10,16 +10,6 @@ class MultipleEntries(Exception):
     pass
 
 
-def update_dict(dictionary, value, key):
-    """
-    Update a dictionary only if value is not None.
-    """
-    if value:
-        dictionary[key] = value
-    if value is False:
-        dictionary[key] = value
-
-
 def parse_tree_to_model(parse_tree):
     """
     Builds the equivalent nested dictionary model from the lark parse tree.
@@ -29,115 +19,7 @@ def parse_tree_to_model(parse_tree):
     """
     tree_model = get_variants(parse_tree)
 
-    return tree_model
-
-
-def get_reference_information(parse_tree):
-    tree_model = {}
-    notes = []
-
-    reference, nts = get_reference(parse_tree)
-    notes.extend(nts)
-
-    specloc, nts = get_specific_locus(parse_tree)
-    notes.extend(nts)
-
-    update_dict(tree_model, reference, 'reference')
-    update_dict(tree_model, specloc, 'specific_locus')
-
-    if reference.get('type') == 'genbank':
-        if specloc.get('type') and specloc.get('type').startswith('lrg'):
-            notes.append('lrg locus provided for genbank reference')
-
-    if reference.get('type') == 'lrg':
-        if specloc.get('type') and not specloc.get('type').startswith('lrg'):
-            notes.append('genbank locus provided for lrg reference')
-
-    coordinate = extract_value(parse_tree, 'coordinate_system', 'COORDINATE')
-    update_dict(tree_model, coordinate, 'coordinate_system')\
-
-    update_dict(tree_model, notes, 'notes')
-
-    return tree_model
-
-
-def get_reference(parse_tree):
-    """
-    Convert the reference information from the parse tree.
-    """
-    reference = {}
-    notes = []
-
-    refid_tree = extract_subtree_child(parse_tree, parent='reference', child='reference_id')
-    if isinstance(refid_tree, Tree):
-        accession = extract_value(refid_tree, 'reference_id', 'ACCESSION')
-        version = extract_value(refid_tree, 'reference_id', 'VERSION')
-
-        if accession and accession.startswith('LRG'):
-            reference['type'] = 'lrg'
-            reference['id'] = accession
-            if version:
-                notes.append('version supplied for LRG reference')
-        else:
-            reference['type'] = 'genbank'
-            reference['accession'] = accession
-        if version:
-            reference['version'] = version
-
-    return reference, notes
-
-
-def get_specific_locus(parse_tree):
-    """
-    Convert the specific locus information from the parse tree.
-    """
-    specific_locus = {}
-    notes = []
-
-    # get the specific locus
-    spec_loc_tree = extract_subtree(parse_tree, 'specific_locus')
-
-    if isinstance(spec_loc_tree, Tree):
-        accession = extract_value(spec_loc_tree, 'genbank_locus', 'ACCESSION')
-        version = extract_value(spec_loc_tree, 'genbank_locus', 'VERSION')
-        gene_name = extract_value(spec_loc_tree, 'genbank_locus', 'GENE_NAME')
-        selector = extract_value(spec_loc_tree, 'genbank_locus', 'SELECTOR')
-        lrglocus = extract_value(spec_loc_tree, 'specific_locus', 'LRG_LOCUS')
-
-        # Accession type, e.g., 'NG_012337.1(NM_012459.2)'
-        if accession:
-            specific_locus['type'] = 'accession'
-            specific_locus['accession'] = accession
-        if version:
-            specific_locus['version'] = version
-
-        # Gene type, e.g., 'NC_012920.1(MT-TL1_i001)'
-        if gene_name:
-            specific_locus['type'] = 'gene'
-            specific_locus['id'] = gene_name
-            if selector:
-                if selector.startswith('_v'):
-                    specific_locus['transcript variant'] = selector[2:]
-                elif selector.startswith('_i'):
-                    specific_locus['protein isoform'] = selector[2:]
-                else:
-                    # The grammar should not allow to reach this step.
-                    notes.append('selector not proper specified')
-
-        # LRG type, e.g., 'LRG_24t1'
-        if lrglocus:
-            if lrglocus.startswith('t'):
-                specific_locus['type'] = 'lrg transcript'
-                specific_locus['transcript variant'] = lrglocus
-            elif lrglocus.startswith('p'):
-                specific_locus['type'] = 'lrg protein'
-                specific_locus['protein isoform'] = lrglocus
-            else:
-                # The grammar should not allow to reach this step.
-                specific_locus['type'] = 'lrg'
-                notes.append('selector not proper specified')
-
-    return specific_locus, notes
+    return tree_model['model']
 
 
 def add_tokens(parent, token_type, token_value):
@@ -182,7 +64,6 @@ def add_tokens(parent, token_type, token_value):
                 {
                     'source': 'description',
                     'length': int(token_value),
-                    # TODO: Check if the int conversion works.
                 }
             ]
         elif token_type == 'INVERTED':
@@ -196,8 +77,12 @@ def add_tokens(parent, token_type, token_value):
                 parent['type'] = 'genbank'
         elif token_type == 'GENE_NAME':
             parent['id'] = token_value
-            parent['type']\
-                = 'gene'
+            parent['type'] = 'gene'
+        elif token_type == 'GENBANK_LOCUS_SELECTOR':
+            if token_value.startswith('v'):
+                parent['transcript_variant'] = token_value[1:]
+            elif token_value.startswith('i'):
+                parent['protein_isoform'] = token_value[1:]
         elif token_type == 'LRG_LOCUS':
             if token_value.startswith('t'):
                 parent['type'] = 'lrg transcript'
@@ -225,7 +110,20 @@ def to_variant_model(parse_tree, model):
         for child_tree in parse_tree.children:
             to_variant_model(child_tree, sub_model)
         if isinstance(model, dict):
-            if parse_tree.data in ['point', 'range']:
+            if parse_tree.data == 'description':
+                model['model'] = sub_model
+            # Reference
+            elif parse_tree.data == 'reference_id':
+                model['reference'] = sub_model
+            elif parse_tree.data == 'specific_locus':
+                if sub_model.get('genbank_locus'):
+                    model['specific_locus'] = sub_model['genbank_locus']
+                else:
+                    model['specific_locus'] = sub_model
+            elif parse_tree.data == 'reference':
+                model.update(sub_model)
+            # Locations
+            elif parse_tree.data in ['point', 'range']:
                 sub_model['type'] = parse_tree.data
                 model['location'] = sub_model
             elif parse_tree.data == 'uncertain':
@@ -240,15 +138,7 @@ def to_variant_model(parse_tree, model):
                 model['end'] = sub_model['location']
             elif parse_tree.data == 'inserted_location':
                 model['insertions'] = [sub_model]
-            elif parse_tree.data == 'reference_id':
-                model['reference'] = sub_model
-            elif parse_tree.data == 'specific_locus':
-                if sub_model.get('genbank_locus'):
-                    model['specific_locus'] = sub_model['genbank_locus']
-                else:
-                    model['specific_locus'] = sub_model
-            elif parse_tree.data == 'reference':
-                model.update(sub_model)
+            # Variant type
             elif parse_tree.data in ['substitution', 'del', 'dup', 'ins',
                                      'inv', 'con', 'delins', 'equal']:
                 model['type'] = parse_tree.data

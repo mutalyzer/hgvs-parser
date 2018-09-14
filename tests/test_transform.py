@@ -5,13 +5,13 @@ Checking the lark tree transformation.
 import pytest
 
 from hgvsparser.hgvs_parser import HgvsParser
-from hgvsparser.to_model import parse_tree_to_model, get_variants, get_reference_information
+from hgvsparser.to_model import parse_tree_to_model, get_variants
 
 
 test_cases = [
     # No specific locus
     # - genbank reference with no version
-    (            # print("parse_tree")
+    (
 
         'NC_000001', {
             'reference': {
@@ -99,7 +99,7 @@ test_cases = [
             'specific_locus': {
                 'type': 'gene',
                 'id': 'SDHD',
-                'transcript variant': '001',
+                'transcript_variant': '001',
             }
         }
     ),
@@ -112,7 +112,7 @@ test_cases = [
             'specific_locus': {
                 'type': 'gene',
                 'id': 'SDHD',
-                'protein isoform': '001',
+                'protein_isoform': '001',
             }
         }
     ),
@@ -126,7 +126,7 @@ test_cases = [
             'specific_locus': {
                 'type': 'gene',
                 'id': 'TIMM8B',
-                'transcript variant': '001'
+                'transcript_variant': '001'
             }
         }
     ),
@@ -140,7 +140,7 @@ test_cases = [
             'specific_locus': {
                 'type': 'gene',
                 'id': 'TIMM8B',
-                'protein isoform': '001'
+                'protein_isoform': '001'
             }
         }
     ),
@@ -154,7 +154,7 @@ test_cases = [
             'specific_locus': {
                 'type': 'gene',
                 'id': 'MT-TL1',
-                'transcript variant': '001',
+                'transcript_variant': '001',
             }
         }
     ),
@@ -168,7 +168,7 @@ test_cases = [
             'specific_locus': {
                 'type': 'gene',
                 'id': 'MT-TL1',
-                'protein isoform': '001',
+                'protein_isoform': '001',
             }
         }
     ),
