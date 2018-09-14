@@ -145,5 +145,7 @@ def point_to_description(point):
     else:
         position = str(point.get('position'))
     if point.get('offset'):
-        offset = str(point.get('offset'))
+        offset = '%+d' % point.get('offset')
+    if point.get('uncertain_offset'):
+        offset = point.get('uncertain_offset')
     return '%s%s%s' %(outside_cds, position, offset)

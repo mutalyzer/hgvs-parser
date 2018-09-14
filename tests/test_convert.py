@@ -8,7 +8,7 @@ from hgvsparser.hgvs_parser import HgvsParser
 from hgvsparser.to_model import parse_tree_to_model
 
 
-test_cases = [
+REFERENCES = [
     # No specific locus
     # - genbank reference with no version
     (
@@ -253,17 +253,17 @@ test_cases = [
 ]
 
 
-@pytest.mark.parametrize('description,model', test_cases)
+@pytest.mark.parametrize('description,model', REFERENCES)
 def test_reference_part(description, model):
     """
-
+    Test the reference part of a description.
     """
     parser = HgvsParser(start_rule='reference')
 
     assert parse_tree_to_model(parser.parse(description)) == model
 
 
-test_variants = [
+VARIANTS = [
     # Substitutions
     (
         '100C>A',
@@ -669,6 +669,47 @@ test_variants = [
             ]
         }
     ),
+    (
+        '(?_-1+?)_(*1-?_?)del',
+        {
+            'variants': [
+                {
+                    'type': 'del',
+                    'location': {
+                        'type': 'range',
+                        'start': {
+                            'type': 'range',
+                            'uncertain': True,
+                            'start': {
+                                'type': 'point',
+                                'uncertain': True
+                            },
+                            'end': {
+                                'type': 'point',
+                                'position': 1,
+                                'outside_cds': 'upstream',
+                                'uncertain_offset': '+?'
+                            }
+                        },
+                        'end': {
+                            'type': 'range',
+                            'uncertain': True,
+                            'start': {
+                                'type': 'point',
+                                'position': 1,
+                                'outside_cds': 'downstream',
+                                'uncertain_offset': '-?'
+                            },
+                            'end': {
+                                'type': 'point',
+                                'uncertain': True
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    ),
     # Duplications
     (
         '10dup',
@@ -695,7 +736,7 @@ test_variants = [
                         'type': 'range',
                         'start': {
                             'type': 'point',
-                                'position': 11
+                            'position': 11
                         },
                         'end': {
                             'type': 'point',
@@ -1152,11 +1193,104 @@ test_variants = [
             ]
         }
     ),
+    # Multiple variants (allele)
+    (
+        '[10=;11_12ins[T;10_20inv;NM_000001.1:c.100_200];10_20delinsGA]',
+        {
+            'variants': [
+                {
+                    'type': 'equal',
+                    'location': {
+                        'type': 'point',
+                        'position': 10
+                    }
+                },
+                {
+                    'type': 'ins',
+                    'location': {
+                        'type': 'range',
+                        'start': {
+                            'type': 'point',
+                            'position': 11
+                        },
+                        'end': {
+                            'type': 'point',
+                            'position': 12
+                        }
+                    },
+                    'insertions': [
+                        {
+                            'sequence': 'T',
+                            'source': 'description'
+                        },
+                        {
+                            'location': {
+                                'type': 'range',
+                                'start': {
+                                    'type': 'point',
+                                    'position': 10
+                                },
+                                'end': {
+                                    'type': 'point',
+                                    'position': 20
+                                }
+                            },
+                            'inverted': True
+                        },
+                        {
+                            'reference_location': {
+                                'reference': {
+                                    'accession': 'NM_000001',
+                                    'version': '1',
+                                    'type': 'genbank'
+                                },
+                                'coordinate_system': 'c',
+                                'location': {
+                                    'type': 'range',
+                                    'start': {
+                                        'type': 'point',
+                                        'position': 100
+                                    },
+                                    'end': {
+                                        'type': 'point',
+                                        'position': 200
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    'type': 'delins',
+                    'location': {
+                        'type': 'range',
+                        'start': {
+                            'type': 'point',
+                            'position': 10
+                        },
+                        'end': {
+                            'type': 'point',
+                            'position': 20
+                        }
+                    },
+                    'insertions': [
+                        {
+                            'sequence': 'GA',
+                            'source': 'description'
+                        }
+                    ]
+                }
+            ]
+        }
+    )
 ]
 
 
-@pytest.mark.parametrize('description,model', test_variants)
+@pytest.mark.parametrize('description,model', VARIANTS)
 def test_variants(description, model):
+    """
+    Test the variants part of a description.
+    """
     parser = HgvsParser(start_rule='variants')
-    assert parse_tree_to_model(parser.parse(description)) == model
 
+    assert parse_tree_to_model(parser.parse(description)) == model
