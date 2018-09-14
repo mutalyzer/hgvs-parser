@@ -48,17 +48,17 @@ def specific_locus_to_description(specific_locus):
             return '(%s.%s)' % (specific_locus['accession'],
                                 specific_locus['version'])
         elif specific_locus.get('type') == 'gene':
-            if specific_locus.get('transcript variant'):
-                selector = '_v%s' % specific_locus.get('transcript variant')
-            elif specific_locus.get('protein isoform'):
-                selector = '_i%s' % specific_locus.get('protein isoform')
+            if specific_locus.get('transcript_variant'):
+                selector = '_v%s' % specific_locus.get('transcript_variant')
+            elif specific_locus.get('protein_isoform'):
+                selector = '_i%s' % specific_locus.get('protein_isoform')
             else:
                 selector = ''
             return '(%s%s)' % (specific_locus.get('id'), selector)
         elif specific_locus.get('type') == 'lrg transcript':
-            return specific_locus.get('transcript variant')
+            return specific_locus.get('transcript_variant')
         elif specific_locus.get('type') == 'lrg protein':
-            return specific_locus.get('protein isoform')
+            return specific_locus.get('protein_isoform')
     else:
         return ''
 
@@ -85,7 +85,13 @@ def variant_to_description(variant):
         location = location_to_description(variant.get('location'))
     if variant.get('insertions'):
         insertions = insertions_to_description(variant['insertions'])
-    return '%s%s%s' %(location, variant.get('type'), insertions)
+    variant_type = variant.get('type')
+    if variant_type == 'substitution':
+        location += variant['deleted'][0]['sequence']
+        variant_type = '>'
+    elif variant_type == 'equal':
+        variant_type = '='
+    return '%s%s%s' %(location, variant_type, insertions)
 
 
 def insertions_to_description(insertions):

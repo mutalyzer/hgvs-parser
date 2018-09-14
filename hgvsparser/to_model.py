@@ -92,7 +92,7 @@ def add_token(parent, token_type, token_value):
             if token_value == '-':
                 parent['outside_cds'] = 'upstream'
         elif token_type in ['INSERTED']:
-            parent['inserted'] = [
+            parent['insertions'] = [
                 {
                     'source': 'description',
                     'sequence': token_value,

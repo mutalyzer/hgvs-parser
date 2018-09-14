@@ -275,7 +275,7 @@ VARIANTS = [
                         'type': 'point',
                         'position': 100
                     },
-                    'inserted': [
+                    'insertions': [
                         {
                             'sequence': 'A',
                             'source': 'description'
@@ -302,7 +302,7 @@ VARIANTS = [
                         'position': 100,
                         'offset': 3
                     },
-                    'inserted': [
+                    'insertions': [
                         {
                             'sequence': 'A',
                             'source': 'description'
@@ -329,7 +329,7 @@ VARIANTS = [
                         'position': 100,
                         'outside_cds': 'downstream'
                     },
-                    'inserted': [
+                    'insertions': [
                         {
                             'sequence': 'A',
                             'source': 'description'
@@ -357,7 +357,7 @@ VARIANTS = [
                         'offset': -3,
                         'outside_cds': 'downstream'
                     },
-                    'inserted': [
+                    'insertions': [
                         {
                             'sequence': 'A',
                             'source': 'description'
@@ -385,7 +385,7 @@ VARIANTS = [
                         'offset': 3,
                         'outside_cds': 'upstream'
                     },
-                    'inserted': [
+                    'insertions': [
                         {
                             'sequence': 'A',
                             'source': 'description'
