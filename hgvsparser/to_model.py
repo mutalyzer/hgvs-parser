@@ -81,7 +81,6 @@ def add_token(parent, token_type, token_value):
             else:
                 parent['uncertain'] = True
         elif token_type == 'OFFSET':
-            print(token_value)
             if '?' in token_value:
                 parent['uncertain_offset'] = token_value
             else:
