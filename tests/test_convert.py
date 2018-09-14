@@ -1,11 +1,11 @@
 """
-Checking the lark tree transformation.
+Tests for the lark tree to dictionary converter.
 """
 
 import pytest
 
 from hgvsparser.hgvs_parser import HgvsParser
-from hgvsparser.to_model import parse_tree_to_model, get_variants
+from hgvsparser.to_model import parse_tree_to_model
 
 
 test_cases = [
@@ -47,7 +47,6 @@ test_cases = [
                 'id': 'LRG_1',
                 'version': '1',
             },
-            # 'notes': ['version supplied for LRG reference']
         }
     ),
     # Specific locus present
@@ -224,7 +223,6 @@ test_cases = [
                 'type': 'lrg transcript',
                 'transcript_variant': 't1',
             },
-            # 'notes': ['lrg locus provided for genbank reference']
         }
     ),
     (
@@ -238,7 +236,6 @@ test_cases = [
                 'type': 'lrg protein',
                 'protein_isoform': 'p1',
             },
-            # 'notes': ['lrg locus provided for genbank reference']
         }
     ),
     (
@@ -251,7 +248,6 @@ test_cases = [
                 'type': 'gene',
                 'id': 'SDHD',
             },
-            # 'notes': ['genbank locus provided for lrg reference']
         }
     ),
 ]
@@ -262,9 +258,9 @@ def test_reference_part(description, model):
     """
 
     """
-    parser = HgvsParser(grammar_path='ebnf/hgvs_mutalyzer_3.g', start_rule='reference')
+    parser = HgvsParser(start_rule='reference')
 
-    assert get_variants(parser.parse(description)) == model
+    assert parse_tree_to_model(parser.parse(description)) == model
 
 
 test_variants = [
@@ -1161,7 +1157,6 @@ test_variants = [
 
 @pytest.mark.parametrize('description,model', test_variants)
 def test_variants(description, model):
-    parser = HgvsParser(grammar_path='ebnf/hgvs_mutalyzer_3.g', start_rule='variants')
-
-    assert get_variants(parser.parse(description)) == model
+    parser = HgvsParser(start_rule='variants')
+    assert parse_tree_to_model(parser.parse(description)) == model
 

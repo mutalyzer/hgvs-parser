@@ -78,12 +78,12 @@ def test_references_with_specific_segments(parser, description):
 
 
 @pytest.mark.parametrize('description', [
-    'NM_002001.2:c.[12del]',
-    'NM_002001.2:c.[(12del)]',
-    'NM_002001.2:c.[(12del)?]',
-    'NM_002001.2:c.[(12del);(12del)]',
-    'NM_002001.2:c.[(12del;12del)]',
-    'NM_002001.2:c.[((12del)?;12del)?]',
+    'NM_002001.2:c.[12del;10_11insA]',
+    # 'NM_002001.2:c.[(12del)]',
+    # 'NM_002001.2:c.[(12del)?]',
+    # 'NM_002001.2:c.[(12del);(12del)]',
+    # 'NM_002001.2:c.[(12del;12del)]',
+    # 'NM_002001.2:c.[((12del)?;12del)?]',
 ])
 def test_alleles(parser, description):
     """
@@ -136,80 +136,3 @@ def test_parse_compound_delins(parser, description):
     Parse compound deletion-insertions.
     """
     parser(description)
-
-
-@pytest.mark.parametrize('description', [
-    'NG_009105.1(OPN1LW):p.=',
-    'NG_009105.1(OPN1LW):p.?',
-    'NM_000076.2(CDKN1C):p.0',
-    'NM_000076.2(CDKN1C):p.0?',
-    'NG_009105.1(OPN1LW):p.(=)',
-    'NM_000076.2(CDKN1C):p.(Ala123del)',
-    'NM_000076.2(CDKN1C):p.(Ala123_Leu126del)',
-    'NM_000076.2(CDKN1C):p.(Ala123_Leu126delinsVal)',
-    'NM_000076.2(CDKN1C):p.Ala123del',
-    'NM_000076.2(CDKN1C):p.Ala*123del',
-    'NM_000076.2(CDKN1C):p.Ala123_Leu126del',
-    'NM_000076.2(CDKN1C):p.Ala123_Leu126delinsVal',
-    'NM_000076.2(CDKN1C):p.Ala123_*317delinsVal',
-    'NM_000076.2(CDKN1C):p.Ala123_X317delinsVal',
-    'NM_000076.2(CDKN1C):p.Ala123delinsVal',
-    'NM_000076.2(CDKN1C):p.Ala123delinsValPro',
-    'NM_000076.2(CDKN1C):p.Ala123delinsVP',
-    'NM_000076.2(CDKN1C):p.Ala123fs',
-    'NM_000076.2(CDKN1C_i001):p.(Glu124Serfs*148)',
-    'NM_000076.2(CDKN1C_i001):p.(Glu124SerfsX148)',
-    'NM_000076.2(CDKN1C_i001):p.(E124Sfs*148)',
-    'NM_000076.2(CDKN1C_i001):p.(E124SfsX148)',
-    'NG_009105.1(OPN1LW):p.Met1Leu',
-    'NP_064445.1(OPN1LW):p.Met1?',
-    'NP_064445.1(OPN1LW):p.M1?',
-    'NP_064445.1:p.Gln16del',
-    'NP_064445.1:p.Gln16dup',
-    'NP_064445.1:p.Gln3del',
-    'NP_064445.1:p.Q16del',
-    'NP_064445.1:p.Q16dup',
-    'NP_064445.1:p.Q16*',
-    'NP_064445.1:p.Q16X',
-    'NG_009105.1:p.Gln3Leu',
-    'NG_009105.1(OPN1LW):p.Gln3Leu',
-    'NG_009105.1(OPN1LW_i1):p.Gln3Leu',
-    'NG_009105.1(OPN1LW_v1):p.Gln3Leu',
-    'NG_009105.1(OPN1LW):p.Gln3_Gln4insLeu',
-    'NG_009105.1(OPN1LW):p.Gln3_Gln4insGln',
-    'NG_009105.1(OPN1LW):p.Gln3_Gln4dup',
-    'NG_009105.1(OPN1LW):p.Q3_Q4insQ',
-    'NG_009105.1(OPN1LW):p.Q3_Q4insQQ',
-    'NG_009105.1(OPN1LW):p.Q3_Q4dup',
-    'NG_009105.1(OPN1LW):p.Gln3_Leu7del',
-    'NG_009105.1(OPN1LW):p.Gln3_Leu7delinsValLeu',
-    'NG_009105.1(OPN1LW):p.Gln3_Leu7delinsValPro',
-    'NG_009105.1(OPN1LW):p.Gln3_Leu7delinsGlnGlnTrpSerLeu',
-    'NG_009105.1(OPN1LW):p.Q3_L7delinsGlnGlnTrpSerLeu',
-    'NG_009105.1(OPN1LW):p.Gln3_Leu7delinsQQWSL',
-    # 'NG_009105.1(OPN1LW):p.Met1AlaextMet-1',
-    # 'NG_009105.1(OPN1LW):p.M1AextM-1',
-    # 'NG_009105.1(OPN1LW):p.Gln3_Leu7[3]',
-    'NG_009105.1(OPN1LW):p.Gln3_Leu7(1_6)',
-    'NG_009105.1(OPN1LW):p.Gln3Leu',
-    'NG_009105.1(OPN1LW):p.Gln3Leu',
-    # 'NM_000076.2(CDKN1C_i001):p.(*317Trpext*3)',
-    'NM_000076.2(CDKN1C_i001):p.(*317TrpextX3)',
-    # 'NM_000076.2(CDKN1C_i001):p.(*317Cysext*1)',
-    'NM_000076.2(CDKN1C_i001):p.(*317CysextX1)',
-    # 'NM_000076.2(CDKN1C_i001):p.(*317Cext*1)',
-    'NM_000076.2(CDKN1C_i001):p.(*317CextX1)',
-    # 't(X;17)(DMD:p.Met1_Val1506; SGCA:p.Val250_*387)'
-])
-def test_parse_protein_variants(parser, description):
-    """
-    Parse protein variants.
-    """
-    parser(description)
-
-
-def test_parse_minus_in_gene_symbol(parser):
-    """
-    Gene symbol is allowed to contain a minus character.
-    """
-    parser('UD_132464528477(KRTAP2-4_v001):c.100del')

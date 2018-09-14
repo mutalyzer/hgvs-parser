@@ -13,10 +13,10 @@ class HgvsParser:
     """
 
     def __init__(self, parser_type='lark', grammar_path='local',
-                 start_rule='var'):
+                 start_rule='description'):
         if grammar_path == 'local':
             self._grammar_path = os.path.join(os.path.dirname(__file__),
-                                              '../ebnf/hgvs_mutalyzer.g')
+                                              '../ebnf/hgvs_mutalyzer_3.g')
         else:
             self._grammar_path = grammar_path
         self._parser_type = parser_type
@@ -37,7 +37,6 @@ class HgvsParser:
         try:
             parser = Lark(grammar, parser='earley',
                           start=self._start_rule, ambiguity='resolve')
-            # parser = Lark(grammar, parser='lalr', start='var', lexer="contextual")
         except Exception as exc:
             print('Lark parser not generated from the \'%s\' grammar file.'
                   % self._grammar_path)
@@ -86,5 +85,5 @@ class HgvsParser:
             print("  Ambiguity: %s" % self._parser.options.ambiguity)
             print("  Start: %s" % self._parser.options.start)
             print("  Tree class: %s" % self._parser.options.tree_class)
-            print("  Propagate positions: %s" % self._parser.options.propagate_positions)
-
+            print("  Propagate positions: %s" %
+                  self._parser.options.propagate_positions)

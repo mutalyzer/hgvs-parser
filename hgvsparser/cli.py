@@ -14,27 +14,30 @@ from lark.tree import pydot__tree_to_png
 
 
 def pyparsing_parser(description):
-    print(description)
+    """
+    Pyparsing based parser previously used in Mutalyzer.
+    """
     parser = HgvsParser(parser_type='pyparsing')
     parser.status()
     parse_tree = parser.parse(description)
     if parse_tree is not None:
         print("Successful parsing.")
         print(parse_tree.dump())
-
     else:
         print("Parse error.")
 
 
-def hgvs_parser(description, transform_to_model, save_png, grammar_file, start_rule):
+def hgvs_parser(description, convert_to_model, save_png,
+                grammar_file, start_rule):
     """
     Parse the HGVS description.
 
-    :param save_png:
-    :param transform_to_model:
-    :param description: HGVS description
+    :param description: HGVS description.
+    :param grammar_file: Path towards grammar file.
+    :param start_rule: Root rule for the grammar.
+    :param save_png: Save parse tree as png.
+    :param convert_to_model:
     """
-    print(description)
     if grammar_file:
         parser = HgvsParser(grammar_path=grammar_file, start_rule=start_rule)
     else:
@@ -46,15 +49,13 @@ def hgvs_parser(description, transform_to_model, save_png, grammar_file, start_r
         print(e)
     else:
         if parse_tree is not None:
-            # print("Successful parsing.")
-            if transform_to_model:
-                # try:
-                    model = parse_tree_to_model(parse_tree)
-                    print(json.dumps(model, indent=2))
-                    print(model_to_description(model))
-                # except Exception as e:
-                #     print("Transform error: \n %s\n" % str(e))
-
+            print('\nSuccessfully parsed HGVS description:\n %s' % description)
+            if convert_to_model:
+                model = parse_tree_to_model(parse_tree)
+                print('\nEquivalent model:')
+                print(json.dumps(model['model'], indent=2))
+                print("\nEquivalent model description:\n %s" %
+                      model_to_description(model['model']))
             if save_png:
                 pydot__tree_to_png(parse_tree, 'test.png')
                 print("image saved to test.png")
@@ -72,11 +73,12 @@ def main():
 
     parser.add_argument('-v', action='version', version=version(parser.prog))
 
-    parser.add_argument('description', help="HGVS variant description to be parsed")
+    parser.add_argument('description',
+                        help="HGVS variant description to be parsed")
 
     parser.add_argument('-p',
                         required=False, action='store_true',
-                        help='use the pyparsing parser instead of the Lark one')
+                        help='use the pyparsing parser')
 
     parser.add_argument('-g',
                         required=False,
