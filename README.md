@@ -111,7 +111,7 @@ Model check summary:
 }
 ```
 
-## Parsing error
+## Parsing errors
 
 
 ```console
@@ -122,7 +122,33 @@ Error occured during parsing:
 NM_00000:.-1+3C>A
          ^
 
-Expecting: {Terminal('OUTSIDE_CDS'), Terminal('POSITION'), Terminal('LSQB'), Terminal('COORDINATE_SYSTEM'), Terminal('LPAR')}
+Expecting: {
+             Terminal('OUTSIDE_CDS'),
+             Terminal('POSITION'),
+             Terminal('LSQB'),
+             Terminal('COORDINATE_SYSTEM'),
+             Terminal('LPAR')
+           }
+```
+
+```console
+hgvsparser "NM_00000t1:g.100_200A>G" -t -c
+Error occured during parsing:
+ No terminal defined for 'A' at line 1 col 21
+
+NM_00000t1:g.100_200A>G
+                    ^
+
+Expecting: {
+             Terminal('DUP'),
+             Terminal('OFFSET'),
+             Terminal('LSQB'),
+             Terminal('EQUAL'),
+             Terminal('CON'),
+             Terminal('DEL'),
+             Terminal('INS'),
+             Terminal('INVERTED')
+           }
 ```
 
 # Testing
