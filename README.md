@@ -22,7 +22,7 @@ separate file.
 # Usage
 ```console
 $ hgvsparser -h
-usage: hgvsparser [-h] [-v] [-t] [-g G] [-r R] [-s S] [-p] description
+usage: hgvsparser [-h] [-v] [-c] [-g G] [-r R] [-s S] [-p] description
 
 hgvsparser: Parser for HGVS variant descriptions.
 
