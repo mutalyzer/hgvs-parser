@@ -58,7 +58,7 @@ DUPLICATED_LENGTH: NUMBER
 
 ins: range "ins" insertions
 
-delins: location "del" (NT+ | NUMBER)? "ins" insertions
+delins: location "del" (DELETED_SEQUENCE | DELETED_LENGTH)? "ins" insertions
 
 insertions: ("[" inserted (";" inserted)* "]") | inserted
 

@@ -1106,6 +1106,65 @@ VARIANTS = [
             ]
         }
     ),
+    (
+        '10_20del10insGA',
+        {
+            'variants': [
+                {
+                    'type': 'delins',
+                    'location': {
+                        'type': 'range',
+                        'start': {
+                            'type': 'point',
+                            'position': 10
+                        },
+                        'end': {
+                            'type': 'point',
+                            'position': 20
+                        }
+                    },
+                    'deleted': [
+                        {
+                            'length': 10,
+                            'source': 'description'
+                        }
+                    ],
+                    'insertions': [
+                        {
+                            'sequence': 'GA',
+                            'source': 'description'
+                        }
+                    ]
+                }
+            ]
+        }
+    ),
+    (
+        '10delAinsGA',
+        {
+            'variants': [
+                {
+                    'type': 'delins',
+                    'location': {
+                        'type': 'point',
+                        'position': 10
+                    },
+                    'deleted': [
+                        {
+                            'sequence': 'A',
+                            'source': 'description'
+                        }
+                    ],
+                    'insertions': [
+                        {
+                            'sequence': 'GA',
+                            'source': 'description'
+                        }
+                    ]
+                }
+            ]
+        }
+    ),
     # Repeats
     # (
     #     '10GA[20]',
