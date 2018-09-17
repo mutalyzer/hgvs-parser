@@ -9,8 +9,6 @@ from . import usage, version
 from hgvsparser.hgvs_parser import HgvsParser
 from lark import ParseError
 from hgvsparser.to_model import parse_tree_to_model
-from hgvsparser.to_description import model_to_description
-from hgvsparser.checks import check
 from lark.tree import pydot__tree_to_png
 
 
@@ -28,9 +26,8 @@ def pyparsing_parser(description):
         print("Parse error.")
 
 
-def hgvs_parser(description, convert_to_model, check_model,
-                save_png,
-                grammar_file, start_rule):
+def hgvs_parser(description, convert_to_model,
+                grammar_file, start_rule, save_png):
     """
     Parse the HGVS description.
 
@@ -44,25 +41,23 @@ def hgvs_parser(description, convert_to_model, check_model,
         parser = HgvsParser(grammar_path=grammar_file, start_rule=start_rule)
     else:
         parser = HgvsParser()
-    # parser.status()
     try:
         parse_tree = parser.parse(description)
     except ParseError as e:
         print(e)
     else:
         if parse_tree is not None:
-            print('\nSuccessfully parsed HGVS description:\n %s' % description)
             if convert_to_model:
                 model = parse_tree_to_model(parse_tree)
-                print('\nEquivalent model:')
                 print(json.dumps(model['model'], indent=2))
-                print("\nEquivalent model description:\n %s" %
-                      model_to_description(model['model']))
-                if check_model:
-                    check(model['model'])
-            if save_png:
-                pydot__tree_to_png(parse_tree, 'test.png')
-                print("image saved to test.png")
+                if save_png:
+                    pydot__tree_to_png(parse_tree, save_png)
+            else:
+                print('Successfully parsed HGVS description:\n %s' %
+                      description)
+                if save_png:
+                    pydot__tree_to_png(parse_tree, save_png)
+                    print('Parse tree image saved to:\n %s ' % save_png)
 
 
 def main():
@@ -78,13 +73,9 @@ def main():
     parser.add_argument('description',
                         help="HGVS variant description to be parsed")
 
-    parser.add_argument('-t',
-                        required=False, action='store_true',
-                        help='transform to model')
-
     parser.add_argument('-c',
                         required=False, action='store_true',
-                        help='check model')
+                        help='convert parse tree to model')
 
     parser.add_argument('-g',
                         required=False,
@@ -108,8 +99,7 @@ def main():
         pyparsing_parser(args.description)
     else:
         hgvs_parser(description=args.description,
-                    convert_to_model=args.t,
-                    check_model=args.c,
+                    convert_to_model=args.c,
                     save_png=args.s,
                     grammar_file=args.g,
                     start_rule=args.r)

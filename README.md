@@ -22,7 +22,7 @@ separate file.
 # Usage
 ```console
 $ hgvsparser -h
-usage: hgvsparser [-h] [-v] [-t] [-c] [-g G] [-r R] [-s S] [-p] description
+usage: hgvsparser [-h] [-v] [-t] [-g G] [-r R] [-s S] [-p] description
 
 hgvsparser: Parser for HGVS variant descriptions.
 
@@ -32,8 +32,7 @@ positional arguments:
 optional arguments:
   -h, --help   show this help message and exit
   -v           show program's version number and exit
-  -t           transform to model
-  -c           check model
+  -c           convert parse tree to model
   -g G         path to input grammar file
   -r R         start (top) rule for the grammar
   -s S         save parse tree as image
@@ -132,7 +131,7 @@ Expecting: {
 ```
 
 ```console
-hgvsparser "NM_00000t1:g.100_200A>G" -t -c
+$ hgvsparser "NM_00000t1:g.100_200A>G" -t -c
 Error occured during parsing:
  No terminal defined for 'A' at line 1 col 21
 
