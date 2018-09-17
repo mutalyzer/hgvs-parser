@@ -3,7 +3,7 @@ hgvsparser: Parser for HGVS variant descriptions.
 
 
 Copyright (c) 2018 Leiden University Medical Center <humgen@lumc.nl>
-Copyright (c) 2017 Mihai Lefter <m.lefter@lumc.nl>
+Copyright (c) 2018 Mihai Lefter <m.lefter@lumc.nl>
 
 
 ...

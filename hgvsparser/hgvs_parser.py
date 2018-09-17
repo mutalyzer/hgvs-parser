@@ -68,7 +68,7 @@ class HgvsParser:
         try:
             parse_tree = self._parser.parse(description)
         except Exception as exc:
-            print('Exception occured during parsing\n', str(exc))
+            print('Error occured during parsing:\n', str(exc))
         return parse_tree
 
     def status(self):

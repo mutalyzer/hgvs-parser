@@ -63,8 +63,6 @@ def hgvs_parser(description, convert_to_model, check_model,
             if save_png:
                 pydot__tree_to_png(parse_tree, 'test.png')
                 print("image saved to test.png")
-        else:
-            print("Parse error.")
 
 
 def main():
@@ -80,14 +78,6 @@ def main():
     parser.add_argument('description',
                         help="HGVS variant description to be parsed")
 
-    parser.add_argument('-p',
-                        required=False, action='store_true',
-                        help='use the pyparsing parser')
-
-    parser.add_argument('-g',
-                        required=False,
-                        help='path to grammar file')
-
     parser.add_argument('-t',
                         required=False, action='store_true',
                         help='transform to model')
@@ -96,13 +86,21 @@ def main():
                         required=False, action='store_true',
                         help='check model')
 
-    parser.add_argument('-s',
-                        required=False, action='store_true',
-                        help='save graph as "temp.png"')
+    parser.add_argument('-g',
+                        required=False,
+                        help='path to input grammar file')
 
     parser.add_argument('-r',
                         required=False,
-                        help='rule to start for the grammar')
+                        help='start (top) rule for the grammar')
+
+    parser.add_argument('-s',
+                        required=False,
+                        help='save parse tree as image')
+
+    parser.add_argument('-p',
+                        required=False, action='store_true',
+                        help='use the pyparsing parser')
 
     args = parser.parse_args()
 
