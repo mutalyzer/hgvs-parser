@@ -4,8 +4,9 @@ Module to parse HGVS variant descriptions.
 
 import os
 from lark import Lark
+from lark.exceptions import UnexpectedCharacters
 from hgvsparser.pyparsing_based_parser import PyparsingParser
-
+from hgvsparser.exceptions import exception_handler
 
 class HgvsParser:
     """
@@ -67,9 +68,13 @@ class HgvsParser:
             print('No parsing defined')
         try:
             parse_tree = self._parser.parse(description)
-        except Exception as exc:
-            print('Error occured during parsing:\n', str(exc))
+        except UnexpectedCharacters as exception:
+            exception_handler(exception, self._parser, description)
+        except Exception as exception:
+            print(exception)
+
         return parse_tree
+
 
     def status(self):
         """

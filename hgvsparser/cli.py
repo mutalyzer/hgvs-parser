@@ -7,8 +7,8 @@ import json
 
 from . import usage, version
 from hgvsparser.hgvs_parser import HgvsParser
-from lark import ParseError
 from hgvsparser.to_model import parse_tree_to_model
+from lark import ParseError
 from lark.tree import pydot__tree_to_png
 
 
