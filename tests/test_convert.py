@@ -12,7 +12,6 @@ REFERENCES = [
     # No specific locus
     # - genbank reference with no version
     (
-
         'NC_000001', {
             'reference': {
                 'type': 'genbank',
