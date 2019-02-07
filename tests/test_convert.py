@@ -1217,6 +1217,16 @@ VARIANTS = [
     # No changes (equal)
     # TODO: Should we enforce exact positions for the range?
     (
+        '=',
+        {
+            'variants': [
+                {
+                    'type': 'equal',
+                }
+            ]
+        }
+    ),
+    (
         '10=',
         {
             'variants': [
