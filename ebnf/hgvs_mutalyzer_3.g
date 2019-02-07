@@ -82,7 +82,7 @@ varssr: (point SEQUENCE "[" REPEAT_LENGTH "]")
 
 SEQUENCE: NT+
 
-equal: (point | range) "="
+equal: (point | range)? "="
 
 REPEAT_LENGTH: NUMBER
 
