@@ -34,7 +34,9 @@ COORDINATE_SYSTEM: ("c" | "g" | "m" | "n" | "r")
 // Variants
 // --------
 
-variants: (variant | "[" variant (";" variant)* "]")
+variants: equal_all | (variant | "[" variant (";" variant)* "]")
+
+equal_all: "=" | "[=]"
 
 variant: substitution | del | dup | ins | inv | con | delins | varssr | equal
 
@@ -82,7 +84,7 @@ varssr: (point SEQUENCE "[" REPEAT_LENGTH "]")
 
 SEQUENCE: NT+
 
-equal: (point | range)? "="
+equal: (point | range) "="
 
 REPEAT_LENGTH: NUMBER
 

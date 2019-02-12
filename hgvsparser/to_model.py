@@ -26,7 +26,9 @@ def convert(parse_tree, model):
         add_token(model, parse_tree.type, parse_tree.value)
     elif isinstance(parse_tree, Tree):
         sub_model = {}
-        if parse_tree.data in ['variants', 'insertions']:
+        if parse_tree.data == 'equal_all':
+            sub_model = {'type': 'equal'}
+        elif parse_tree.data in ['variants', 'insertions']:
             sub_model = []
         for child_tree in parse_tree.children:
             convert(child_tree, sub_model)
@@ -60,8 +62,12 @@ def convert(parse_tree, model):
             elif parse_tree.data == 'inserted_location':
                 model['insertions'] = [sub_model]
             # Variant type
+            elif parse_tree.data == 'equal_all':
+                model['type'] = 'equal'
+                print("fsd")
             elif parse_tree.data in ['substitution', 'del', 'dup', 'ins',
                                      'inv', 'con', 'delins', 'equal']:
+                print("jhg")
                 model['type'] = parse_tree.data
                 model.update(sub_model)
             else:
