@@ -88,9 +88,9 @@ def add_token(parent, token_type, token_value):
                 parent['uncertain'] = True
         elif token_type == 'OFFSET':
             if '?' in token_value:
-                parent['uncertain_offset'] = token_value
+                parent['offset'] = {'uncertain': True}
             else:
-                parent['offset'] = int(token_value)
+                parent['offset'] = {'value': int(token_value)}
         elif token_type == 'OUTSIDE_CDS':
             if token_value == '*':
                 parent['outside_cds'] = 'downstream'

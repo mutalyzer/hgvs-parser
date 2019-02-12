@@ -299,7 +299,9 @@ VARIANTS = [
                     'location': {
                         'type': 'point',
                         'position': 100,
-                        'offset': 3
+                        'offset': {
+                            'value': 3
+                        }
                     },
                     'insertions': [
                         {
@@ -353,7 +355,9 @@ VARIANTS = [
                     'location': {
                         'type': 'point',
                         'position': 1,
-                        'offset': -3,
+                        'offset': {
+                            'value': -3,
+                        },
                         'outside_cds': 'downstream'
                     },
                     'insertions': [
@@ -381,7 +385,9 @@ VARIANTS = [
                     'location': {
                         'type': 'point',
                         'position': 1,
-                        'offset': 3,
+                        'offset': {
+                            'value': 3,
+                        },
                         'outside_cds': 'upstream'
                     },
                     'insertions': [
@@ -445,7 +451,9 @@ VARIANTS = [
                     'location': {
                         'type': 'point',
                         'position': 100,
-                        'offset': 1
+                        'offset': {
+                            'value': 1
+                        }
                     }
                 }
             ]
@@ -483,12 +491,16 @@ VARIANTS = [
                         'start': {
                             'type': 'point',
                             'position': 10,
-                            'offset': -1
+                            'offset': {
+                                'value': -1
+                            }
                         },
                         'end': {
                             'type': 'point',
                             'position': 20,
-                            'offset': -3
+                            'offset': {
+                                'value': -3
+                            }
                         }
                     }
                 }
@@ -615,12 +627,16 @@ VARIANTS = [
                             'start': {
                                 'type': 'point',
                                 'position': 30,
-                                'offset': 1
+                                'offset': {
+                                    'value': 1
+                                }
                             },
                             'end': {
                                 'type': 'point',
                                 'position': 30,
-                                'offset': -1
+                                'offset': {
+                                    'value': -1
+                                }
                             },
                             'uncertain': True
                         }
@@ -687,7 +703,9 @@ VARIANTS = [
                                 'type': 'point',
                                 'position': 1,
                                 'outside_cds': 'upstream',
-                                'uncertain_offset': '+?'
+                                'offset': {
+                                    'uncertain': True
+                                }
                             }
                         },
                         'end': {
@@ -697,7 +715,9 @@ VARIANTS = [
                                 'type': 'point',
                                 'position': 1,
                                 'outside_cds': 'downstream',
-                                'uncertain_offset': '-?'
+                                'offset':  {
+                                    'uncertain': True
+                                }
                             },
                             'end': {
                                 'type': 'point',
