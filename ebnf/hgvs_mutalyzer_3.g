@@ -38,7 +38,8 @@ variants: equal_all | (variant | "[" variant (";" variant)* "]")
 
 equal_all: "=" | "[=]"
 
-variant: substitution | del | dup | ins | inv | con | delins | varssr | equal
+variant: substitution | deletion | duplication | insertion
+       | inversion | conversion | deletion_insertion | varssr | equal
 
 substitution: (point | uncertain) DELETED ">" INSERTED
 
@@ -46,21 +47,21 @@ DELETED: NT
 
 INSERTED: NT
 
-del: location "del" (DELETED_SEQUENCE | DELETED_LENGTH)?
+deletion: location "del" (DELETED_SEQUENCE | DELETED_LENGTH)?
 
 DELETED_SEQUENCE: NT+
 
 DELETED_LENGTH: NUMBER
 
-dup: location "dup" (DUPLICATED_SEQUENCE | DUPLICATED_LENGTH)?
+duplication: location "dup" (DUPLICATED_SEQUENCE | DUPLICATED_LENGTH)?
 
 DUPLICATED_SEQUENCE: NT+
 
 DUPLICATED_LENGTH: NUMBER
 
-ins: range "ins" insertions
+insertion: range "ins" insertions
 
-delins: location "del" (DELETED_SEQUENCE | DELETED_LENGTH)? "ins" insertions
+deletion_insertion: location "del" (DELETED_SEQUENCE | DELETED_LENGTH)? "ins" insertions
 
 insertions: ("[" inserted (";" inserted)* "]") | inserted
 
@@ -70,9 +71,9 @@ INVERTED: "inv"
 
 INSERTED_SEQUENCE: NT+
 
-inv: range "inv" (NT+ | NUMBER)?
+inversion: range "inv" (NT+ | NUMBER)?
 
-con: range "con" inserted_location
+conversion: range "con" inserted_location
 
 inserted_location: range | reference_location
 

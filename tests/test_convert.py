@@ -412,7 +412,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'del',
+                    'type': 'deletion',
                     'location': {
                         'type': 'point',
                         'position': 10
@@ -427,7 +427,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'del',
+                    'type': 'deletion',
                     'location': {
                         'type': 'point',
                         'position': 10
@@ -447,7 +447,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'del',
+                    'type': 'deletion',
                     'location': {
                         'type': 'point',
                         'position': 100,
@@ -464,7 +464,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'del',
+                    'type': 'deletion',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -485,7 +485,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'del',
+                    'type': 'deletion',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -513,7 +513,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'del',
+                    'type': 'deletion',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -540,7 +540,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'del',
+                    'type': 'deletion',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -569,7 +569,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'del',
+                    'type': 'deletion',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -606,7 +606,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'del',
+                    'type': 'deletion',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -650,7 +650,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'del',
+                    'type': 'deletion',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -689,7 +689,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'del',
+                    'type': 'deletion',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -735,7 +735,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'dup',
+                    'type': 'duplication',
                     'location': {
                         'type': 'point',
                         'position': 10
@@ -750,7 +750,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'ins',
+                    'type': 'insertion',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -777,7 +777,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'ins',
+                    'type': 'insertion',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -804,7 +804,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'ins',
+                    'type': 'insertion',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -844,7 +844,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'ins',
+                    'type': 'insertion',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -885,7 +885,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'ins',
+                    'type': 'insertion',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -947,7 +947,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'ins',
+                    'type': 'insertion',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -991,7 +991,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'ins',
+                    'type': 'insertion',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -1024,7 +1024,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'inv',
+                    'type': 'inversion',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -1046,7 +1046,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'con',
+                    'type': 'conversion',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -1083,7 +1083,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'delins',
+                    'type': 'deletion_insertion',
                     'location': {
                         'type': 'point',
                         'position': 10
@@ -1103,7 +1103,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'delins',
+                    'type': 'deletion_insertion',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -1130,7 +1130,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'delins',
+                    'type': 'deletion_insertion',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -1163,7 +1163,7 @@ VARIANTS = [
         {
             'variants': [
                 {
-                    'type': 'delins',
+                    'type': 'deletion_insertion',
                     'location': {
                         'type': 'point',
                         'position': 10
@@ -1294,7 +1294,7 @@ VARIANTS = [
                     }
                 },
                 {
-                    'type': 'ins',
+                    'type': 'insertion',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -1349,7 +1349,7 @@ VARIANTS = [
                     ]
                 },
                 {
-                    'type': 'delins',
+                    'type': 'deletion_insertion',
                     'location': {
                         'type': 'range',
                         'start': {

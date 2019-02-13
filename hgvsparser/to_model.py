@@ -64,10 +64,9 @@ def convert(parse_tree, model):
             # Variant type
             elif parse_tree.data == 'equal_all':
                 model['type'] = 'equal'
-                print("fsd")
-            elif parse_tree.data in ['substitution', 'del', 'dup', 'ins',
-                                     'inv', 'con', 'delins', 'equal']:
-                print("jhg")
+            elif parse_tree.data in ['substitution', 'deletion', 'duplication',
+                                     'insertion', 'inversion', 'conversion',
+                                     'deletion_insertion', 'equal']:
                 model['type'] = parse_tree.data
                 model.update(sub_model)
             else:
