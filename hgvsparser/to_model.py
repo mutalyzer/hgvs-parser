@@ -82,7 +82,7 @@ def add_token(parent, token_type, token_value):
     if isinstance(parent, dict):
         if token_type == 'POSITION':
             if token_value != '?':
-                parent['position'] = int(token_value)
+                parent['position'] = int(token_value) - 1
             else:
                 parent['uncertain'] = True
         elif token_type == 'OFFSET':

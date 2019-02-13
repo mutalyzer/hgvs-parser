@@ -265,7 +265,7 @@ def test_reference_part(description, model):
 VARIANTS = [
     # Substitutions
     (
-        '100C>A',
+        '101C>A',
         {
             'variants': [
                 {
@@ -291,7 +291,7 @@ VARIANTS = [
         }
     ),
     (
-        '100+3C>A',
+        '101+3C>A',
         {
             'variants': [
                 {
@@ -320,7 +320,7 @@ VARIANTS = [
         }
     ),
     (
-        '*100C>A',
+        '*101C>A',
         {
             'variants': [
                 {
@@ -354,7 +354,7 @@ VARIANTS = [
                     'type': 'substitution',
                     'location': {
                         'type': 'point',
-                        'position': 1,
+                        'position': 0,
                         'offset': {
                             'value': -3,
                         },
@@ -384,7 +384,7 @@ VARIANTS = [
                     'type': 'substitution',
                     'location': {
                         'type': 'point',
-                        'position': 1,
+                        'position': 0,
                         'offset': {
                             'value': 3,
                         },
@@ -408,7 +408,7 @@ VARIANTS = [
     ),
     # Deletions
     (
-        '10del',
+        '11del',
         {
             'variants': [
                 {
@@ -423,7 +423,7 @@ VARIANTS = [
     ),
     (
         # Note: the addition of 'A' is not HGVS.
-        '10delA',
+        '11delA',
         {
             'variants': [
                 {
@@ -443,7 +443,7 @@ VARIANTS = [
         }
     ),
     (
-        '100+1del',
+        '101+1del',
         {
             'variants': [
                 {
@@ -460,7 +460,7 @@ VARIANTS = [
         }
     ),
     (
-        '10_20del',
+        '11_21del',
         {
             'variants': [
                 {
@@ -481,7 +481,7 @@ VARIANTS = [
         }
     ),
     (
-        '10-1_20-3del',
+        '11-1_21-3del',
         {
             'variants': [
                 {
@@ -509,7 +509,7 @@ VARIANTS = [
     ),
     (
         # Note: the addition of '5' is not HGVS.
-        '10_15del5',
+        '11_16del5',
         {
             'variants': [
                 {
@@ -536,7 +536,7 @@ VARIANTS = [
         }
     ),
     (
-        '(10_20)_30del',
+        '(11_21)_31del',
         {
             'variants': [
                 {
@@ -565,7 +565,7 @@ VARIANTS = [
         }
     ),
     (
-        '(10_20)_(30_40)del',
+        '(11_21)_(31_41)del',
         {
             'variants': [
                 {
@@ -602,7 +602,7 @@ VARIANTS = [
         }
     ),
     (
-        '(?_-20)_(30+1_30-1)del',
+        '(?_-21)_(31+1_31-1)del',
         {
             'variants': [
                 {
@@ -662,7 +662,7 @@ VARIANTS = [
                             },
                             'end': {
                                 'type': 'point',
-                                'position': 1,
+                                'position': 0,
                                 'outside_cds': 'upstream'
                             }
                         },
@@ -671,7 +671,7 @@ VARIANTS = [
                             'uncertain': True,
                             'start': {
                                 'type': 'point',
-                                'position': 1,
+                                'position': 0,
                                 'outside_cds': 'downstream'
                             },
                             'end': {
@@ -701,7 +701,7 @@ VARIANTS = [
                             },
                             'end': {
                                 'type': 'point',
-                                'position': 1,
+                                'position': 0,
                                 'outside_cds': 'upstream',
                                 'offset': {
                                     'uncertain': True
@@ -713,7 +713,7 @@ VARIANTS = [
                             'uncertain': True,
                             'start': {
                                 'type': 'point',
-                                'position': 1,
+                                'position': 0,
                                 'outside_cds': 'downstream',
                                 'offset':  {
                                     'uncertain': True
@@ -731,7 +731,7 @@ VARIANTS = [
     ),
     # Duplications
     (
-        '10dup',
+        '11dup',
         {
             'variants': [
                 {
@@ -755,11 +755,11 @@ VARIANTS = [
                         'type': 'range',
                         'start': {
                             'type': 'point',
-                            'position': 11
+                            'position': 10
                         },
                         'end': {
                             'type': 'point',
-                            'position': 12
+                            'position': 11
                         }
                     },
                     'inserted': [
@@ -782,11 +782,11 @@ VARIANTS = [
                         'type': 'range',
                         'start': {
                             'type': 'point',
-                            'position': 11
+                            'position': 10
                         },
                         'end': {
                             'type': 'point',
-                            'position': 12
+                            'position': 11
                         }
                     },
                     'inserted': [
@@ -800,7 +800,7 @@ VARIANTS = [
         }
     ),
     (
-        '11_12ins[T;10_20]',
+        '11_12ins[T;11_21]',
         {
             'variants': [
                 {
@@ -809,11 +809,11 @@ VARIANTS = [
                         'type': 'range',
                         'start': {
                             'type': 'point',
-                            'position': 11
+                            'position': 10
                         },
                         'end': {
                             'type': 'point',
-                            'position': 12
+                            'position': 11
                         }
                     },
                     'inserted': [
@@ -840,7 +840,7 @@ VARIANTS = [
         }
     ),
     (
-        '11_12ins[T;10_20inv]',
+        '11_12ins[T;11_21inv]',
         {
             'variants': [
                 {
@@ -849,11 +849,11 @@ VARIANTS = [
                         'type': 'range',
                         'start': {
                             'type': 'point',
-                            'position': 11
+                            'position': 10
                         },
                         'end': {
                             'type': 'point',
-                            'position': 12
+                            'position': 11
                         }
                     },
                     'inserted': [
@@ -881,7 +881,7 @@ VARIANTS = [
         }
     ),
     (
-        '11_12ins[T;10_20inv;NM_000001.1:c.100_200]',
+        '11_12ins[T;11_21inv;NM_000001.1:c.101_201]',
         {
             'variants': [
                 {
@@ -890,11 +890,11 @@ VARIANTS = [
                         'type': 'range',
                         'start': {
                             'type': 'point',
-                            'position': 11
+                            'position': 10
                         },
                         'end': {
                             'type': 'point',
-                            'position': 12
+                            'position': 11
                         }
                     },
                     'inserted': [
@@ -943,7 +943,7 @@ VARIANTS = [
         }
     ),
     (
-        '11_12insNM_000001.1:c.100_200',
+        '11_12insNM_000001.1:c.101_201',
         {
             'variants': [
                 {
@@ -952,11 +952,11 @@ VARIANTS = [
                         'type': 'range',
                         'start': {
                             'type': 'point',
-                            'position': 11
+                            'position': 10
                         },
                         'end': {
                             'type': 'point',
-                            'position': 12
+                            'position': 11
                         }
                     },
                     'inserted': [
@@ -996,11 +996,11 @@ VARIANTS = [
                         'type': 'range',
                         'start': {
                             'type': 'point',
-                            'position': 11
+                            'position': 10
                         },
                         'end': {
                             'type': 'point',
-                            'position': 12
+                            'position': 11
                         }
                     },
                     'inserted': [
@@ -1029,11 +1029,11 @@ VARIANTS = [
                         'type': 'range',
                         'start': {
                             'type': 'point',
-                            'position': 11
+                            'position': 10
                         },
                         'end': {
                             'type': 'point',
-                            'position': 12
+                            'position': 11
                         }
                     }
                 }
@@ -1042,7 +1042,7 @@ VARIANTS = [
     ),
     # Conversions
     (
-        '10_20con30_40',
+        '11_21con31_41',
         {
             'variants': [
                 {
@@ -1079,7 +1079,7 @@ VARIANTS = [
     ),
     # Deletion-inserted
     (
-        '10delinsGA',
+        '11delinsGA',
         {
             'variants': [
                 {
@@ -1099,7 +1099,7 @@ VARIANTS = [
         }
     ),
     (
-        '10_20delinsGA',
+        '11_21delinsGA',
         {
             'variants': [
                 {
@@ -1126,7 +1126,7 @@ VARIANTS = [
         }
     ),
     (
-        '10_20del10insGA',
+        '11_21del10insGA',
         {
             'variants': [
                 {
@@ -1159,7 +1159,7 @@ VARIANTS = [
         }
     ),
     (
-        '10delAinsGA',
+        '11delAinsGA',
         {
             'variants': [
                 {
@@ -1247,7 +1247,7 @@ VARIANTS = [
         }
     ),
     (
-        '10=',
+        '11=',
         {
             'variants': [
                 {
@@ -1261,7 +1261,7 @@ VARIANTS = [
         }
     ),
     (
-        '10_20=',
+        '11_21=',
         {
             'variants': [
                 {
@@ -1283,7 +1283,7 @@ VARIANTS = [
     ),
     # Multiple variants (allele)
     (
-        '[10=;11_12ins[T;10_20inv;NM_000001.1:c.100_200];10_20delinsGA]',
+        '[11=;11_12ins[T;11_21inv;NM_000001.1:c.101_201];11_21delinsGA]',
         {
             'variants': [
                 {
@@ -1299,11 +1299,11 @@ VARIANTS = [
                         'type': 'range',
                         'start': {
                             'type': 'point',
-                            'position': 11
+                            'position': 10
                         },
                         'end': {
                             'type': 'point',
-                            'position': 12
+                            'position': 11
                         }
                     },
                     'inserted': [

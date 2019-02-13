@@ -48,65 +48,43 @@ Copyright (c) 2018 Mihai Lefter <m.lefter@lumc.nl>
 ## Successful parsing
 
 ```console
-$ hgvsparser "NM_00000t1:g.[-1+3C>A;100_200del]" -t -c
-
-Successfully parsed HGVS description:
- NM_00000:g.-1+3C>A
-
-Equivalent model:
+$ hgvsparser "NG_012232.1(NM_004006.1):c.93+1G>T" -c
 {
+  "reference": {
+    "version": "1",
+    "accession": "NG_012232",
+    "type": "genbank"
+  },
   "variants": [
     {
-      "type": "substitution",
-      "deleted": [
+      "location": {
+        "type": "point",
+        "position": 92,
+        "offset": {
+          "value": 1
+        }
+      },
+      "inserted": [
         {
-          "sequence": "C",
+          "sequence": "T",
           "source": "description"
         }
       ],
-      "location": {
-        "type": "point",
-        "position": 1,
-        "offset": 3,
-        "outside_cds": "upstream"
-      },
-      "insertions": [
+      "deleted": [
         {
-          "sequence": "A",
+          "sequence": "G",
           "source": "description"
         }
-      ]
-    },
-    {
-      "type": "del",
-      "location": {
-        "type": "range"
-        "start": {
-          "type": "point",
-          "position": 100
-        },
-        "end": {
-          "type": "point",
-          "position": 200
-        },
-      }
+      ],
+      "type": "substitution"
     }
-
   ],
-  "reference": {
-    "type": "genbank",
-    "accession": "NM_00000"
+  "specific_locus": {
+    "version": "1",
+    "accession": "NM_004006",
+    "type": "genbank"
   },
-  "coordinate_system": "g"
-}
-
-Model check summary:
-{
-  "warnings": "No version specified. The most recent found version will be considered.",
-  "extras": [],
-  "errors": [
-    "LRG specific locus mentioned for genbank reference."
-  ]
+  "coordinate_system": "c"
 }
 ```
 
@@ -115,39 +93,39 @@ Model check summary:
 
 ```console
 $ hgvsparser "NM_00000:.-1+3C>A"
-Error occured during parsing:
- No terminal defined for '.' at line 1 col 10
+Error!
+Unexpected input: .
 
 NM_00000:.-1+3C>A
          ^
 
-Expecting: {
-             Terminal('OUTSIDE_CDS'),
-             Terminal('POSITION'),
-             Terminal('LSQB'),
-             Terminal('COORDINATE_SYSTEM'),
-             Terminal('LPAR')
-           }
+Expecting:
+  - "(" for an uncertain position start
+  - position (e.g., 100)
+  - coordinate system: (e.g., "g", "c")
+  - outside CDS ("*" or "-")
+  - "=" to indicate no changes
+  - __ANON_0
+  - "[" for multiple variants, insertions, or repeats
 ```
 
 ```console
-$ hgvsparser "NM_00000t1:g.100_200A>G" -t -c
-Error occured during parsing:
- No terminal defined for 'A' at line 1 col 21
+$ hgvsparser "NM_00000t1:g.100_200A>G" 
+Error!
+Unexpected input: A
 
 NM_00000t1:g.100_200A>G
                     ^
 
-Expecting: {
-             Terminal('DUP'),
-             Terminal('OFFSET'),
-             Terminal('LSQB'),
-             Terminal('EQUAL'),
-             Terminal('CON'),
-             Terminal('DEL'),
-             Terminal('INS'),
-             Terminal('INVERTED')
-           }
+Expecting:
+  - "[" for multiple variants, insertions, or repeats
+  - position offset ("-" or "+")
+  - inv
+  - duplication operation (e.g., 10dup)
+  - conversion operation (e.g., 10_12con20_22)
+  - deletion operation (e.g., 10del)
+  - insertion operation (e.g., 11_12insTA, ins10_20)
+  - "=" to indicate no changes
 ```
 
 # Testing
