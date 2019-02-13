@@ -28,7 +28,7 @@ def convert(parse_tree, model):
         sub_model = {}
         if parse_tree.data == 'equal_all':
             sub_model = {'type': 'equal'}
-        elif parse_tree.data in ['variants', 'insertions']:
+        elif parse_tree.data in ['variants', 'inserted']:
             sub_model = []
         for child_tree in parse_tree.children:
             convert(child_tree, sub_model)
@@ -60,7 +60,7 @@ def convert(parse_tree, model):
             elif parse_tree.data == 'uncertain_end':
                 model['end'] = sub_model['location']
             elif parse_tree.data == 'inserted_location':
-                model['insertions'] = [sub_model]
+                model['inserted'] = [sub_model]
             # Variant type
             elif parse_tree.data == 'equal_all':
                 model['type'] = 'equal'
@@ -96,7 +96,7 @@ def add_token(parent, token_type, token_value):
             if token_value == '-':
                 parent['outside_cds'] = 'upstream'
         elif token_type in ['INSERTED']:
-            parent['insertions'] = [
+            parent['inserted'] = [
                 {
                     'source': 'description',
                     'sequence': token_value,

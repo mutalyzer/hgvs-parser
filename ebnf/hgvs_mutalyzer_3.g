@@ -59,13 +59,13 @@ DUPLICATED_SEQUENCE: NT+
 
 DUPLICATED_LENGTH: NUMBER
 
-insertion: range "ins" insertions
+insertion: range "ins" inserted
 
-deletion_insertion: location "del" (DELETED_SEQUENCE | DELETED_LENGTH)? "ins" insertions
+deletion_insertion: location "del" (DELETED_SEQUENCE | DELETED_LENGTH)? "ins" inserted
 
-insertions: ("[" inserted (";" inserted)* "]") | inserted
+inserted: ("[" insert (";" insert)* "]") | insert
 
-inserted: INSERTED_SEQUENCE | (range | reference_location) INVERTED?
+insert: INSERTED_SEQUENCE | (range | reference_location) INVERTED?
 
 INVERTED: "inv"
 

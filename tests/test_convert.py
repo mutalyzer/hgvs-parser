@@ -274,7 +274,7 @@ VARIANTS = [
                         'type': 'point',
                         'position': 100
                     },
-                    'insertions': [
+                    'inserted': [
                         {
                             'sequence': 'A',
                             'source': 'description'
@@ -303,7 +303,7 @@ VARIANTS = [
                             'value': 3
                         }
                     },
-                    'insertions': [
+                    'inserted': [
                         {
                             'sequence': 'A',
                             'source': 'description'
@@ -330,7 +330,7 @@ VARIANTS = [
                         'position': 100,
                         'outside_cds': 'downstream'
                     },
-                    'insertions': [
+                    'inserted': [
                         {
                             'sequence': 'A',
                             'source': 'description'
@@ -360,7 +360,7 @@ VARIANTS = [
                         },
                         'outside_cds': 'downstream'
                     },
-                    'insertions': [
+                    'inserted': [
                         {
                             'sequence': 'A',
                             'source': 'description'
@@ -390,7 +390,7 @@ VARIANTS = [
                         },
                         'outside_cds': 'upstream'
                     },
-                    'insertions': [
+                    'inserted': [
                         {
                             'sequence': 'A',
                             'source': 'description'
@@ -744,7 +744,7 @@ VARIANTS = [
             ]
         }
     ),
-    # Insertions
+    # inserted
     (
         '11_12insT',
         {
@@ -762,7 +762,7 @@ VARIANTS = [
                             'position': 12
                         }
                     },
-                    'insertions': [
+                    'inserted': [
                         {
                             'sequence': 'T',
                             'source': 'description'
@@ -789,7 +789,7 @@ VARIANTS = [
                             'position': 12
                         }
                     },
-                    'insertions': [
+                    'inserted': [
                         {
                             'sequence': 'T',
                             'source': 'description'
@@ -816,7 +816,7 @@ VARIANTS = [
                             'position': 12
                         }
                     },
-                    'insertions': [
+                    'inserted': [
                         {
                             'sequence': 'T',
                             'source': 'description'
@@ -856,7 +856,7 @@ VARIANTS = [
                             'position': 12
                         }
                     },
-                    'insertions': [
+                    'inserted': [
                         {
                             'sequence': 'T',
                             'source': 'description'
@@ -897,7 +897,7 @@ VARIANTS = [
                             'position': 12
                         }
                     },
-                    'insertions': [
+                    'inserted': [
                         {
                             'sequence': 'T',
                             'source': 'description'
@@ -959,7 +959,7 @@ VARIANTS = [
                             'position': 12
                         }
                     },
-                    'insertions': [
+                    'inserted': [
                         {
                             'reference_location': {
                                 'reference': {
@@ -1003,7 +1003,7 @@ VARIANTS = [
                             'position': 12
                         }
                     },
-                    'insertions': [
+                    'inserted': [
                         {
                             'reference_location': {
                                 'reference': {
@@ -1058,7 +1058,7 @@ VARIANTS = [
                             'position': 20
                         }
                     },
-                    'insertions': [
+                    'inserted': [
                         {
                             'location': {
                                 'type': 'range',
@@ -1077,7 +1077,7 @@ VARIANTS = [
             ]
         }
     ),
-    # Deletion-insertions
+    # Deletion-inserted
     (
         '10delinsGA',
         {
@@ -1088,7 +1088,7 @@ VARIANTS = [
                         'type': 'point',
                         'position': 10
                     },
-                    'insertions': [
+                    'inserted': [
                         {
                             'sequence': 'GA',
                             'source': 'description'
@@ -1115,7 +1115,7 @@ VARIANTS = [
                             'position': 20
                         }
                     },
-                    'insertions': [
+                    'inserted': [
                         {
                             'sequence': 'GA',
                             'source': 'description'
@@ -1148,7 +1148,7 @@ VARIANTS = [
                             'source': 'description'
                         }
                     ],
-                    'insertions': [
+                    'inserted': [
                         {
                             'sequence': 'GA',
                             'source': 'description'
@@ -1174,7 +1174,7 @@ VARIANTS = [
                             'source': 'description'
                         }
                     ],
-                    'insertions': [
+                    'inserted': [
                         {
                             'sequence': 'GA',
                             'source': 'description'
@@ -1194,7 +1194,7 @@ VARIANTS = [
     #                 'location': {
     #                     'position': 10,
     #                 },
-    #                 'insertions': [
+    #                 'inserted': [
     #                     {
     #                         'sequence': 'GA',
     #                         'length': 4
@@ -1219,7 +1219,7 @@ VARIANTS = [
     #
     #                     }
     #                 },
-    #                 'insertions': [
+    #                 'inserted': [
     #                     {
     #                         'sequence': 'CAG',
     #                         'length': 19
@@ -1306,7 +1306,7 @@ VARIANTS = [
                             'position': 12
                         }
                     },
-                    'insertions': [
+                    'inserted': [
                         {
                             'sequence': 'T',
                             'source': 'description'
@@ -1361,7 +1361,7 @@ VARIANTS = [
                             'position': 20
                         }
                     },
-                    'insertions': [
+                    'inserted': [
                         {
                             'sequence': 'GA',
                             'source': 'description'
