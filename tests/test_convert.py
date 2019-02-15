@@ -13,240 +13,335 @@ REFERENCES = [
     # - genbank reference with no version
     (
         'NC_000001', {
-            'reference': {
-                'type': 'genbank',
-                'accession': 'NC_000001',
+            'references': {
+                'reference': {
+                    'type': 'genbank',
+                    'accession': 'NC_000001',
+                }
             }
         }
     ),
     # - genbank reference with accession and version
     (
         'NC_000001.10', {
-            'reference': {
-                'type': 'genbank',
-                'accession': 'NC_000001',
-                'version': '10',
+            'references': {
+                'reference': {
+                    'type': 'genbank',
+                    'accession': 'NC_000001',
+                    'version': '10',
+                }
+            }
+        }
+    ),
+    # - genbank reference with accession, version and coordinate system
+    (
+        'NC_000001.10:c.', {
+            'references': {
+                'reference': {
+                    'type': 'genbank',
+                    'accession': 'NC_000001',
+                    'version': '10',
+                    'coordinate_system': 'c',
+                }
             }
         }
     ),
     # - lrg reference
     (
         'LRG_1', {
-            'reference': {
-                'type': 'lrg',
-                'id': 'LRG_1',
+            'references': {
+                'reference': {
+                    'type': 'lrg',
+                    'id': 'LRG_1',
+                }
             }
         }
     ),
-    # - lrg reference with version - should not be possible
+    # - lrg reference with coordinate system
+    (
+        'LRG_1:g.', {
+            'references': {
+                'reference': {
+                    'type': 'lrg',
+                    'id': 'LRG_1',
+                    'coordinate_system': 'g'
+                }
+            }
+        }
+    ),
+    # - lrg reference with version - the user should be notified somehow
     (
         'LRG_1.1', {
-            'reference': {
-                'type': 'lrg',
-                'id': 'LRG_1',
-                'version': '1',
-            },
+            'references': {
+                'reference': {
+                    'type': 'lrg',
+                    'id': 'LRG_1',
+                    'version': '1',
+                }
+            }
         }
     ),
     # Specific locus present
     # - with gene names only
     (
         'NC_000001(SDHD)', {
-            'reference': {
-                'type': 'genbank',
-                'accession': 'NC_000001',
-            },
-            'specific_locus': {
-                'type': 'gene',
-                'id': 'SDHD',
+            'references': {
+                'reference': {
+                    'type': 'genbank',
+                    'accession': 'NC_000001',
+                    'specific_locus': {
+                        'type': 'gene',
+                        'id': 'SDHD',
+                    }
+                }
             }
         }
     ),
     (
         'NC_012920.1(MT-TL1)', {
-            'reference': {
-                'type': 'genbank',
-                'accession': 'NC_012920',
-                'version': '1',
-            },
-            'specific_locus': {
-                'type': 'gene',
-                'id': 'MT-TL1',
+            'references': {
+                'reference': {
+                    'type': 'genbank',
+                    'accession': 'NC_012920',
+                    'version': '1',
+                    'specific_locus': {
+                        'type': 'gene',
+                        'id': 'MT-TL1',
+                    }
+                }
             }
         }
     ),
     (
         'NG_012337.1(TIMM8B)', {
-            'reference': {
-                'type': 'genbank',
-                'accession': 'NG_012337',
-                'version': '1',
-            },
-            'specific_locus': {
-                'type': 'gene',
-                'id': 'TIMM8B',
+            'references': {
+                'reference': {
+                    'type': 'genbank',
+                    'accession': 'NG_012337',
+                    'version': '1',
+                    'specific_locus': {
+                        'type': 'gene',
+                        'id': 'TIMM8B',
+                    }
+                }
             }
         }
     ),
     (
         'NC_000001(SDHD_v001)', {
-            'reference': {
-                'type': 'genbank',
-                'accession': 'NC_000001',
-            },
-            'specific_locus': {
-                'type': 'gene',
-                'id': 'SDHD',
-                'transcript_variant': '001',
+            'references': {
+                'reference': {
+                    'type': 'genbank',
+                    'accession': 'NC_000001',
+                    'specific_locus': {
+                        'type': 'gene',
+                        'id': 'SDHD',
+                        'transcript_variant': '001',
+                    }
+                }
             }
         }
     ),
     (
         'NC_000001(SDHD_i001)', {
-            'reference': {
-                'type': 'genbank',
-                'accession': 'NC_000001',
-            },
-            'specific_locus': {
-                'type': 'gene',
-                'id': 'SDHD',
-                'protein_isoform': '001',
+            'references': {
+                'reference': {
+                    'type': 'genbank',
+                    'accession': 'NC_000001',
+                    'specific_locus': {
+                        'type': 'gene',
+                        'id': 'SDHD',
+                        'protein_isoform': '001',
+                    }
+                }
             }
         }
     ),
     (
         'NG_012337.1(TIMM8B_v001)', {
-            'reference': {
-                'type': 'genbank',
-                'accession': 'NG_012337',
-                'version': '1',
-            },
-            'specific_locus': {
-                'type': 'gene',
-                'id': 'TIMM8B',
-                'transcript_variant': '001'
+            'references': {
+                'reference': {
+                    'type': 'genbank',
+                    'accession': 'NG_012337',
+                    'version': '1',
+                    'specific_locus': {
+                        'type': 'gene',
+                        'id': 'TIMM8B',
+                        'transcript_variant': '001'
+                    }
+                }
             }
         }
     ),
     (
         'NG_012337.1(TIMM8B_i001)', {
-            'reference': {
-                'type': 'genbank',
-                'accession': 'NG_012337',
-                'version': '1',
-            },
-            'specific_locus': {
-                'type': 'gene',
-                'id': 'TIMM8B',
-                'protein_isoform': '001'
+            'references': {
+                'reference': {
+                    'type': 'genbank',
+                    'accession': 'NG_012337',
+                    'version': '1',
+                    'specific_locus': {
+                        'type': 'gene',
+                        'id': 'TIMM8B',
+                        'protein_isoform': '001'
+                    }
+                }
             }
         }
     ),
     (
         'NC_012920.1(MT-TL1_v001)', {
-            'reference': {
-                'type': 'genbank',
-                'accession': 'NC_012920',
-                'version': '1',
-            },
-            'specific_locus': {
-                'type': 'gene',
-                'id': 'MT-TL1',
-                'transcript_variant': '001',
+            'references': {
+                'reference': {
+                    'type': 'genbank',
+                    'accession': 'NC_012920',
+                    'version': '1',
+                    'specific_locus': {
+                        'type': 'gene',
+                        'id': 'MT-TL1',
+                        'transcript_variant': '001',
+                    }
+                }
             }
         }
     ),
     (
         'NC_012920.1(MT-TL1_i001)', {
-            'reference': {
-                'type': 'genbank',
-                'accession': 'NC_012920',
-                'version': '1',
-            },
-            'specific_locus': {
-                'type': 'gene',
-                'id': 'MT-TL1',
-                'protein_isoform': '001',
+            'references': {
+                'reference': {
+                    'type': 'genbank',
+                    'accession': 'NC_012920',
+                    'version': '1',
+                    'specific_locus': {
+                        'type': 'gene',
+                        'id': 'MT-TL1',
+                        'protein_isoform': '001',
+                    }
+                }
+            }
+        }
+    ),
+    (
+        'NC_012920.1(MT-TL1_i001):c.', {
+            'references': {
+                'reference': {
+                    'type': 'genbank',
+                    'accession': 'NC_012920',
+                    'version': '1',
+                    'specific_locus': {
+                        'type': 'gene',
+                        'id': 'MT-TL1',
+                        'protein_isoform': '001',
+                    },
+                    'coordinate_system': 'c'
+                }
             }
         }
     ),
     # - with accession and version
     (
         'NG_012337.1(NM_012459.2)', {
-            'reference': {
-                'type': 'genbank',
-                'accession': 'NG_012337',
-                'version': '1',
-            },
-            'specific_locus': {
-                'type': 'genbank',
-                'accession': 'NM_012459',
-                'version': '2',
+            'references': {
+                'reference': {
+                    'type': 'genbank',
+                    'accession': 'NG_012337',
+                    'version': '1',
+                    'specific_locus': {
+                        'type': 'genbank',
+                        'accession': 'NM_012459',
+                        'version': '2',
+                    }
+                }
             }
         }
     ),
     # - LRG ones
     (
         'LRG_24t1', {
-            'reference': {
-                'type': 'lrg',
-                'id': 'LRG_24',
-            },
-            'specific_locus': {
-                'type': 'lrg transcript',
-                'transcript_variant': 't1',
+            'references': {
+                'reference': {
+                    'type': 'lrg',
+                    'id': 'LRG_24',
+                    'specific_locus': {
+                        'type': 'lrg transcript',
+                        'transcript_variant': 't1',
+                    }
+                }
             }
         }
     ),
     (
         'LRG_24p1', {
-            'reference': {
-                'type': 'lrg',
-                'id': 'LRG_24',
-            },
-            'specific_locus': {
-                'type': 'lrg protein',
-                'protein_isoform': 'p1',
+            'references': {
+                'reference': {
+                    'type': 'lrg',
+                    'id': 'LRG_24',
+                    'specific_locus': {
+                        'type': 'lrg protein',
+                        'protein_isoform': 'p1',
+                    }
+                }
             }
         }
     ),
     # - mix
     (
         'NC_000001.1t1', {
-            'reference': {
-                'type': 'genbank',
-                'accession': 'NC_000001',
-                'version': '1',
-            },
-            'specific_locus': {
-                'type': 'lrg transcript',
-                'transcript_variant': 't1',
-            },
+            'references': {
+                'reference': {
+                    'type': 'genbank',
+                    'accession': 'NC_000001',
+                    'version': '1',
+                    'specific_locus': {
+                        'type': 'lrg transcript',
+                        'transcript_variant': 't1',
+                    }
+                }
+            }
         }
     ),
     (
         'NC_000001.1p1', {
-            'reference': {
-                'type': 'genbank',
-                'accession': 'NC_000001',
-                'version': '1',
-            },
-            'specific_locus': {
-                'type': 'lrg protein',
-                'protein_isoform': 'p1',
-            },
+            'references': {
+                'reference': {
+                    'type': 'genbank',
+                    'accession': 'NC_000001',
+                    'version': '1',
+                    'specific_locus': {
+                        'type': 'lrg protein',
+                        'protein_isoform': 'p1',
+                    }
+                }
+            }
         }
     ),
     (
         'LRG_24(SDHD)', {
-            'reference': {
-                'id': 'LRG_24',
-                'type': 'lrg'
-            },
-            'specific_locus': {
-                'type': 'gene',
-                'id': 'SDHD',
-            },
+            'references': {
+                'reference': {
+                    'id': 'LRG_24',
+                    'type': 'lrg',
+                    'specific_locus': {
+                        'type': 'gene',
+                        'id': 'SDHD',
+                    }
+                }
+            }
+        }
+    ),
+    (
+        'LRG_24(SDHD):c.', {
+            'references': {
+                'reference': {
+                    'id': 'LRG_24',
+                    'type': 'lrg',
+                    'specific_locus': {
+                        'type': 'gene',
+                        'id': 'SDHD',
+                    },
+                    'coordinate_system': 'c'
+                }
+            }
         }
     ),
 ]
@@ -270,6 +365,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'substitution',
+                    'source': 'reference',
                     'location': {
                         'type': 'point',
                         'position': 100
@@ -296,6 +392,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'substitution',
+                    'source': 'reference',
                     'location': {
                         'type': 'point',
                         'position': 100,
@@ -325,6 +422,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'substitution',
+                    'source': 'reference',
                     'location': {
                         'type': 'point',
                         'position': 100,
@@ -352,6 +450,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'substitution',
+                    'source': 'reference',
                     'location': {
                         'type': 'point',
                         'position': 0,
@@ -382,6 +481,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'substitution',
+                    'source': 'reference',
                     'location': {
                         'type': 'point',
                         'position': 0,
@@ -413,6 +513,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'deletion',
+                    'source': 'reference',
                     'location': {
                         'type': 'point',
                         'position': 10
@@ -428,6 +529,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'deletion',
+                    'source': 'reference',
                     'location': {
                         'type': 'point',
                         'position': 10
@@ -448,6 +550,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'deletion',
+                    'source': 'reference',
                     'location': {
                         'type': 'point',
                         'position': 100,
@@ -465,6 +568,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'deletion',
+                    'source': 'reference',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -486,6 +590,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'deletion',
+                    'source': 'reference',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -514,6 +619,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'deletion',
+                    'source': 'reference',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -541,6 +647,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'deletion',
+                    'source': 'reference',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -570,6 +677,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'deletion',
+                    'source': 'reference',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -607,6 +715,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'deletion',
+                    'source': 'reference',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -651,6 +760,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'deletion',
+                    'source': 'reference',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -690,6 +800,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'deletion',
+                    'source': 'reference',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -736,6 +847,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'duplication',
+                    'source': 'reference',
                     'location': {
                         'type': 'point',
                         'position': 10
@@ -744,13 +856,17 @@ VARIANTS = [
             ]
         }
     ),
-    # inserted
+    # Insertions
+    #  - note that one of the reasons why 'source' is present also at the
+    #    variant level (and not only in the 'inserted') is that an 'insertion'
+    #    is considered a special case of a 'deletion_insertion'.
     (
         '11_12insT',
         {
             'variants': [
                 {
                     'type': 'insertion',
+                    'source': 'reference',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -778,6 +894,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'insertion',
+                    'source': 'reference',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -805,6 +922,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'insertion',
+                    'source': 'reference',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -816,12 +934,12 @@ VARIANTS = [
                             'position': 11
                         }
                     },
-                    'inserted': [
-                        {
+                    'inserted': [{
                             'sequence': 'T',
                             'source': 'description'
                         },
                         {
+                            'source': 'reference',
                             'location': {
                                 'type': 'range',
                                 'start': {
@@ -845,6 +963,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'insertion',
+                    'source': 'reference',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -862,6 +981,7 @@ VARIANTS = [
                             'source': 'description'
                         },
                         {
+                            'source': 'reference',
                             'location': {
                                 'type': 'range',
                                 'start': {
@@ -883,9 +1003,17 @@ VARIANTS = [
     (
         '11_12ins[T;11_21inv;NM_000001.1:c.101_201]',
         {
+            'references': {
+                'NM_000001.1:c.': {
+                    'accession': 'NM_000001',
+                    'version': '1',
+                    'type': 'genbank'
+                },
+            },
             'variants': [
                 {
                     'type': 'insertion',
+                    'source': 'reference',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -903,6 +1031,7 @@ VARIANTS = [
                             'source': 'description'
                         },
                         {
+                            'source': 'reference',
                             'location': {
                                 'type': 'range',
                                 'start': {
@@ -917,23 +1046,16 @@ VARIANTS = [
                             'inverted': True
                         },
                         {
-                            'reference_location': {
-                                'reference': {
-                                    'accession': 'NM_000001',
-                                    'version': '1',
-                                    'type': 'genbank'
+                            'source': 'NM_000001.1:c.',
+                            'location': {
+                                'type': 'range',
+                                'start': {
+                                    'type': 'point',
+                                    'position': 100
                                 },
-                                'coordinate_system': 'c',
-                                'location': {
-                                    'type': 'range',
-                                    'start': {
-                                        'type': 'point',
-                                        'position': 100
-                                    },
-                                    'end': {
-                                        'type': 'point',
-                                        'position': 200
-                                    }
+                                'end': {
+                                    'type': 'point',
+                                    'position': 200
                                 }
                             }
                         }
@@ -945,9 +1067,17 @@ VARIANTS = [
     (
         '11_12insNM_000001.1:c.101_201',
         {
+            'references': {
+                'NM_000001.1:c.': {
+                    'accession': 'NM_000001',
+                    'version': '1',
+                    'type': 'genbank'
+                },
+            },
             'variants': [
                 {
                     'type': 'insertion',
+                    'source': 'reference',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -961,23 +1091,16 @@ VARIANTS = [
                     },
                     'inserted': [
                         {
-                            'reference_location': {
-                                'reference': {
-                                    'accession': 'NM_000001',
-                                    'version': '1',
-                                    'type': 'genbank'
+                            'source': 'NM_000001.1:c.',
+                            'location': {
+                                'type': 'range',
+                                'start': {
+                                    'type': 'point',
+                                    'position': 100
                                 },
-                                'coordinate_system': 'c',
-                                'location': {
-                                    'type': 'range',
-                                    'start': {
-                                        'type': 'point',
-                                        'position': 100
-                                    },
-                                    'end': {
-                                        'type': 'point',
-                                        'position': 200
-                                    }
+                                'end': {
+                                    'type': 'point',
+                                    'position': 200
                                 }
                             }
                         }
@@ -989,9 +1112,17 @@ VARIANTS = [
     (
         '11_12insNM_000001.1',
         {
+            'references': {
+                'NM_000001.1': {
+                    'accession': 'NM_000001',
+                    'version': '1',
+                    'type': 'genbank'
+                },
+            },
             'variants': [
                 {
                     'type': 'insertion',
+                    'source': 'reference',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -1005,13 +1136,41 @@ VARIANTS = [
                     },
                     'inserted': [
                         {
-                            'reference_location': {
-                                'reference': {
-                                    'accession': 'NM_000001',
-                                    'version': '1',
-                                    'type': 'genbank'
-                                },
-                            }
+                            'source': 'NM_000001.1',
+                        }
+                    ]
+                }
+            ]
+        }
+    ),
+    (
+        '11_12insNG_000001.1(NM_000002.3):c.100del',
+        {
+            'references': {
+                'NG_000001.1(NM_000002.3):c.': {
+                    'accession': 'NM_000001',
+                    'version': '1',
+                    'type': 'genbank'
+                },
+            },
+            'variants': [
+                {
+                    'type': 'insertion',
+                    'source': 'reference',
+                    'location': {
+                        'type': 'range',
+                        'start': {
+                            'type': 'point',
+                            'position': 10
+                        },
+                        'end': {
+                            'type': 'point',
+                            'position': 11
+                        }
+                    },
+                    'inserted': [
+                        {
+                            'source': 'NM_000001.1',
                         }
                     ]
                 }
@@ -1025,6 +1184,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'inversion',
+                    'source': 'reference',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -1047,6 +1207,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'conversion',
+                    'source': 'reference',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -1242,6 +1403,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'equal',
+                    'source': 'reference',
                 }
             ]
         }
@@ -1252,6 +1414,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'equal',
+                    'source': 'reference',
                     'location': {
                         'type': 'point',
                         'position': 10
@@ -1266,6 +1429,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'equal',
+                    'source': 'reference',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -1285,9 +1449,17 @@ VARIANTS = [
     (
         '[11=;11_12ins[T;11_21inv;NM_000001.1:c.101_201];11_21delinsGA]',
         {
+            'references': {
+                'NM_000001.1': {
+                    'accession': 'NM_000001',
+                    'version': '1',
+                    'type': 'genbank'
+                },
+            },
             'variants': [
                 {
                     'type': 'equal',
+                    'source': 'reference',
                     'location': {
                         'type': 'point',
                         'position': 10
@@ -1295,6 +1467,7 @@ VARIANTS = [
                 },
                 {
                     'type': 'insertion',
+                    'source': 'reference',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -1312,6 +1485,7 @@ VARIANTS = [
                             'source': 'description'
                         },
                         {
+                            'source': 'reference',
                             'location': {
                                 'type': 'range',
                                 'start': {
@@ -1326,23 +1500,16 @@ VARIANTS = [
                             'inverted': True
                         },
                         {
-                            'reference_location': {
-                                'reference': {
-                                    'accession': 'NM_000001',
-                                    'version': '1',
-                                    'type': 'genbank'
+                            'source': 'NM_000001.1:c.',
+                            'location': {
+                                'type': 'range',
+                                'start': {
+                                    'type': 'point',
+                                    'position': 100
                                 },
-                                'coordinate_system': 'c',
-                                'location': {
-                                    'type': 'range',
-                                    'start': {
-                                        'type': 'point',
-                                        'position': 100
-                                    },
-                                    'end': {
-                                        'type': 'point',
-                                        'position': 200
-                                    }
+                                'end': {
+                                    'type': 'point',
+                                    'position': 200
                                 }
                             }
                         }
@@ -1350,6 +1517,7 @@ VARIANTS = [
                 },
                 {
                     'type': 'deletion_insertion',
+                    'source': 'reference',
                     'location': {
                         'type': 'range',
                         'start': {

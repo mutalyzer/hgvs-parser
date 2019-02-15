@@ -1,12 +1,12 @@
 // Top rule
 // --------
 
-description: reference ":" ( COORDINATE_SYSTEM ".")? variants
+description: reference variants
 
 // References
 // ----------
 
-reference: reference_id specific_locus?
+reference: reference_id specific_locus? (":" ( COORDINATE_SYSTEM "."))?
 
 reference_id: ACCESSION ("." VERSION)?
 
@@ -122,7 +122,7 @@ uncertain_end: point
 
 // Other
 
-reference_location: reference (":" (COORDINATE_SYSTEM ".")? range)?
+reference_location: reference_id specific_locus? (":" (COORDINATE_SYSTEM "."))? range?
 
 chrom: NAME
 
