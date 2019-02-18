@@ -1004,7 +1004,7 @@ VARIANTS = [
         '11_12ins[T;11_21inv;NM_000001.1:c.101_201]',
         {
             'references': {
-                'NM_000001.1:c.': {
+                'NM_000001.1': {
                     'accession': 'NM_000001',
                     'version': '1',
                     'type': 'genbank'
@@ -1068,7 +1068,7 @@ VARIANTS = [
         '11_12insNM_000001.1:c.101_201',
         {
             'references': {
-                'NM_000001.1:c.': {
+                'NM_000001.1': {
                     'accession': 'NM_000001',
                     'version': '1',
                     'type': 'genbank'
@@ -1144,11 +1144,11 @@ VARIANTS = [
         }
     ),
     (
-        '11_12insNG_000001.1(NM_000002.3):c.100del',
+        '11_12insNG_000001.1(NM_000002.3):c.100',
         {
             'references': {
-                'NG_000001.1(NM_000002.3):c.': {
-                    'accession': 'NM_000001',
+                'NG_000001.1': {
+                    'accession': 'NG_000001',
                     'version': '1',
                     'type': 'genbank'
                 },
@@ -1170,7 +1170,11 @@ VARIANTS = [
                     },
                     'inserted': [
                         {
-                            'source': 'NM_000001.1',
+                            'source': 'NG_000001.1(NM_000002.3):c.',
+                            'location': {
+                                'type': 'point',
+                                'position': 99
+                            },
                         }
                     ]
                 }
@@ -1221,6 +1225,7 @@ VARIANTS = [
                     },
                     'inserted': [
                         {
+                            'source': 'reference',
                             'location': {
                                 'type': 'range',
                                 'start': {
@@ -1245,6 +1250,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'deletion_insertion',
+                    'source': 'reference',
                     'location': {
                         'type': 'point',
                         'position': 10
@@ -1265,6 +1271,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'deletion_insertion',
+                    'source': 'reference',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -1292,6 +1299,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'deletion_insertion',
+                    'source': 'reference',
                     'location': {
                         'type': 'range',
                         'start': {
@@ -1325,6 +1333,7 @@ VARIANTS = [
             'variants': [
                 {
                     'type': 'deletion_insertion',
+                    'source': 'reference',
                     'location': {
                         'type': 'point',
                         'position': 10

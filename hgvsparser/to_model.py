@@ -199,7 +199,8 @@ def extract_references_from_variants(sub_model):
                     new_inserted.append(new_insertion)
                 else:
                     new_insertion = insertion
-                    new_insertion.update({'source': 'reference'})
+                    if insertion.get('source') is None:
+                        new_insertion.update({'source': 'reference'})
                     new_inserted.append(new_insertion)
             variant['inserted'] = new_inserted
     return references
