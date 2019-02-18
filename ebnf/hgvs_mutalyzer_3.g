@@ -122,7 +122,7 @@ uncertain_end: point
 
 // Other
 
-reference_location: reference_id specific_locus? (":" (COORDINATE_SYSTEM "."))? range?
+reference_location: reference_id specific_locus? (":" (COORDINATE_SYSTEM "."))? (point | range)?
 
 chrom: NAME
 
