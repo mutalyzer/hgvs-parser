@@ -1,5 +1,6 @@
 """
-Tests for the lark based HGVS parser.
+Syntax tests for the lark based HGVS parser - taken from the previous
+Mutalyzer tests.
 """
 
 import pytest
