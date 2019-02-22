@@ -47,11 +47,9 @@ DELETED: NT
 
 INSERTED: NT
 
-deletion: location "del" (DELETED_SEQUENCE | DELETED_LENGTH)?
+deletion: location "del" deleted?
 
-DELETED_SEQUENCE: NT+
-
-DELETED_LENGTH: NUMBER
+deleted: SEQUENCE | length
 
 duplication: location "dup" (DUPLICATED_SEQUENCE | DUPLICATED_LENGTH)?
 
@@ -59,9 +57,9 @@ DUPLICATED_SEQUENCE: NT+
 
 DUPLICATED_LENGTH: NUMBER
 
-insertion: range "ins" inserted
+insertion: (range | uncertain_length) "ins" inserted
 
-deletion_insertion: location "del" (DELETED_SEQUENCE | DELETED_LENGTH)? "ins" inserted
+deletion_insertion: location "del" deleted? "ins" inserted
 
 inserted: ("[" insert (";" insert)* "]") | insert
 
@@ -125,6 +123,17 @@ uncertain_end: point
 reference_location: reference_id specific_locus? (":" (COORDINATE_SYSTEM "."))? (point | range)?
 
 chrom: NAME
+
+// Lengths
+// -------
+
+length: NUMBER | "?" | uncertain_length
+
+uncertain_length: "(" NUMBER ")" | "(" length_start "_" length_end ")"
+
+length_start: NUMBER | "?"
+
+length_end: NUMBER | "?"
 
 // Commons
 // -------

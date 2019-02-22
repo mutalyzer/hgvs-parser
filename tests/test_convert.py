@@ -642,6 +642,29 @@ VARIANTS = [
         }
     ),
     (
+        '(11_16)del',
+        {
+            'variants': [
+                {
+                    'type': 'deletion',
+                    'source': 'reference',
+                    'location': {
+                        'type': 'range',
+                        'uncertain': True,
+                        'start': {
+                            'type': 'point',
+                            'position': 10
+                        },
+                        'end': {
+                            'type': 'point',
+                            'position': 15
+                        },
+                    }
+                }
+            ]
+        }
+    ),
+    (
         '(11_21)_31del',
         {
             'variants': [
@@ -652,6 +675,7 @@ VARIANTS = [
                         'type': 'range',
                         'start': {
                             'type': 'range',
+                            'uncertain': True,
                             'start': {
                                 'type': 'point',
                                 'position': 10
@@ -659,8 +683,7 @@ VARIANTS = [
                             'end': {
                                 'type': 'point',
                                 'position': 20
-                            },
-                            'uncertain': True
+                            }
                         },
                         'end': {
                             'type': 'point',
@@ -682,6 +705,7 @@ VARIANTS = [
                         'type': 'range',
                         'start': {
                             'type': 'range',
+                            'uncertain': True,
                             'start': {
                                 'type': 'point',
                                 'position': 10
@@ -689,11 +713,11 @@ VARIANTS = [
                             'end': {
                                 'type': 'point',
                                 'position': 20
-                            },
-                            'uncertain': True
+                            }
                         },
                         'end': {
                             'type': 'range',
+                            'uncertain': True,
                             'start': {
                                 'type': 'point',
                                 'position': 30
@@ -701,8 +725,7 @@ VARIANTS = [
                             'end': {
                                 'type': 'point',
                                 'position': 40
-                            },
-                            'uncertain': True
+                            }
                         }
                     }
                 }
@@ -720,6 +743,7 @@ VARIANTS = [
                         'type': 'range',
                         'start': {
                             'type': 'range',
+                            'uncertain': True,
                             'start': {
                                 'type': 'point',
                                 'uncertain': True
@@ -728,11 +752,11 @@ VARIANTS = [
                                 'type': 'point',
                                 'position': 20,
                                 'outside_cds': 'upstream'
-                            },
-                            'uncertain': True
+                            }
                         },
                         'end': {
                             'type': 'range',
+                            'uncertain': True,
                             'start': {
                                 'type': 'point',
                                 'position': 30,
@@ -746,8 +770,7 @@ VARIANTS = [
                                 'offset': {
                                     'value': -1
                                 }
-                            },
-                            'uncertain': True
+                            }
                         }
                     },
                 }

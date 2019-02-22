@@ -92,6 +92,15 @@ def add_sub_module(node, model, sub_model):
             model['type'] = node
             model['source'] = 'reference'
             model.update(sub_model)
+        # Other
+        elif node == 'deleted':
+            sub_model.update({'source': 'description'})
+            model[node] = [sub_model]
+        # Length
+        elif node == 'length':
+            print(sub_model)
+            if 'number' in sub_model:
+                model[node] = int(sub_model['number'])
         else:
             model[node] = sub_model
     elif isinstance(model, list):
