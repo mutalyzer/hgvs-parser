@@ -70,6 +70,7 @@ setup(
     license=license,
     platforms=['any'],
     packages=[package],
+    include_package_data=True,
     install_requires=dependencies,
     entry_points={
         'console_scripts': ['{0} = {0}.cli:main'.format(package)]
