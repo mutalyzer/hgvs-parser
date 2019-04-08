@@ -360,7 +360,7 @@ def test_reference_part(description, model):
 VARIANTS = [
     # Substitutions
     (
-        '101C>A',
+        '100C>A',
         {
             'variants': [
                 {
@@ -387,7 +387,7 @@ VARIANTS = [
         }
     ),
     (
-        '101+3C>A',
+        '100+3C>A',
         {
             'variants': [
                 {
@@ -417,7 +417,7 @@ VARIANTS = [
         }
     ),
     (
-        '*101C>A',
+        '*100C>A',
         {
             'variants': [
                 {
@@ -453,7 +453,7 @@ VARIANTS = [
                     'source': 'reference',
                     'location': {
                         'type': 'point',
-                        'position': 0,
+                        'position': 1,
                         'offset': {
                             'value': -3,
                         },
@@ -484,7 +484,7 @@ VARIANTS = [
                     'source': 'reference',
                     'location': {
                         'type': 'point',
-                        'position': 0,
+                        'position': 1,
                         'offset': {
                             'value': 3,
                         },
@@ -508,7 +508,7 @@ VARIANTS = [
     ),
     # Deletions
     (
-        '11del',
+        '10del',
         {
             'variants': [
                 {
@@ -524,7 +524,7 @@ VARIANTS = [
     ),
     (
         # Note: the addition of 'A' is not HGVS.
-        '11delA',
+        '10delA',
         {
             'variants': [
                 {
@@ -545,7 +545,7 @@ VARIANTS = [
         }
     ),
     (
-        '101+1del',
+        '100+1del',
         {
             'variants': [
                 {
@@ -563,7 +563,7 @@ VARIANTS = [
         }
     ),
     (
-        '11_21del',
+        '10_20del',
         {
             'variants': [
                 {
@@ -585,7 +585,7 @@ VARIANTS = [
         }
     ),
     (
-        '11-1_21-3del',
+        '10-1_20-3del',
         {
             'variants': [
                 {
@@ -614,7 +614,7 @@ VARIANTS = [
     ),
     (
         # Note: the addition of '5' is not HGVS.
-        '11_16del5',
+        '10_15del5',
         {
             'variants': [
                 {
@@ -642,7 +642,7 @@ VARIANTS = [
         }
     ),
     (
-        '(11_16)del',
+        '(10_15)del',
         {
             'variants': [
                 {
@@ -665,7 +665,7 @@ VARIANTS = [
         }
     ),
     (
-        '(11_21)_31del',
+        '(10_20)_30del',
         {
             'variants': [
                 {
@@ -695,7 +695,7 @@ VARIANTS = [
         }
     ),
     (
-        '(11_21)_(31_41)del',
+        '(10_20)_(30_40)del',
         {
             'variants': [
                 {
@@ -733,7 +733,7 @@ VARIANTS = [
         }
     ),
     (
-        '(?_-21)_(31+1_31-1)del',
+        '(?_-20)_(30+1_30-1)del',
         {
             'variants': [
                 {
@@ -795,7 +795,7 @@ VARIANTS = [
                             },
                             'end': {
                                 'type': 'point',
-                                'position': 0,
+                                'position': 1,
                                 'outside_cds': 'upstream'
                             }
                         },
@@ -804,7 +804,7 @@ VARIANTS = [
                             'uncertain': True,
                             'start': {
                                 'type': 'point',
-                                'position': 0,
+                                'position': 1,
                                 'outside_cds': 'downstream'
                             },
                             'end': {
@@ -835,7 +835,7 @@ VARIANTS = [
                             },
                             'end': {
                                 'type': 'point',
-                                'position': 0,
+                                'position': 1,
                                 'outside_cds': 'upstream',
                                 'offset': {
                                     'uncertain': True
@@ -847,7 +847,7 @@ VARIANTS = [
                             'uncertain': True,
                             'start': {
                                 'type': 'point',
-                                'position': 0,
+                                'position': 1,
                                 'outside_cds': 'downstream',
                                 'offset':  {
                                     'uncertain': True
@@ -865,7 +865,7 @@ VARIANTS = [
     ),
     # Duplications
     (
-        '11dup',
+        '10dup',
         {
             'variants': [
                 {
@@ -884,7 +884,7 @@ VARIANTS = [
     #    variant level (and not only in the 'inserted') is that an 'insertion'
     #    is considered a special case of a 'deletion_insertion'.
     (
-        '11_12insT',
+        '10_11insT',
         {
             'variants': [
                 {
@@ -912,7 +912,7 @@ VARIANTS = [
         }
     ),
     (
-        '11_12ins[T]',
+        '10_11ins[T]',
         {
             'variants': [
                 {
@@ -940,7 +940,7 @@ VARIANTS = [
         }
     ),
     (
-        '11_12ins[T;11_21]',
+        '10_11ins[T;10_20]',
         {
             'variants': [
                 {
@@ -981,7 +981,7 @@ VARIANTS = [
         }
     ),
     (
-        '11_12ins[T;11_21inv]',
+        '10_11ins[T;10_20inv]',
         {
             'variants': [
                 {
@@ -1024,7 +1024,7 @@ VARIANTS = [
         }
     ),
     (
-        '11_12ins[T;11_21inv;NM_000001.1:c.101_201]',
+        '10_11ins[T;10_20inv;NM_000001.1:c.100_200]',
         {
             'references': {
                 'NM_000001.1': {
@@ -1088,7 +1088,7 @@ VARIANTS = [
         }
     ),
     (
-        '11_12insNM_000001.1:c.101_201',
+        '10_11insNM_000001.1:c.100_200',
         {
             'references': {
                 'NM_000001.1': {
@@ -1133,7 +1133,7 @@ VARIANTS = [
         }
     ),
     (
-        '11_12insNM_000001.1',
+        '10_11insNM_000001.1',
         {
             'references': {
                 'NM_000001.1': {
@@ -1167,7 +1167,7 @@ VARIANTS = [
         }
     ),
     (
-        '11_12insNG_000001.1(NM_000002.3):c.100',
+        '10_11insNG_000001.1(NM_000002.3):c.100',
         {
             'references': {
                 'NG_000001.1': {
@@ -1196,7 +1196,7 @@ VARIANTS = [
                             'source': 'NG_000001.1(NM_000002.3):c.',
                             'location': {
                                 'type': 'point',
-                                'position': 99
+                                'position': 100
                             },
                         }
                     ]
@@ -1206,7 +1206,7 @@ VARIANTS = [
     ),
     # Inversions
     (
-        '11_12inv',
+        '10_11inv',
         {
             'variants': [
                 {
@@ -1229,7 +1229,7 @@ VARIANTS = [
     ),
     # Conversions
     (
-        '11_21con31_41',
+        '10_20con30_40',
         {
             'variants': [
                 {
@@ -1268,7 +1268,7 @@ VARIANTS = [
     ),
     # Deletion-inserted
     (
-        '11delinsGA',
+        '10delinsGA',
         {
             'variants': [
                 {
@@ -1289,7 +1289,7 @@ VARIANTS = [
         }
     ),
     (
-        '11_21delinsGA',
+        '10_20delinsGA',
         {
             'variants': [
                 {
@@ -1327,11 +1327,11 @@ VARIANTS = [
                         'type': 'range',
                         'start': {
                             'type': 'point',
-                            'position': 10
+                            'position': 11
                         },
                         'end': {
                             'type': 'point',
-                            'position': 20
+                            'position': 21
                         }
                     },
                     'deleted': [
@@ -1359,7 +1359,7 @@ VARIANTS = [
                     'source': 'reference',
                     'location': {
                         'type': 'point',
-                        'position': 10
+                        'position': 11
                     },
                     'deleted': [
                         {
@@ -1441,7 +1441,7 @@ VARIANTS = [
         }
     ),
     (
-        '11=',
+        '10=',
         {
             'variants': [
                 {
@@ -1456,7 +1456,7 @@ VARIANTS = [
         }
     ),
     (
-        '11_21=',
+        '10_20=',
         {
             'variants': [
                 {
@@ -1479,7 +1479,7 @@ VARIANTS = [
     ),
     # Multiple variants (allele)
     (
-        '[11=;11_12ins[T;11_21inv;NM_000001.1:c.101_201];11_21delinsGA]',
+        '[10=;10_11ins[T;10_20inv;NM_000001.1:c.100_200];10_20delinsGA]',
         {
             'references': {
                 'NM_000001.1': {
