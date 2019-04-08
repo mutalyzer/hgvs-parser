@@ -6,6 +6,7 @@ import pytest
 
 from hgvsparser.hgvs_parser import HgvsParser
 
+
 @pytest.fixture
 def grammar():
     return HgvsParser()
@@ -122,6 +123,17 @@ def parser(grammar):
     'NG_012232.1:g.19_29=',
 ])
 def test_ncbi_references(parser, description):
+    """
+    Parse example variants with NCBI references.
+    """
+    parser(description)
+
+
+@pytest.mark.parametrize('description', [
+    ' NC_000023 . 10 : g . 33038255 C > A ',
+    'LRG_199 t1 :c.( 4071+1_4072 -1)_ ( 5154 +1_5155-1)[ 3]',
+])
+def test_allowed_white_spaces(parser, description):
     """
     Parse example variants with NCBI references.
     """
