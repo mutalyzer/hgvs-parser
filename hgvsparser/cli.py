@@ -7,7 +7,7 @@ import json
 
 from . import usage, version
 from hgvsparser.hgvs_parser import HgvsParser
-from hgvsparser.to_model import parse_tree_to_model
+from hgvsparser.to_model import parse_tree_to_model, to_model_open_grammar
 from lark import ParseError
 from lark.tree import pydot__tree_to_png
 
@@ -48,13 +48,14 @@ def hgvs_parser(description, convert_to_model,
     else:
         if parse_tree is not None:
             if convert_to_model:
-                model = parse_tree_to_model(parse_tree)
+                model = to_model_open_grammar(parse_tree)
                 print(json.dumps(model['model'], indent=2))
                 if save_png:
                     pydot__tree_to_png(parse_tree, save_png)
             else:
                 print('Successfully parsed HGVS description:\n %s' %
                       description)
+                print(parse_tree)
                 if save_png:
                     pydot__tree_to_png(parse_tree, save_png)
                     print('Parse tree image saved to:\n %s ' % save_png)

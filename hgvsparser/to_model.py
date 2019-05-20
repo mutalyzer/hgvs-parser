@@ -6,6 +6,7 @@ from lark import Tree
 from lark.lexer import Token
 import copy
 
+
 def parse_tree_to_model(parse_tree):
     """
     Wrapper around the actual parse tree to dictionary model converter.
@@ -204,7 +205,8 @@ def extract_references_from_variants(sub_model):
                     source = insertion['reference_location']['source']
                     new_insertion = {'source': source}
                     if insertion['reference_location'].get('location'):
-                        new_insertion['location'] = insertion['reference_location']['location']
+                        new_insertion['location'] = insertion[
+                            'reference_location']['location']
                     new_inserted.append(new_insertion)
                 else:
                     new_insertion = insertion
@@ -274,3 +276,45 @@ def get_reference_id(reference):
                                  )
         if reference['type'] == 'lrg':
             return '{}'.format(value_to_str(reference, 'id'))
+
+
+def to_model_open_grammar(parse_tree):
+    """
+    Convert a parse tree obtained by using the open grammar to the
+    description model.
+    """
+    model = {}
+    if isinstance(parse_tree, Tree):
+        for child in parse_tree.children:
+            if isinstance(child, Token):
+                if child.type == 'COORDINATE_SYSTEM':
+                    model['coordinate_system'] = child.value
+            elif isinstance(parse_tree, Tree):
+                if child.data == 'reference':
+                    model['reference'] = reference_to_model_open_grammar(
+                        child)
+                elif child.data == 'variants':
+                    model['variants'] = variants_to_model_open_grammar(
+                        child)
+
+    return {'model': model}
+
+
+def reference_to_model_open_grammar(reference_tree):
+    if len(reference_tree.children) == 1:
+        return {'id': reference_tree.children[0].value}
+    elif len(reference_tree.children) == 2:
+        return {'id': reference_tree.children[0].value,
+                'selector': reference_to_model_open_grammar(
+                    reference_tree.children[1])}
+
+
+def variants_to_model_open_grammar(variants_tree):
+    variants = []
+    for variant in variants_tree.children:
+        variants.append(variant_to_model_open_grammar(variant))
+    return variants
+
+
+def variant_to_model_open_grammar(variant_tree):
+    return {}

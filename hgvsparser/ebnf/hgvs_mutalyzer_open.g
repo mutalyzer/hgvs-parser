@@ -1,10 +1,12 @@
-description: reference ":" (LETTER ".")? allele
+description: reference ":" (COORDINATE_SYSTEM ".")? variants
 
-reference: IDENTIFIER (reference)? | "(" IDENTIFIER (reference)? ")"
+reference: ID (reference)? | "(" ID (reference)? ")"
 
-IDENTIFIER: LETTER (LETTER | DIGIT | "." | "_" | "-")*
+ID: LETTER (LETTER | DIGIT | "." | "_" | "-")*
 
-allele: (("[" ((variant (";" variant)*) | "=") "]") | variant | "=")
+COORDINATE_SYSTEM:  "c" | "g" | "o"
+
+variants: (("[" ((variant (";" variant)*) | "=") "]") | variant | "=")
 
 variant: location (conversion | deletion | deletion_insertion | duplication
                   | equal | insertion | inversion | substitution | repeat)?
