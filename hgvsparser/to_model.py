@@ -280,7 +280,7 @@ def get_reference_id(reference):
 
 def to_model_open_grammar(parse_tree):
     """
-    Convert a parse tree obtained by using the open grammar to the
+    Convert a parse tree, obtained by using the open grammar, to the
     description model.
     """
     model = {}
@@ -316,5 +316,112 @@ def variants_to_model_open_grammar(variants_tree):
     return variants
 
 
+def inserted_to_model_open_grammar(inserted_tree):
+    inserted = []
+    for inserted_subtree in inserted_tree.children:
+        insert = {}
+        for insert_part in inserted_subtree.children:
+            if isinstance(insert_part, Token):
+                if insert_part.type == 'SEQUENCE':
+                    insert.update({'sequence': insert_part.value,
+                                   'source': 'description'})
+                elif insert_part.type == 'INVERTED':
+                    insert['inverted'] = True
+            elif isinstance(insert_part, Tree):
+                if insert_part.data == 'location':
+                    insert['location'] = location_to_model_open_grammar(
+                        insert_part)
+                    insert['source'] = 'reference'
+                elif insert_part.data == 'description':
+                    for description_part in insert_part.children:
+                        print(description_part)
+                        if isinstance(description_part, Token) and \
+                                description_part.type == 'COORDINATE_SYSTEM':
+                            insert['coordinate_system'] = description_part.value
+                        elif description_part.data == 'variants':
+                            if len(description_part.children) != 1:
+                                raise Exception('Nested descriptions?')
+                            else:
+                                insert['location'] = \
+                                    location_to_model_open_grammar(
+                                        description_part.children[0])
+                        elif description_part.data == 'reference':
+                            insert['source'] = reference_to_model_open_grammar(
+                                description_part)
+
+        inserted.append(insert)
+
+    return inserted
+
+
 def variant_to_model_open_grammar(variant_tree):
-    return {}
+    variant = {'location': location_to_model_open_grammar(
+        variant_tree.children[0])}
+    variant_tree = variant_tree.children[1]
+    variant['type'] = variant_tree.data
+    variant['source'] = 'reference'
+    print(variant_tree)
+    if variant_tree.data == 'substitution':
+        if isinstance(variant_tree.children[0], Token):
+            variant['deleted'] = [{'sequence': variant_tree.children[0].value,
+                                   'source': 'description'}]
+            variant['inserted'] = inserted_to_model_open_grammar(
+                variant_tree.children[1])
+        else:
+            variant['inserted'] = inserted_to_model_open_grammar(
+                variant_tree.children[0])
+    if variant_tree.data == 'deletion':
+        if isinstance(variant_tree.children[0], Token):
+            variant['deleted'] = [{'sequence': variant_tree.children[0].value,
+                                   'source': 'description'}]
+            variant['inserted'] = inserted_to_model_open_grammar(
+                variant_tree.children[1])
+        else:
+            variant['inserted'] = inserted_to_model_open_grammar(
+                variant_tree.children[0])
+
+    return variant
+
+
+def point_to_model_open_grammar(point_tree):
+    if point_tree.data == 'uncertain_point':
+        return {**range_to_model_open_grammar(point_tree),
+                **{'uncertain': True}}
+    point = {'type': 'point'}
+    for token in point_tree.children:
+        if token.type == 'OUTSIDE_CDS':
+            if token.value == '*':
+                point['outside_cds'] = 'downstream'
+            elif token.value == '-':
+                point['outside_cds'] = 'upstream'
+        elif token.type == 'NUMBER':
+            point['position'] = int(token.value)
+        elif token.type == 'UNKNOWN':
+            point['uncertain'] = True
+        elif token.type == 'OFFSET':
+            if '?' in token.value:
+                point['offset'] = {'uncertain': True}
+                if '+' in token.value:
+                    point['offset']['downstream'] = True
+                elif '-' in token.value:
+                    point['offset']['upstream'] = True
+            else:
+                point['offset'] = {'value': int(token.value)}
+    return point
+
+
+def range_to_model_open_grammar(range_tree):
+    range_location = {'type': 'range',
+                      'start': point_to_model_open_grammar(
+                          range_tree.children[0]),
+                      'end': point_to_model_open_grammar(
+                          range_tree.children[1])}
+    return range_location
+
+
+def location_to_model_open_grammar(location_tree):
+    location_tree = location_tree.children[0]
+    if location_tree.data in ['point', 'uncertain_point']:
+        return point_to_model_open_grammar(location_tree)
+    elif location_tree.data == 'range':
+        return range_to_model_open_grammar(location_tree)
