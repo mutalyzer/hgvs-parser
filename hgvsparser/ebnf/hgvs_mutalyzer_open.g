@@ -4,7 +4,7 @@ reference: ID (reference)? | "(" ID (reference)? ")"
 
 ID: LETTER (LETTER | DIGIT | "." | "_" | "-")*
 
-COORDINATE_SYSTEM:  "c" | "g" | "o"
+COORDINATE_SYSTEM:  "g" | "o" | "m" | "c" | "n" | "r" | "p"
 
 variants: (("[" ((variant (";" variant)*) | "=") "]") | variant | "=")
 
