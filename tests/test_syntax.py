@@ -121,6 +121,12 @@ def parser(grammar):
     'NM_021080.3:c.-136-75952ATTTT[15]',
     'NG_012232.1:g.19=',
     'NG_012232.1:g.19_29=',
+    # Other ones - for the open grammar
+    'REF:[4]',
+    # 'REF:1del[AAA;A[3]inv]insGGG[4]inv', TODO: -check if deleted = inserted
+    'REF:10>[REF:g.(4_6)]',
+    'REF:c.4conREF:g.[3;4;5;6;(5_5)_?con[3456_09209]]',
+    'REF(A(B(C))):3'
 ])
 def test_ncbi_references(parser, description):
     """
@@ -130,7 +136,7 @@ def test_ncbi_references(parser, description):
 
 
 @pytest.mark.parametrize('description', [
-    ' NC_000023 . 10 : g . 33038255 C > A ',
+    ' NC_000023.10 : g . 33038255 C > A ',
     'LRG_199 t1 :c.( 4071+1_4072 -1)_ ( 5154 +1_5155-1)[ 3]',
 ])
 def test_allowed_white_spaces(parser, description):

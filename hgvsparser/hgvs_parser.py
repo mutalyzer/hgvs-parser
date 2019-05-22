@@ -19,7 +19,7 @@ class HgvsParser:
                  start_rule='description', ignore_white_spaces=True):
         if grammar_path == 'local':
             self._grammar_path = os.path.join(os.path.dirname(__file__),
-                                              'ebnf/hgvs_mutalyzer_3.g')
+                                              'ebnf/hgvs_mutalyzer_open.g')
         else:
             self._grammar_path = grammar_path
         self._parser_type = parser_type

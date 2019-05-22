@@ -5,1580 +5,419 @@ Tests for the lark tree to dictionary converter.
 import pytest
 
 from hgvsparser.hgvs_parser import HgvsParser
-from hgvsparser.to_model import parse_tree_to_model
+from hgvsparser.to_model import convert, location_to_model, \
+    variant_to_model, variants_to_model, inserted_to_model, reference_to_model
 
 
-REFERENCES = [
-    # No specific locus
-    # - genbank reference with no version
-    (
-        'NC_000001', {
-            'references': {
-                'reference': {
-                    'type': 'genbank',
-                    'accession': 'NC_000001',
-                }
-            }
-        }
-    ),
-    # - genbank reference with accession and version
-    (
-        'NC_000001.10', {
-            'references': {
-                'reference': {
-                    'type': 'genbank',
-                    'accession': 'NC_000001',
-                    'version': '10',
-                }
-            }
-        }
-    ),
-    # - genbank reference with accession, version and coordinate system
-    (
-        'NC_000001.10:c.', {
-            'references': {
-                'reference': {
-                    'type': 'genbank',
-                    'accession': 'NC_000001',
-                    'version': '10',
-                    'coordinate_system': 'c',
-                }
-            }
-        }
-    ),
-    # - lrg reference
-    (
-        'LRG_1', {
-            'references': {
-                'reference': {
-                    'type': 'lrg',
-                    'id': 'LRG_1',
-                }
-            }
-        }
-    ),
-    # - lrg reference with coordinate system
-    (
-        'LRG_1:g.', {
-            'references': {
-                'reference': {
-                    'type': 'lrg',
-                    'id': 'LRG_1',
-                    'coordinate_system': 'g'
-                }
-            }
-        }
-    ),
-    # - lrg reference with version - the user should be notified somehow
-    (
-        'LRG_1.1', {
-            'references': {
-                'reference': {
-                    'type': 'lrg',
-                    'id': 'LRG_1',
-                    'version': '1',
-                }
-            }
-        }
-    ),
-    # Specific locus present
-    # - with gene names only
-    (
-        'NC_000001(SDHD)', {
-            'references': {
-                'reference': {
-                    'type': 'genbank',
-                    'accession': 'NC_000001',
-                    'specific_locus': {
-                        'type': 'gene',
-                        'id': 'SDHD',
-                    }
-                }
-            }
-        }
-    ),
-    (
-        'NC_012920.1(MT-TL1)', {
-            'references': {
-                'reference': {
-                    'type': 'genbank',
-                    'accession': 'NC_012920',
-                    'version': '1',
-                    'specific_locus': {
-                        'type': 'gene',
-                        'id': 'MT-TL1',
-                    }
-                }
-            }
-        }
-    ),
-    (
-        'NG_012337.1(TIMM8B)', {
-            'references': {
-                'reference': {
-                    'type': 'genbank',
-                    'accession': 'NG_012337',
-                    'version': '1',
-                    'specific_locus': {
-                        'type': 'gene',
-                        'id': 'TIMM8B',
-                    }
-                }
-            }
-        }
-    ),
-    (
-        'NC_000001(SDHD_v001)', {
-            'references': {
-                'reference': {
-                    'type': 'genbank',
-                    'accession': 'NC_000001',
-                    'specific_locus': {
-                        'type': 'gene',
-                        'id': 'SDHD',
-                        'transcript_variant': '001',
-                    }
-                }
-            }
-        }
-    ),
-    (
-        'NC_000001(SDHD_i001)', {
-            'references': {
-                'reference': {
-                    'type': 'genbank',
-                    'accession': 'NC_000001',
-                    'specific_locus': {
-                        'type': 'gene',
-                        'id': 'SDHD',
-                        'protein_isoform': '001',
-                    }
-                }
-            }
-        }
-    ),
-    (
-        'NG_012337.1(TIMM8B_v001)', {
-            'references': {
-                'reference': {
-                    'type': 'genbank',
-                    'accession': 'NG_012337',
-                    'version': '1',
-                    'specific_locus': {
-                        'type': 'gene',
-                        'id': 'TIMM8B',
-                        'transcript_variant': '001'
-                    }
-                }
-            }
-        }
-    ),
-    (
-        'NG_012337.1(TIMM8B_i001)', {
-            'references': {
-                'reference': {
-                    'type': 'genbank',
-                    'accession': 'NG_012337',
-                    'version': '1',
-                    'specific_locus': {
-                        'type': 'gene',
-                        'id': 'TIMM8B',
-                        'protein_isoform': '001'
-                    }
-                }
-            }
-        }
-    ),
-    (
-        'NC_012920.1(MT-TL1_v001)', {
-            'references': {
-                'reference': {
-                    'type': 'genbank',
-                    'accession': 'NC_012920',
-                    'version': '1',
-                    'specific_locus': {
-                        'type': 'gene',
-                        'id': 'MT-TL1',
-                        'transcript_variant': '001',
-                    }
-                }
-            }
-        }
-    ),
-    (
-        'NC_012920.1(MT-TL1_i001)', {
-            'references': {
-                'reference': {
-                    'type': 'genbank',
-                    'accession': 'NC_012920',
-                    'version': '1',
-                    'specific_locus': {
-                        'type': 'gene',
-                        'id': 'MT-TL1',
-                        'protein_isoform': '001',
-                    }
-                }
-            }
-        }
-    ),
-    (
-        'NC_012920.1(MT-TL1_i001):c.', {
-            'references': {
-                'reference': {
-                    'type': 'genbank',
-                    'accession': 'NC_012920',
-                    'version': '1',
-                    'specific_locus': {
-                        'type': 'gene',
-                        'id': 'MT-TL1',
-                        'protein_isoform': '001',
-                    },
-                    'coordinate_system': 'c'
-                }
-            }
-        }
-    ),
-    # - with accession and version
-    (
-        'NG_012337.1(NM_012459.2)', {
-            'references': {
-                'reference': {
-                    'type': 'genbank',
-                    'accession': 'NG_012337',
-                    'version': '1',
-                    'specific_locus': {
-                        'type': 'genbank',
-                        'accession': 'NM_012459',
-                        'version': '2',
-                    }
-                }
-            }
-        }
-    ),
-    # - LRG ones
-    (
-        'LRG_24t1', {
-            'references': {
-                'reference': {
-                    'type': 'lrg',
-                    'id': 'LRG_24',
-                    'specific_locus': {
-                        'type': 'lrg transcript',
-                        'transcript_variant': 't1',
-                    }
-                }
-            }
-        }
-    ),
-    (
-        'LRG_24p1', {
-            'references': {
-                'reference': {
-                    'type': 'lrg',
-                    'id': 'LRG_24',
-                    'specific_locus': {
-                        'type': 'lrg protein',
-                        'protein_isoform': 'p1',
-                    }
-                }
-            }
-        }
-    ),
-    # - mix
-    (
-        'NC_000001.1t1', {
-            'references': {
-                'reference': {
-                    'type': 'genbank',
-                    'accession': 'NC_000001',
-                    'version': '1',
-                    'specific_locus': {
-                        'type': 'lrg transcript',
-                        'transcript_variant': 't1',
-                    }
-                }
-            }
-        }
-    ),
-    (
-        'NC_000001.1p1', {
-            'references': {
-                'reference': {
-                    'type': 'genbank',
-                    'accession': 'NC_000001',
-                    'version': '1',
-                    'specific_locus': {
-                        'type': 'lrg protein',
-                        'protein_isoform': 'p1',
-                    }
-                }
-            }
-        }
-    ),
-    (
-        'LRG_24(SDHD)', {
-            'references': {
-                'reference': {
-                    'id': 'LRG_24',
-                    'type': 'lrg',
-                    'specific_locus': {
-                        'type': 'gene',
-                        'id': 'SDHD',
-                    }
-                }
-            }
-        }
-    ),
-    (
-        'LRG_24(SDHD):c.', {
-            'references': {
-                'reference': {
-                    'id': 'LRG_24',
-                    'type': 'lrg',
-                    'specific_locus': {
-                        'type': 'gene',
-                        'id': 'SDHD',
-                    },
-                    'coordinate_system': 'c'
-                }
-            }
-        }
-    ),
-]
+def get_tests(tests):
+    return [(k, tests[k]) for k in tests.keys()]
 
 
-@pytest.mark.parametrize('description,model', REFERENCES)
-def test_reference_part(description, model):
-    """
-    Test the reference part of a description.
-    """
+REFERENCES = {
+    'R1': {'id': 'R1'},
+    'R1(R2)': {'id': 'R1',
+               'selector': {'id': 'R2'}},
+    'R1(R2(R3))': {'id': 'R1',
+                   'selector': {'id': 'R2',
+                                'selector': {'id': 'R3'}}},
+    'NM_000001.1': {'id': 'NM_000001.1'},
+    'NG_000001.1(NM_000002.3)': {'id': 'NG_000001.1',
+                                 'selector': {'id': 'NM_000002.3'}}
+}
+
+
+@pytest.mark.parametrize('reference, model', get_tests(REFERENCES))
+def test_reference_to_model(reference, model):
     parser = HgvsParser(start_rule='reference')
+    assert reference_to_model(parser.parse(reference)) == model
 
-    assert parse_tree_to_model(parser.parse(description)) == model
+
+LOCATIONS = {
+    '1': {'type': 'point',
+           'position': 1},
+    '10': {'type': 'point',
+           'position': 10},
+    '100': {'type': 'point',
+            'position': 100},
+    '10-20': {'type': 'point',
+              'position': 10,
+              'offset': {'value': -20}},
+    '10+20': {'type': 'point',
+              'position': 10,
+              'offset': {'value': +20}},
+    '?': {'type': 'point',
+          'uncertain': True},
+    '??': {'type': 'point',
+           'uncertain': True,
+           'offset': {'uncertain': True}},
+    '?+?': {'type': 'point',
+            'uncertain': True,
+            'offset': {'uncertain': True,
+                       'downstream': True}},
+    '?-?': {'type': 'point',
+            'uncertain': True,
+            'offset': {'uncertain': True,
+                       'upstream': True}},
+    '-10': {'type': 'point',
+            'position': 10,
+            'outside_cds': 'upstream'},
+    '-10-20': {'type': 'point',
+               'position': 10,
+               'outside_cds': 'upstream',
+               'offset': {'value': -20}},
+    '-10+20': {'type': 'point',
+               'position': 10,
+               'outside_cds': 'upstream',
+               'offset': {'value': 20}},
+    '*10': {'type': 'point',
+            'position': 10,
+            'outside_cds': 'downstream'},
+    '*10+20': {'type': 'point',
+               'position': 10,
+               'outside_cds': 'downstream',
+               'offset': {'value': 20}},
+    '*10-20': {'type': 'point',
+               'position': 10,
+               'outside_cds': 'downstream',
+               'offset': {'value': -20}},
+    '10_15': {'type': 'range',
+              'start': {'type': 'point',
+                        'position': 10},
+              'end': {'type': 'point',
+                      'position': 15}},
+    '(10_15)': {'type': 'range',
+                'uncertain': True,
+                'start': {'type': 'point',
+                          'position': 10},
+                'end': {'type': 'point',
+                        'position': 15}},
+    '(10_20)_30': {'type': 'range',
+                   'start': {'type': 'range',
+                             'uncertain': True,
+                             'start': {'type': 'point',
+                                       'position': 10},
+                             'end': {'type': 'point',
+                                     'position': 20}},
+                   'end': {'type': 'point',
+                           'position': 30}},
+    '10_(20_30)': {'type': 'range',
+                   'start': {'type': 'point',
+                             'position': 10},
+                   'end': {'type': 'range',
+                           'uncertain': True,
+                           'start': {'type': 'point',
+                                     'position': 20},
+                           'end': {'type': 'point',
+                                   'position': 30}}},
+    '(10_20)_(30_40)': {'type': 'range',
+                        'start': {'type': 'range',
+                                  'uncertain': True,
+                                  'start': {'type': 'point',
+                                            'position': 10},
+                                  'end': {'type': 'point',
+                                          'position': 20}},
+                        'end': {'type': 'range',
+                                'uncertain': True,
+                                'start': {'type': 'point',
+                                          'position': 30},
+                                'end': {'type': 'point',
+                                        'position': 40}}},
+    '(?_-20)_(30+1_30-1)': {'type': 'range',
+                            'start': {'type': 'range',
+                                      'uncertain': True,
+                                      'start': {'type': 'point',
+                                                'uncertain': True},
+                                      'end': {'type': 'point',
+                                              'position': 20,
+                                              'outside_cds': 'upstream'}},
+                            'end': {'type': 'range',
+                                    'uncertain': True,
+                                    'start': {'type': 'point',
+                                              'position': 30,
+                                              'offset': {'value': 1}},
+                                    'end': {'type': 'point',
+                                            'position': 30,
+                                            'offset': {'value': -1}}}},
+    '(?_-1)_(*1_?)': {'type': 'range',
+                      'start': {'type': 'range',
+                                'uncertain': True,
+                                'start': {'type': 'point',
+                                          'uncertain': True},
+                                'end': {'type': 'point',
+                                        'position': 1,
+                                        'outside_cds': 'upstream'}},
+                      'end': {'type': 'range',
+                              'uncertain': True,
+                              'start': {'type': 'point',
+                                        'position': 1,
+                                        'outside_cds': 'downstream'},
+                              'end': {'type': 'point',
+                                      'uncertain': True}}},
+    '(?_-1+?)_(*1-?_?)': {'type': 'range',
+                          'start': {'type': 'range',
+                                    'uncertain': True,
+                                    'start': {'type': 'point',
+                                              'uncertain': True},
+                                    'end': {'type': 'point',
+                                            'position': 1,
+                                            'outside_cds': 'upstream',
+                                            'offset': {'uncertain': True,
+                                                       'downstream': True}}},
+                          'end': {'type': 'range',
+                                  'uncertain': True,
+                                  'start': {'type': 'point',
+                                            'position': 1,
+                                            'outside_cds': 'downstream',
+                                            'offset': {'uncertain': True,
+                                                       'upstream': True}},
+                                  'end': {'type': 'point',
+                                          'uncertain': True}}},
+    '10_11': {'type': 'range',
+              'start': {'type': 'point',
+                        'position': 10},
+              'end': {'type': 'point',
+                      'position': 11}},
+    '10_20': {'type': 'range',
+              'start': {'type': 'point',
+                        'position': 10},
+              'end': {'type': 'point',
+                      'position': 20}},
+    '40_50': {'type': 'range',
+              'start': {'type': 'point',
+                        'position': 40},
+              'end': {'type': 'point',
+                      'position': 50}},
+    '200_300': {'type': 'range',
+                'start': {'type': 'point',
+                          'position': 200},
+                'end': {'type': 'point',
+                        'position': 300}},
+    '123_191': {'type': 'range',
+                'start': {'type': 'point',
+                          'position': 123},
+                'end': {'type': 'point',
+                        'position': 191}},
+}
 
 
-VARIANTS = [
+@pytest.mark.parametrize('description, model', get_tests(LOCATIONS))
+def test_location_to_model(description, model):
+    parser = HgvsParser(start_rule='location')
+    assert location_to_model(parser.parse(description)) == model
+
+
+INSERTED = {
+    'A': [{'sequence': 'A',
+           'source': 'description'}],
+    'GA': [{'sequence': 'GA',
+            'source': 'description'}],
+    '[A;10_20]': [{'sequence': 'A',
+                   'source': 'description'},
+                  {'source': 'reference',
+                   'location': LOCATIONS['10_20']}],
+    '[A;10_20inv]': [{'sequence': 'A',
+                      'source': 'description'},
+                     {'source': 'reference',
+                      'location': LOCATIONS['10_20'],
+                      'inverted': True}],
+    'R2:g.10_15': [{'source': {'id': 'R2'},
+                    'coordinate_system': 'g',
+                    'location': LOCATIONS['10_15']}],
+    'NG_000001.1(NM_000002.3):c.100': [{'source':
+                                            REFERENCES[
+                                                'NG_000001.1(NM_000002.3)'],
+                                        'coordinate_system': 'c',
+                                        'location': LOCATIONS['100']}],
+    '[R2:g.200_300;40_50]': [{'source': {'id': 'R2'},
+                              'coordinate_system': 'g',
+                              'location': LOCATIONS['200_300']},
+                             {'source': 'reference',
+                              'location': LOCATIONS['40_50']}],
+    '[T;10_20inv;NM_000001.1:c.200_300]': [{'sequence': 'T',
+                                            'source': 'description'},
+                                           {'source': 'reference',
+                                            'location': LOCATIONS['10_20'],
+                                            'inverted': True},
+                                           {'source': {'id': 'NM_000001.1'},
+                                            'coordinate_system': 'c',
+                                            'location': LOCATIONS['200_300']}]
+}
+
+
+@pytest.mark.parametrize('description, model', get_tests(INSERTED))
+def test_inserted_to_model(description, model):
+    parser = HgvsParser(start_rule='inserted')
+    assert inserted_to_model(parser.parse(description)) == model
+
+
+VARIANTS = {
+    '1': {'location': LOCATIONS['1']},
+    '10_15': {'location': LOCATIONS['10_15']},
     # Substitutions
-    (
-        '100C>A',
-        {
-            'variants': [
-                {
-                    'type': 'substitution',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'point',
-                        'position': 100
-                    },
-                    'inserted': [
-                        {
-                            'sequence': 'A',
-                            'source': 'description'
-                        }
-                    ],
-                    'deleted': [
-                        {
-                            'sequence': 'C',
-                            'source': 'description'
-                        }
-                    ]
-                }
-            ]
-        }
-    ),
-    (
-        '100+3C>A',
-        {
-            'variants': [
-                {
-                    'type': 'substitution',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'point',
-                        'position': 100,
-                        'offset': {
-                            'value': 3
-                        }
-                    },
-                    'inserted': [
-                        {
-                            'sequence': 'A',
-                            'source': 'description'
-                        }
-                    ],
-                    'deleted': [
-                        {
-                            'sequence': 'C',
-                            'source': 'description'
-                        }
-                    ]
-                }
-            ]
-        }
-    ),
-    (
-        '*100C>A',
-        {
-            'variants': [
-                {
-                    'type': 'substitution',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'point',
-                        'position': 100,
-                        'outside_cds': 'downstream'
-                    },
-                    'inserted': [
-                        {
-                            'sequence': 'A',
-                            'source': 'description'
-                        }
-                    ],
-                    'deleted': [
-                        {
-                            'sequence': 'C',
-                            'source': 'description'
-                        }
-                    ]
-                }
-            ]
-        }
-    ),
-    (
-        '*1-3C>A',
-        {
-            'variants': [
-                {
-                    'type': 'substitution',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'point',
-                        'position': 1,
-                        'offset': {
-                            'value': -3,
-                        },
-                        'outside_cds': 'downstream'
-                    },
-                    'inserted': [
-                        {
-                            'sequence': 'A',
-                            'source': 'description'
-                        }
-                    ],
-                    'deleted': [
-                        {
-                            'sequence': 'C',
-                            'source': 'description'
-                        }
-                    ]
-                }
-            ]
-        }
-    ),
-    (
-        '-1+3C>A',
-        {
-            'variants': [
-                {
-                    'type': 'substitution',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'point',
-                        'position': 1,
-                        'offset': {
-                            'value': 3,
-                        },
-                        'outside_cds': 'upstream'
-                    },
-                    'inserted': [
-                        {
-                            'sequence': 'A',
-                            'source': 'description'
-                        }
-                    ],
-                    'deleted': [
-                        {
-                            'sequence': 'C',
-                            'source': 'description'
-                        }
-                    ]
-                }
-            ]
-        }
-    ),
+    '10C>A': {'type': 'substitution',
+              'source': 'reference',
+              'location': LOCATIONS['10'],
+              'deleted': [{'sequence': 'C',
+                           'source': 'description'}],
+              'inserted': [{'sequence': 'A',
+                            'source': 'description'}]},
+    '10>A': {'type': 'substitution',
+             'source': 'reference',
+             'location': LOCATIONS['10'],
+             'inserted': INSERTED['A']},
+    '10>R2:g.10_15': {'type': 'substitution',
+                      'source': 'reference',
+                      'location': LOCATIONS['10'],
+                      'inserted': INSERTED['R2:g.10_15']},
+    '10>[R2:g.200_300;40_50]': {'type': 'substitution',
+                                'source': 'reference',
+                                'location': LOCATIONS['10'],
+                                'inserted': INSERTED['[R2:g.200_300;40_50]']},
     # Deletions
-    (
-        '10del',
-        {
-            'variants': [
-                {
-                    'type': 'deletion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'point',
-                        'position': 10
-                    }
-                }
-            ]
-        }
-    ),
-    (
-        # Note: the addition of 'A' is not HGVS.
-        '10delA',
-        {
-            'variants': [
-                {
-                    'type': 'deletion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'point',
-                        'position': 10
-                    },
-                    'deleted': [
-                        {
-                            'sequence': 'A',
-                            'source': 'description'
-                        }
-                    ]
-                }
-            ]
-        }
-    ),
-    (
-        '100+1del',
-        {
-            'variants': [
-                {
-                    'type': 'deletion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'point',
-                        'position': 100,
-                        'offset': {
-                            'value': 1
-                        }
-                    }
-                }
-            ]
-        }
-    ),
-    (
-        '10_20del',
-        {
-            'variants': [
-                {
-                    'type': 'deletion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'range',
-                        'start': {
-                            'type': 'point',
-                            'position': 10
-                        },
-                        'end': {
-                            'type': 'point',
-                            'position': 20
-                        }
-                    }
-                }
-            ]
-        }
-    ),
-    (
-        '10-1_20-3del',
-        {
-            'variants': [
-                {
-                    'type': 'deletion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'range',
-                        'start': {
-                            'type': 'point',
-                            'position': 10,
-                            'offset': {
-                                'value': -1
-                            }
-                        },
-                        'end': {
-                            'type': 'point',
-                            'position': 20,
-                            'offset': {
-                                'value': -3
-                            }
-                        }
-                    }
-                }
-            ]
-        }
-    ),
-    (
-        # Note: the addition of '5' is not HGVS.
-        '10_15del5',
-        {
-            'variants': [
-                {
-                    'type': 'deletion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'range',
-                        'start': {
-                            'type': 'point',
-                            'position': 10
-                        },
-                        'end': {
-                            'type': 'point',
-                            'position': 15
-                        }
-                    },
-                    'deleted': [
-                        {
-                            'source': 'description',
-                            'length': 5
-                        }
-                    ]
-                }
-            ]
-        }
-    ),
-    (
-        '(10_15)del',
-        {
-            'variants': [
-                {
-                    'type': 'deletion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'range',
-                        'uncertain': True,
-                        'start': {
-                            'type': 'point',
-                            'position': 10
-                        },
-                        'end': {
-                            'type': 'point',
-                            'position': 15
-                        },
-                    }
-                }
-            ]
-        }
-    ),
-    (
-        '(10_20)_30del',
-        {
-            'variants': [
-                {
-                    'type': 'deletion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'range',
-                        'start': {
-                            'type': 'range',
-                            'uncertain': True,
-                            'start': {
-                                'type': 'point',
-                                'position': 10
-                            },
-                            'end': {
-                                'type': 'point',
-                                'position': 20
-                            }
-                        },
-                        'end': {
-                            'type': 'point',
-                            'position': 30
-                        }
-                    }
-                }
-            ]
-        }
-    ),
-    (
-        '(10_20)_(30_40)del',
-        {
-            'variants': [
-                {
-                    'type': 'deletion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'range',
-                        'start': {
-                            'type': 'range',
-                            'uncertain': True,
-                            'start': {
-                                'type': 'point',
-                                'position': 10
-                            },
-                            'end': {
-                                'type': 'point',
-                                'position': 20
-                            }
-                        },
-                        'end': {
-                            'type': 'range',
-                            'uncertain': True,
-                            'start': {
-                                'type': 'point',
-                                'position': 30
-                            },
-                            'end': {
-                                'type': 'point',
-                                'position': 40
-                            }
-                        }
-                    }
-                }
-            ]
-        }
-    ),
-    (
-        '(?_-20)_(30+1_30-1)del',
-        {
-            'variants': [
-                {
-                    'type': 'deletion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'range',
-                        'start': {
-                            'type': 'range',
-                            'uncertain': True,
-                            'start': {
-                                'type': 'point',
-                                'uncertain': True
-                            },
-                            'end': {
-                                'type': 'point',
-                                'position': 20,
-                                'outside_cds': 'upstream'
-                            }
-                        },
-                        'end': {
-                            'type': 'range',
-                            'uncertain': True,
-                            'start': {
-                                'type': 'point',
-                                'position': 30,
-                                'offset': {
-                                    'value': 1
-                                }
-                            },
-                            'end': {
-                                'type': 'point',
-                                'position': 30,
-                                'offset': {
-                                    'value': -1
-                                }
-                            }
-                        }
-                    },
-                }
-            ]
-        }
-    ),
-    (
-        '(?_-1)_(*1_?)del',
-        {
-            'variants': [
-                {
-                    'type': 'deletion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'range',
-                        'start': {
-                            'type': 'range',
-                            'uncertain': True,
-                            'start': {
-                                'type': 'point',
-                                'uncertain': True
-                            },
-                            'end': {
-                                'type': 'point',
-                                'position': 1,
-                                'outside_cds': 'upstream'
-                            }
-                        },
-                        'end': {
-                            'type': 'range',
-                            'uncertain': True,
-                            'start': {
-                                'type': 'point',
-                                'position': 1,
-                                'outside_cds': 'downstream'
-                            },
-                            'end': {
-                                'type': 'point',
-                                'uncertain': True
-                            }
-                        }
-                    }
-                }
-            ]
-        }
-    ),
-    (
-        '(?_-1+?)_(*1-?_?)del',
-        {
-            'variants': [
-                {
-                    'type': 'deletion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'range',
-                        'start': {
-                            'type': 'range',
-                            'uncertain': True,
-                            'start': {
-                                'type': 'point',
-                                'uncertain': True
-                            },
-                            'end': {
-                                'type': 'point',
-                                'position': 1,
-                                'outside_cds': 'upstream',
-                                'offset': {
-                                    'uncertain': True
-                                }
-                            }
-                        },
-                        'end': {
-                            'type': 'range',
-                            'uncertain': True,
-                            'start': {
-                                'type': 'point',
-                                'position': 1,
-                                'outside_cds': 'downstream',
-                                'offset':  {
-                                    'uncertain': True
-                                }
-                            },
-                            'end': {
-                                'type': 'point',
-                                'uncertain': True
-                            }
-                        }
-                    }
-                }
-            ]
-        }
-    ),
+    '10del': {'type': 'deletion',
+              'source': 'reference',
+              'location': LOCATIONS['10']},
+    '10delA': {'type': 'deletion',
+               'source': 'reference',
+               'location': LOCATIONS['10'],
+               'deleted': [{'sequence': 'A',
+                            'source': 'description'}]},
+    '10_15del6': {'type': 'deletion',
+                  'source': 'reference',
+                  'location': LOCATIONS['10_15'],
+                  'deleted': [{'length': 6,
+                               'source': 'description'}]},
     # Duplications
-    (
-        '10dup',
-        {
-            'variants': [
-                {
-                    'type': 'duplication',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'point',
-                        'position': 10
-                    },
-                }
-            ]
-        }
-    ),
+    '10dup': {'type': 'duplication',
+              'source': 'reference',
+              'location': LOCATIONS['10']},
     # Insertions
-    #  - note that one of the reasons why 'source' is present also at the
-    #    variant level (and not only in the 'inserted') is that an 'insertion'
-    #    is considered a special case of a 'deletion_insertion'.
-    (
-        '10_11insT',
-        {
-            'variants': [
-                {
-                    'type': 'insertion',
+    '10_11insA': {'type': 'insertion',
+                  'source': 'reference',
+                  'location': LOCATIONS['10_11'],
+                  'inserted': INSERTED['A']},
+    '10_11ins[A]': {'type': 'insertion',
                     'source': 'reference',
-                    'location': {
-                        'type': 'range',
-                        'start': {
-                            'type': 'point',
-                            'position': 10
-                        },
-                        'end': {
-                            'type': 'point',
-                            'position': 11
-                        }
-                    },
-                    'inserted': [
-                        {
-                            'sequence': 'T',
-                            'source': 'description'
-                        }
-                    ]
-                }
-            ]
-        }
-    ),
-    (
-        '10_11ins[T]',
-        {
-            'variants': [
-                {
-                    'type': 'insertion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'range',
-                        'start': {
-                            'type': 'point',
-                            'position': 10
-                        },
-                        'end': {
-                            'type': 'point',
-                            'position': 11
-                        }
-                    },
-                    'inserted': [
-                        {
-                            'sequence': 'T',
-                            'source': 'description'
-                        }
-                    ]
-                }
-            ]
-        }
-    ),
-    (
-        '10_11ins[T;10_20]',
-        {
-            'variants': [
-                {
-                    'type': 'insertion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'range',
-                        'start': {
-                            'type': 'point',
-                            'position': 10
-                        },
-                        'end': {
-                            'type': 'point',
-                            'position': 11
-                        }
-                    },
-                    'inserted': [{
-                            'sequence': 'T',
-                            'source': 'description'
-                        },
-                        {
-                            'source': 'reference',
-                            'location': {
-                                'type': 'range',
-                                'start': {
-                                    'type': 'point',
-                                    'position': 10
-                                },
-                                'end': {
-                                    'type': 'point',
-                                    'position': 20
-                                }
-                            }
-                        }
-                    ]
-                }
-            ]
-        }
-    ),
-    (
-        '10_11ins[T;10_20inv]',
-        {
-            'variants': [
-                {
-                    'type': 'insertion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'range',
-                        'start': {
-                            'type': 'point',
-                            'position': 10
-                        },
-                        'end': {
-                            'type': 'point',
-                            'position': 11
-                        }
-                    },
-                    'inserted': [
-                        {
-                            'sequence': 'T',
-                            'source': 'description'
-                        },
-                        {
-                            'source': 'reference',
-                            'location': {
-                                'type': 'range',
-                                'start': {
-                                    'type': 'point',
-                                    'position': 10
-                                },
-                                'end': {
-                                    'type': 'point',
-                                    'position': 20
-                                }
-                            },
-                            'inverted': True
-                        }
-                    ]
-                }
-            ]
-        }
-    ),
-    (
-        '10_11ins[T;10_20inv;NM_000001.1:c.100_200]',
-        {
-            'references': {
-                'NM_000001.1': {
-                    'accession': 'NM_000001',
-                    'version': '1',
-                    'type': 'genbank'
-                },
-            },
-            'variants': [
-                {
-                    'type': 'insertion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'range',
-                        'start': {
-                            'type': 'point',
-                            'position': 10
-                        },
-                        'end': {
-                            'type': 'point',
-                            'position': 11
-                        }
-                    },
-                    'inserted': [
-                        {
-                            'sequence': 'T',
-                            'source': 'description'
-                        },
-                        {
-                            'source': 'reference',
-                            'location': {
-                                'type': 'range',
-                                'start': {
-                                    'type': 'point',
-                                    'position': 10
-                                },
-                                'end': {
-                                    'type': 'point',
-                                    'position': 20
-                                }
-                            },
-                            'inverted': True
-                        },
-                        {
-                            'source': 'NM_000001.1:c.',
-                            'location': {
-                                'type': 'range',
-                                'start': {
-                                    'type': 'point',
-                                    'position': 100
-                                },
-                                'end': {
-                                    'type': 'point',
-                                    'position': 200
-                                }
-                            }
-                        }
-                    ]
-                }
-            ]
-        }
-    ),
-    (
-        '10_11insNM_000001.1:c.100_200',
-        {
-            'references': {
-                'NM_000001.1': {
-                    'accession': 'NM_000001',
-                    'version': '1',
-                    'type': 'genbank'
-                },
-            },
-            'variants': [
-                {
-                    'type': 'insertion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'range',
-                        'start': {
-                            'type': 'point',
-                            'position': 10
-                        },
-                        'end': {
-                            'type': 'point',
-                            'position': 11
-                        }
-                    },
-                    'inserted': [
-                        {
-                            'source': 'NM_000001.1:c.',
-                            'location': {
-                                'type': 'range',
-                                'start': {
-                                    'type': 'point',
-                                    'position': 100
-                                },
-                                'end': {
-                                    'type': 'point',
-                                    'position': 200
-                                }
-                            }
-                        }
-                    ]
-                }
-            ]
-        }
-    ),
-    (
-        '10_11insNM_000001.1',
-        {
-            'references': {
-                'NM_000001.1': {
-                    'accession': 'NM_000001',
-                    'version': '1',
-                    'type': 'genbank'
-                },
-            },
-            'variants': [
-                {
-                    'type': 'insertion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'range',
-                        'start': {
-                            'type': 'point',
-                            'position': 10
-                        },
-                        'end': {
-                            'type': 'point',
-                            'position': 11
-                        }
-                    },
-                    'inserted': [
-                        {
-                            'source': 'NM_000001.1',
-                        }
-                    ]
-                }
-            ]
-        }
-    ),
-    (
-        '10_11insNG_000001.1(NM_000002.3):c.100',
-        {
-            'references': {
-                'NG_000001.1': {
-                    'accession': 'NG_000001',
-                    'version': '1',
-                    'type': 'genbank'
-                },
-            },
-            'variants': [
-                {
-                    'type': 'insertion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'range',
-                        'start': {
-                            'type': 'point',
-                            'position': 10
-                        },
-                        'end': {
-                            'type': 'point',
-                            'position': 11
-                        }
-                    },
-                    'inserted': [
-                        {
-                            'source': 'NG_000001.1(NM_000002.3):c.',
-                            'location': {
-                                'type': 'point',
-                                'position': 100
-                            },
-                        }
-                    ]
-                }
-            ]
-        }
-    ),
+                    'location': LOCATIONS['10_11'],
+                    'inserted': INSERTED['A']},
+    '10_11ins[A;10_20]': {'type': 'insertion',
+                          'source': 'reference',
+                          'location': LOCATIONS['10_11'],
+                          'inserted': INSERTED['[A;10_20]']},
+    '10_11ins[A;10_20inv]': {'type': 'insertion',
+                             'source': 'reference',
+                             'location': LOCATIONS['10_11'],
+                             'inserted': INSERTED['[A;10_20inv]']},
+    '10_11ins[T;10_20inv;NM_000001.1:c.200_300]': {
+        'type': 'insertion',
+        'source': 'reference',
+        'location': LOCATIONS['10_11'],
+        'inserted': INSERTED['[T;10_20inv;NM_000001.1:c.200_300]']},
+    '10_11insNM_000001.1:c.100_200': {
+        'type': 'insertion',
+        'source': 'reference',
+        'location': LOCATIONS['10_11'],
+        'inserted': [{'source': {'id': 'NM_000001.1'},
+                      'coordinate_system': 'c',
+                      'location': {'type': 'range',
+                                   'start': {'type': 'point',
+                                             'position': 100},
+                                   'end': {'type': 'point',
+                                           'position': 200}}}]},
+    # TODO: Check if just a reference should be considered a description.
+    # '10_11insNM_000001.1': {'type': 'insertion',
+    #                         'source': 'reference',
+    #                         'location': LOCATIONS['10_11'],
+    #                         'inserted': [{'source': {'id': 'NM_000001.1'}}]},
+    '10_11insNG_000001.1(NM_000002.3):c.100': {
+        'type': 'insertion',
+        'source': 'reference',
+        'location': LOCATIONS['10_11'],
+        'inserted': [{'source': {'id': 'NG_000001.1',
+                                 'selector': {'id': 'NM_000002.3'}},
+                      'coordinate_system': 'c',
+                      'location': {'type': 'point',
+                                   'position': 100}}]},
     # Inversions
-    (
-        '10_11inv',
-        {
-            'variants': [
-                {
-                    'type': 'inversion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'range',
-                        'start': {
-                            'type': 'point',
-                            'position': 10
-                        },
-                        'end': {
-                            'type': 'point',
-                            'position': 11
-                        }
-                    }
-                }
-            ]
-        }
-    ),
+    '10_11inv': {'type': 'inversion',
+                 'source': 'reference',
+                 'location': LOCATIONS['10_11']},
     # Conversions
-    (
-        '10_20con30_40',
-        {
-            'variants': [
-                {
-                    'type': 'conversion',
+    '10_20con40_50': {'type': 'conversion',
+                      'source': 'reference',
+                      'location': LOCATIONS['10_20'],
+                      'inserted': [{'source': 'reference',
+                                    'location': LOCATIONS['40_50']}]},
+    # Deletion insertions
+    '10delinsGA': {'type': 'deletion_insertion',
+                   'source': 'reference',
+                   'location': LOCATIONS['10'],
+                   'inserted': INSERTED['GA']},
+    '10_20delinsGA': {'type': 'deletion_insertion',
+                      'source': 'reference',
+                      'location': LOCATIONS['10_20'],
+                      'inserted': INSERTED['GA']},
+    '10_20del10insGA': {'type': 'deletion_insertion',
+                        'source': 'reference',
+                        'location': LOCATIONS['10_20'],
+                        'deleted': [{'length': 10,
+                                     'source': 'description'}],
+                        'inserted': INSERTED['GA']},
+    '10delAinsGA': {'type': 'deletion_insertion',
                     'source': 'reference',
-                    'location': {
-                        'type': 'range',
-                        'start': {
-                            'type': 'point',
-                            'position': 10
-                        },
-                        'end': {
-                            'type': 'point',
-                            'position': 20
-                        }
-                    },
-                    'inserted': [
-                        {
-                            'source': 'reference',
-                            'location': {
-                                'type': 'range',
-                                'start': {
-                                    'type': 'point',
-                                    'position': 30
-                                },
-                                'end': {
-                                    'type': 'point',
-                                    'position': 40
-                                }
-                            }
-                        }
-                    ]
-                }
-            ]
-        }
-    ),
-    # Deletion-inserted
-    (
-        '10delinsGA',
-        {
-            'variants': [
-                {
-                    'type': 'deletion_insertion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'point',
-                        'position': 10
-                    },
-                    'inserted': [
-                        {
-                            'sequence': 'GA',
-                            'source': 'description'
-                        }
-                    ]
-                }
-            ]
-        }
-    ),
-    (
-        '10_20delinsGA',
-        {
-            'variants': [
-                {
-                    'type': 'deletion_insertion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'range',
-                        'start': {
-                            'type': 'point',
-                            'position': 10
-                        },
-                        'end': {
-                            'type': 'point',
-                            'position': 20
-                        }
-                    },
-                    'inserted': [
-                        {
-                            'sequence': 'GA',
-                            'source': 'description'
-                        }
-                    ]
-                }
-            ]
-        }
-    ),
-    (
-        '11_21del10insGA',
-        {
-            'variants': [
-                {
-                    'type': 'deletion_insertion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'range',
-                        'start': {
-                            'type': 'point',
-                            'position': 11
-                        },
-                        'end': {
-                            'type': 'point',
-                            'position': 21
-                        }
-                    },
-                    'deleted': [
-                        {
-                            'length': 10,
-                            'source': 'description'
-                        }
-                    ],
-                    'inserted': [
-                        {
-                            'sequence': 'GA',
-                            'source': 'description'
-                        }
-                    ]
-                }
-            ]
-        }
-    ),
-    (
-        '11delAinsGA',
-        {
-            'variants': [
-                {
-                    'type': 'deletion_insertion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'point',
-                        'position': 11
-                    },
-                    'deleted': [
-                        {
-                            'sequence': 'A',
-                            'source': 'description'
-                        }
-                    ],
-                    'inserted': [
-                        {
-                            'sequence': 'GA',
-                            'source': 'description'
-                        }
-                    ]
-                }
-            ]
-        }
-    ),
+                    'location': LOCATIONS['10'],
+                    'deleted': [{'sequence': 'A',
+                                 'source': 'description'}],
+                    'inserted': INSERTED['GA']},
+    '10_11delinsR2:g.10_15': {'type': 'deletion_insertion',
+                              'source': 'reference',
+                              'location': LOCATIONS['10_11'],
+                              'inserted': INSERTED['R2:g.10_15']},
     # Repeats
-    # (
-    #     '10GA[20]',
-    #     {
-    #         'variants': [
-    #             {
-    #                 'type': 'repeat',
-    #                 'location': {
-    #                     'position': 10,
-    #                 },
-    #                 'inserted': [
-    #                     {
-    #                         'sequence': 'GA',
-    #                         'length': 4
-    #                     }
-    #                 ]
-    #             }
-    #         ]
-    #     }
-    # ),
-    # (
-    #     '123_191CAG[19]CAA[4]',
-    #     {
-    #         'variants': [
-    #             {
-    #                 'type': 'repeat',
-    #                 'location': {
-    #                     'start': {
-    #                         'position': 123,
-    #                     },
-    #                     'end': {
-    #                         'position': 191,
-    #
-    #                     }
-    #                 },
-    #                 'inserted': [
-    #                     {
-    #                         'sequence': 'CAG',
-    #                         'length': 19
-    #                     },
-    #                     {
-    #                         'sequence': 'CAA',
-    #                         'length': 4
-    #                     }
-    #                 ]
-    #             }
-    #         ]
-    #     }
-    # ),
-
+    # '10GA[20]': {'type': 'repeat',
+    #              'location': LOCATIONS['10'],
+    #              'inserted': [{'sequence': 'GA',
+    #                            'length': 20}]},
+    # '123_191CAG[19]CAA[4]': {'type': 'repeat',
+    #                          'location': {'start': {'position': 123},
+    #                                       'end': {'position': 191}},
+    #                          'inserted': [{'sequence': 'CAG',
+    #                                        'length': 19},
+    #                                       {'sequence': 'CAA',
+    #                                        'length': 4}]},
     # No changes (equal)
-    # TODO: Should we enforce exact positions for the range?
-    (
-        '=',
-        {
-            'variants': [
-                {
-                    'type': 'equal',
-                    'source': 'reference',
-                }
-            ]
-        }
-    ),
-    (
-        '10=',
-        {
-            'variants': [
-                {
-                    'type': 'equal',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'point',
-                        'position': 10
-                    }
-                }
-            ]
-        }
-    ),
-    (
-        '10_20=',
-        {
-            'variants': [
-                {
-                    'type': 'equal',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'range',
-                        'start': {
-                            'type': 'point',
-                            'position': 10
-                        },
-                        'end': {
-                            'type': 'point',
-                            'position': 20
-                        }
-                    }
-                }
-            ]
-        }
-    ),
-    # Multiple variants (allele)
-    (
-        '[10=;10_11ins[T;10_20inv;NM_000001.1:c.100_200];10_20delinsGA]',
-        {
-            'references': {
-                'NM_000001.1': {
-                    'accession': 'NM_000001',
-                    'version': '1',
-                    'type': 'genbank'
-                },
-            },
-            'variants': [
-                {
-                    'type': 'equal',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'point',
-                        'position': 10
-                    }
-                },
-                {
-                    'type': 'insertion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'range',
-                        'start': {
-                            'type': 'point',
-                            'position': 10
-                        },
-                        'end': {
-                            'type': 'point',
-                            'position': 11
-                        }
-                    },
-                    'inserted': [
-                        {
-                            'sequence': 'T',
-                            'source': 'description'
-                        },
-                        {
-                            'source': 'reference',
-                            'location': {
-                                'type': 'range',
-                                'start': {
-                                    'type': 'point',
-                                    'position': 10
-                                },
-                                'end': {
-                                    'type': 'point',
-                                    'position': 20
-                                }
-                            },
-                            'inverted': True
-                        },
-                        {
-                            'source': 'NM_000001.1:c.',
-                            'location': {
-                                'type': 'range',
-                                'start': {
-                                    'type': 'point',
-                                    'position': 100
-                                },
-                                'end': {
-                                    'type': 'point',
-                                    'position': 200
-                                }
-                            }
-                        }
-                    ]
-                },
-                {
-                    'type': 'deletion_insertion',
-                    'source': 'reference',
-                    'location': {
-                        'type': 'range',
-                        'start': {
-                            'type': 'point',
-                            'position': 10
-                        },
-                        'end': {
-                            'type': 'point',
-                            'position': 20
-                        }
-                    },
-                    'inserted': [
-                        {
-                            'sequence': 'GA',
-                            'source': 'description'
-                        }
-                    ]
-                }
-            ]
-        }
-    )
-]
+    # '=': [],
+    '10=': {'type': 'equal'
+        ,'source': 'reference',
+            'location': LOCATIONS['10']},
+    '10_20=': {'type': 'equal',
+               'source': 'reference',
+               'location': LOCATIONS['10_20']},
+}
 
 
-@pytest.mark.parametrize('description,model', VARIANTS)
-def test_variants(description, model):
-    """
-    Test the variants part of a description.
-    """
-    parser = HgvsParser(start_rule='variants')
+@pytest.mark.parametrize('variant, model', get_tests(VARIANTS))
+def test_variants_to_model(variant, model):
+    parser = HgvsParser(start_rule='variant')
+    assert variant_to_model(parser.parse(variant)) == model
 
-    assert parse_tree_to_model(parser.parse(description)) == model
+
+DESCRIPTIONS = {
+    'R1(R2(R3)):g.[10del;10_11delinsR2:g.10_15]': {
+        'reference': REFERENCES['R1(R2(R3))'],
+        'coordinate_system': 'g',
+        'variants': [VARIANTS['10del'],
+                     VARIANTS['10_11delinsR2:g.10_15']]},
+    'R1:g.[10=;10_11ins[T;10_20inv;NM_000001.1:c.200_300];10_20delinsGA]': {
+        'reference': REFERENCES['R1'],
+        'coordinate_system': 'g',
+        'variants': [VARIANTS['10='],
+                     VARIANTS['10_11ins[T;10_20inv;NM_000001.1:c.200_300]'],
+                     VARIANTS['10_20delinsGA']]},
+}
+
+
+@pytest.mark.parametrize('description, model', get_tests(DESCRIPTIONS))
+def test_convert(description, model):
+    parser = HgvsParser()
+    assert convert(parser.parse(description)) == model

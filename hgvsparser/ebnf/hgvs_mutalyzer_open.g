@@ -1,6 +1,6 @@
 description: reference ":" (COORDINATE_SYSTEM ".")? variants
 
-reference: ID (reference)? | "(" ID (reference)? ")"
+reference: ID reference? | "(" ID reference? ")"
 
 ID: LETTER (LETTER | DIGIT | "." | "_" | "-")*
 
@@ -13,7 +13,9 @@ variant: location (conversion | deletion | deletion_insertion | duplication
 
 location: point | uncertain_point | range
 
-point: ("*" | "-")? (NUMBER | UNKNOWN) (OFFSET)?
+point: OUTSIDE_CDS? (NUMBER | UNKNOWN) OFFSET?
+
+OUTSIDE_CDS: "*" | "-"
 
 OFFSET: ("+" | "-")? (NUMBER | UNKNOWN)
 
@@ -27,24 +29,28 @@ conversion: "con" inserted
 
 inserted: (("[" (insert (";" insert)*) "]") | insert)
 
-insert: (SEQUENCE | description | location | length) (("inv"? ("[" repeat_number "]")?)
-                                                     | (("[" repeat_number "]")? "inv"?))?
+insert: (SEQUENCE | description | location | length) ((INVERTED? ("[" repeat_number "]")?)
+                                                     | (("[" repeat_number "]")? INVERTED?))?
+
+INVERTED: "inv"
 
 repeat_number: (NUMBER | UNKNOWN | exact_range)
 
 length: NUMBER | UNKNOWN | "(" (NUMBER | UNKNOWN | exact_range) ")"
 
-deletion: "del" (inserted)?
+deletion: "del" deleted?
 
-deletion_insertion: "del" (inserted)? "ins" inserted
+deleted: SEQUENCE | length
 
-duplication: "dup" (inserted)?
+deletion_insertion: "del" (deleted)? "ins" inserted
+
+duplication: "dup" inserted?
 
 insertion: "ins" inserted
 
-inversion: "inv" (inserted)?
+inversion: "inv" inserted?
 
-substitution: (SEQUENCE)? ">" inserted
+substitution: SEQUENCE? ">" inserted
 
 repeat: "[" repeat_number "]" | (SEQUENCE "[" repeat_number "]")+
 
