@@ -55,8 +55,14 @@ def inserted_to_model(inserted_tree):
                     insert['inverted'] = True
             elif isinstance(insert_part, Tree):
                 if insert_part.data == 'location':
-                    insert['location'] = location_to_model(insert_part)
-                    insert['source'] = 'reference'
+                    location = location_to_model(insert_part)
+                    if convert_location_to_length(location):
+                        insert['length'] = length_to_model(insert_part)
+                    else:
+                        insert['location'] = location_to_model(insert_part)
+                        insert['source'] = 'reference'
+                elif insert_part.data == 'length':
+                    insert['length'] = length_to_model(insert_part)
                 elif insert_part.data == 'description':
                     for description_part in insert_part.children:
                         if isinstance(description_part, Token) and \
@@ -98,15 +104,10 @@ def variant_to_model(variant_tree):
         variant_tree = variant_tree.children[1]
         variant['type'] = variant_tree.data
         variant['source'] = 'reference'
-        for operation in variant_tree.children:
-            if isinstance(operation, Tree):
-                if operation.data == 'inserted':
-                    variant['inserted'] = inserted_to_model(operation)
-                if operation.data == 'deleted':
-                    variant['deleted'] = deleted_to_model(operation)
-            if isinstance(operation, Token):
-                variant['deleted'] = [{'sequence': operation.value,
-                                       'source': 'description'}]
+        if variant_tree.data == 'deletion':
+            variant['deleted'] = inserted_to_model(variant_tree.children[0])
+        else:
+            variant['inserted'] = inserted_to_model(variant_tree.children[0])
     return variant
 
 
@@ -152,3 +153,55 @@ def location_to_model(location_tree):
         return point_to_model(location_tree)
     elif location_tree.data == 'range':
         return range_to_model(location_tree)
+
+
+def length_point_to_model(length_point_token):
+    if length_point_token.type == 'UNKNOWN':
+        return {'type': 'point',
+                'uncertain': True}
+    if length_point_token.type == 'NUMBER':
+        return {'type': 'point',
+                'value': length_point_token.value}
+
+
+def length_to_model(length_tree):
+    print(length_tree)
+    if length_tree.data == 'length':
+        length_tree = length_tree.children[0]
+        if isinstance(length_tree, Token):
+            return length_point_to_model(length_tree)
+        elif length_tree.data == 'exact_range':
+            return {'type': 'range',
+                    'start': length_point_to_model(length_tree.children[0]),
+                    'end': length_point_to_model(length_tree.children[1]),
+                    'uncertain': True}
+
+    if length_tree.data == 'location':
+        length_tree = length_tree.children[0]
+        if length_tree.data == 'point':
+            return length_point_to_model(length_tree.children[0])
+
+
+def is_regular_point(point):
+    """
+    i.e., 100 and not -100, *100, -1+100, etc.
+    """
+    if (point.get('outside_cds') is not None) or \
+            (point.get('outside_cds') is not None):
+        return False
+    else:
+        return True
+
+
+def convert_location_to_length(location):
+    """
+    Check if a location is `N` or `(N_N)`, with `N` being a number or `?`.
+    """
+    if location.get('type') == 'point':
+        return is_regular_point(location)
+    elif location.get('type') == 'range':
+        if is_regular_point(location['start']) and \
+                is_regular_point(location['end']) and \
+                location.get('uncertain') is True:
+            return True
+    return False

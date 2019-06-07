@@ -285,8 +285,9 @@ VARIANTS = {
     '10_15del6': {'type': 'deletion',
                   'source': 'reference',
                   'location': LOCATIONS['10_15'],
-                  'deleted': [{'length': 6,
-                               'source': 'description'}]},
+                  'deleted': [{'length': {'value': '6',
+                                          'type': 'point'
+                                          }}]},
     # Duplications
     '10dup': {'type': 'duplication',
               'source': 'reference',
@@ -393,6 +394,12 @@ VARIANTS = {
     '10_20=': {'type': 'equal',
                'source': 'reference',
                'location': LOCATIONS['10_20']},
+
+    '10del20': {'type': 'deletion',
+                'source': 'reference',
+                'location': LOCATIONS['10'],
+                'inserted': [{'length': {'type': 'point',
+                                         'value': '20'}}]}
 }
 
 
