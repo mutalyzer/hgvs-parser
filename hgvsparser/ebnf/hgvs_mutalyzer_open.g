@@ -38,11 +38,9 @@ repeat_number: (NUMBER | UNKNOWN | exact_range)
 
 length: NUMBER | UNKNOWN | "(" (NUMBER | UNKNOWN | exact_range) ")"
 
-deletion: "del" deleted?
+deletion: "del" inserted?
 
-deleted: SEQUENCE | length
-
-deletion_insertion: "del" (deleted)? "ins" inserted
+deletion_insertion: "del" (inserted)? "ins" inserted
 
 duplication: "dup" inserted?
 
