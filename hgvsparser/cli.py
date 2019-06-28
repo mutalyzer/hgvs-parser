@@ -12,7 +12,7 @@ from lark import ParseError
 from lark.tree import pydot__tree_to_png
 
 
-def pyparsing_parser(description):
+def _pyparsing_parser(description):
     """
     Pyparsing based parser previously used in Mutalyzer.
     """
@@ -26,8 +26,8 @@ def pyparsing_parser(description):
         print("Parse error.")
 
 
-def hgvs_parser(description, convert_to_model,
-                grammar_file, start_rule, save_png):
+def _hgvs_parser(description, convert_to_model,
+                 grammar_file, start_rule, save_png):
     """
     Parse the HGVS description.
 
@@ -97,13 +97,13 @@ def main():
     args = parser.parse_args()
 
     if args.p:
-        pyparsing_parser(args.description)
+        _pyparsing_parser(args.description)
     else:
-        hgvs_parser(description=args.description,
-                    convert_to_model=args.c,
-                    save_png=args.s,
-                    grammar_file=args.g,
-                    start_rule=args.r)
+        _hgvs_parser(description=args.description,
+                     convert_to_model=args.c,
+                     save_png=args.s,
+                     grammar_file=args.g,
+                     start_rule=args.r)
 
 
 if __name__ == '__main__':
