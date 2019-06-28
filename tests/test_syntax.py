@@ -8,18 +8,15 @@ from hgvsparser.hgvs_parser import HgvsParser
 
 
 @pytest.fixture
-def grammar():
-    return HgvsParser()
-
-
-@pytest.fixture
-def parser(grammar):
-    def parse(description):
-        __tracebackhide__ = True
-        parse_tree = grammar.parse(description)
-        if parse_tree is None:
-            pytest.fail('failed to parse `%s`:' % description)
-
+def parser():
+    def parse(description, correct):
+        parse_tree = HgvsParser().parse(description)
+        if correct:
+            if parse_tree is None:
+                pytest.fail('failed to parse: `%s`' % description)
+        else:
+            if parse_tree is not None:
+                pytest.fail('should not parse: `%s`' % description)
     return parse
 
 
@@ -121,26 +118,123 @@ def parser(grammar):
     'NM_021080.3:c.-136-75952ATTTT[15]',
     'NG_012232.1:g.19=',
     'NG_012232.1:g.19_29=',
-    # Other ones - for the open grammar
+    # Other descriptions
     'REF:[4]',
-    # 'REF:1del[AAA;A[3]inv]insGGG[4]inv', TODO: -check if deleted = inserted
+    'REF:1del[AAA;A[3]inv]insGGG[4]inv',
     'REF:10>[REF:g.(4_6)]',
     'REF:c.4conREF:g.[3;4;5;6;(5_5)_?con[3456_09209]]',
-    'REF(A(B(C))):3'
+    'REF(A(B(C))):3',
+    'R:4',
+    'R(R):4',
+    'REF:4',
+    'REF:?',
+    'REF(R1_1):4',
+    'REF_1:4',
+    'REF:4_10',
+    'REF_2:4_10',
+    'REF_2:(4_10)',
+    'REF_2:(4_10)_(20_30)',
+    'REF_2:(?_10)_(20_30)',
+    'REF_2:(?_?)_(20_30)',
+    'REF_2:(?+10_?)_(20_30)',
+    'REF_2:(?_?)_(?_?)',
+    'REF_2:c.100_200',
+    'REF_2:c.(?_?)_(?_?)',
+    'REF_2:c.[(?_?)_(?_?)]',
+    'REF_2:c.[(?_?)_(?_?);100_200]',
+    'R(R):1con50',
+    'R(R):1conAAA',
+    'R(R):1conr3:40',
+    'R(R):1conr3:40inv',
+    'R(R):1conr3:40inv[50]',
+    'R(R):1conr3:40[50]inv',
+    'R(R):1conr3:40inv[50_60]',
+    'R(R):1conr3:40[50_60]inv',
+    'R1(R2):1conR2(R3):g.10con100',
+    'R1(R2):g.100conR3:100con50',
+    'R1(R2):g.100conR3(R4):100con50',
+    'R1(R2):g.100conR3(R4):c.100con50',
+    # White spaces
+    ' NC_000023.10 : g . 33038255 C > A ',
+    'LRG_199 t1 :c.( 4071+1_4072 -1)_ ( 5154 +1_5155-1)[ 3]',
+
 ])
-def test_ncbi_references(parser, description):
+def test_correct_syntax(parser, description):
     """
-    Parse example variants with NCBI references.
+    These descriptions should be successfully parsed.
     """
-    parser(description)
+    parser(description, correct=True)
 
 
 @pytest.mark.parametrize('description', [
-    ' NC_000023.10 : g . 33038255 C > A ',
-    'LRG_199 t1 :c.( 4071+1_4072 -1)_ ( 5154 +1_5155-1)[ 3]',
+    'REF(',
+    'REF(000)',
+    'REF:c.',
+    'REF:',
+    'REF:$',
+    'REF:(',
+    'REF:(1',
+    'REF:(1)',
+    'REF:(1_',
+    'REF:(-',
+    'REF:(-1',
+    'REF:(-1-',
+    'REF:(-1-?_?',
+    'REF:(1_1)_',
+    'REF:*?+?_(',
+    'REF:*?+?_(+1+_',
+    'REF:*?+?_(*1+?_1_)',
+    'REF:1A',
+    'REF:1Ax',
+    'REF:1A>',
+    'REF:1A>x',
+    'REF:1A>Ax',
+    'REF:1A[',
+    'REF:1A[?',
+    'REF:1A[1',
+    'REF:1A(',
+    'REF:1A(1',
+    'REF:1A(1)',
+    'REF:1A(1_',
+    'REF:1A(1_)',
+    'REF:1A(1_A)',
+    'REF:1A(1_1',
+    'REF:1delAx',
+    'REF:1del(5',
+    'REF:1del1A',
+    'REF:1delAins',
+    'REF:1del1ins',
+    'REF:1ins()',
+    'REF:1ins(1',
+    'REF:1ins[]',
+    'REF:1ins[A',
+    'REF:1ins[(1_1)inv',
+    'REF:1ins[(1_1)inv[]',
+    'REF:1ins[(1_1)inv()',
+    'REF:1x',
+    'REF:[',
+    'REF:[]',
+    'REF:[1del',
+    'REF:[1del;]',
+    'REF:[=;=]',
+    'LRG_199t1:c.85=/T>C',
+    'NM_004006.1:c.85=//T>C',
+    'NG_012232.1:g.19_21=/del',
+    'NG_012232.1:g.19_21=//del',
+    'NG_012232.1:g.19_21=/dup',
+    'NG_012232.1:g.19_21=//dup',
+    'LRG_199t1:c.[2376G>C];[3103del]',
+    'LRG_199t1:c.[296T>G;476T>C;1083A>C];[296T>G;1083A>C]',
+    'LRG_199t1:c.[2376G>C];[2376=]',
+    'LRG_199t1:c.[2376G>C];[?]',
+    'LRG_199t1:c.2376G>C(;)3103del',
+    'NM_004006.2:c.[296T>G;476T>C];[476T>C](;)1083A>C',
+    'LRG_199t1:c.[296T>G];[476T>C](;)1083G>C(;)1406del',
+    'NC_000014.8:g.101179660TG[14];[18]',
 ])
-def test_allowed_white_spaces(parser, description):
+def test_incorrect_syntax(parser, description):
     """
-    Parse example variants with NCBI references.
+    The parser should fail for these descriptions.
     """
-    parser(description)
+    parser(description, correct=False)
+

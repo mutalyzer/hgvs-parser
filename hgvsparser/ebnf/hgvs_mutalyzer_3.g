@@ -1,154 +1,72 @@
-// Top rule
-// --------
+description: reference ":" (COORDINATE_SYSTEM ".")? variants
 
-description: reference variants
+reference: ID reference? | "(" ID reference? ")"
 
-// References
-// ----------
+ID: LETTER (LETTER | DIGIT | "." | "_" | "-")*
 
-reference: reference_id specific_locus? (":" ( COORDINATE_SYSTEM "."))?
+COORDINATE_SYSTEM:  "g" | "o" | "m" | "c" | "n" | "r" | "p"
 
-reference_id: ACCESSION ("." VERSION)?
+variants: ("[" ((variant (";" variant)*) | "=") "]") | variant | "="
 
-ACCESSION: LETTER (LETTER | NUMBER | "_")+ ((DIGIT DIGIT) | ("_" DIGIT))
+variant: location (conversion | deletion | deletion_insertion | duplication
+                  | equal | insertion | inversion | substitution | repeat)?
 
-VERSION: NUMBER
+location: point | uncertain_point | range
 
-// Specific locus
+point: OUTSIDE_CDS? (NUMBER | UNKNOWN) OFFSET?
 
-specific_locus: genbank_locus | LRG_LOCUS
+OUTSIDE_CDS: "*" | "-"
 
-genbank_locus: "(" ((ACCESSION "." VERSION)
-             | GENE_NAME ("_" GENBANK_LOCUS_SELECTOR)?) ")"
+OFFSET: ("+" | "-")? (NUMBER | UNKNOWN)
 
-GENE_NAME: (LETTER | NUMBER | "-")+
+uncertain_point: "(" point "_" point ")"
 
-GENBANK_LOCUS_SELECTOR: ("v" | "i") NUMBER
+range: (point | uncertain_point) "_" (point | uncertain_point)
 
-LRG_LOCUS: ("t" | "p") NUMBER
+exact_range: (NUMBER | UNKNOWN) "_" (NUMBER | UNKNOWN)
 
-// Coordinate system
+conversion: "con" inserted
 
-COORDINATE_SYSTEM: ("c" | "g" | "m" | "n" | "r")
+inserted: ("[" (insert (";" insert)*) "]") | insert
 
-// Variants
-// --------
-
-variants: equal_all | (variant | "[" variant (";" variant)* "]")
-
-equal_all: "=" | "[=]"
-
-variant: substitution | deletion | duplication | insertion
-       | inversion | conversion | deletion_insertion | varssr | equal
-
-substitution: (point | uncertain) DELETED ">" INSERTED
-
-DELETED: NT
-
-INSERTED: NT
-
-deletion: location "del" deleted?
-
-deleted: SEQUENCE | length
-
-duplication: location "dup" (DUPLICATED_SEQUENCE | DUPLICATED_LENGTH)?
-
-DUPLICATED_SEQUENCE: NT+
-
-DUPLICATED_LENGTH: NUMBER
-
-insertion: (range | uncertain_length) "ins" inserted
-
-deletion_insertion: location "del" deleted? "ins" inserted
-
-inserted: ("[" insert (";" insert)* "]") | insert
-
-insert: INSERTED_SEQUENCE | (range | reference_location) INVERTED?
+insert: (SEQUENCE | description | location | length) ((INVERTED? ("[" repeat_number "]")?)
+                                                     | (("[" repeat_number "]")? INVERTED?))?
 
 INVERTED: "inv"
 
-INSERTED_SEQUENCE: NT+
+repeat_number: NUMBER | UNKNOWN | exact_range
 
-inversion: range "inv" (NT+ | NUMBER)?
+length: NUMBER | UNKNOWN | "(" (NUMBER | UNKNOWN | exact_range) ")"
 
-conversion: range "con" inserted_location
+deletion: "del" inserted?
 
-inserted_location: range | reference_location
+deletion_insertion: "del" inserted? "ins" inserted
 
-abrssr: (point | uncertain)  INSERTED_SEQUENCE "(" NUMBER "_" NUMBER ")"
+duplication: "dup" inserted?
 
-varssr: (point SEQUENCE "[" REPEAT_LENGTH "]")
-      | (range "[" REPEAT_LENGTH "]")
-      | abrssr
+insertion: "ins" inserted
 
-SEQUENCE: NT+
+inversion: "inv" inserted?
 
-equal: (point | range) "="
+substitution: SEQUENCE? ">" inserted
 
-REPEAT_LENGTH: NUMBER
+repeat: "[" repeat_number "]" | (SEQUENCE "[" repeat_number "]")+
 
-// Locations
-// ---------
+equal: "="
 
-location: point | range | uncertain
+DIGIT: "0".."9"
 
-// Positions
-
-point: OUTSIDE_CDS? POSITION OFFSET?
-
-POSITION: NUMBER | "?"
-
-OFFSET: ("+" | "-") (NUMBER | "?")
-
-OUTSIDE_CDS: "-" | "*"
-
-// Ranges
-
-range: start "_" end
-
-start: point | uncertain
-
-end: point | uncertain
-
-// Uncertain
-
-uncertain: "(" uncertain_start "_" uncertain_end ")"
-
-uncertain_start: point
-
-uncertain_end: point
-
-// Other
-
-reference_location: reference_id specific_locus? (":" (COORDINATE_SYSTEM "."))? (point | range)?
-
-chrom: NAME
-
-// Lengths
-// -------
-
-length: NUMBER | "?" | uncertain_length
-
-uncertain_length: "(" NUMBER ")" | "(" length_start "_" length_end ")"
-
-length_start: NUMBER | "?"
-
-length_end: NUMBER | "?"
-
-// Commons
-// -------
+NUMBER: DIGIT+
 
 LCASE_LETTER: "a".."z"
 
 UCASE_LETTER: "A".."Z"
 
-NAME: ((LCASE_LETTER) | (UCASE_LETTER) | (NUMBER))+
-
 LETTER: UCASE_LETTER | LCASE_LETTER
 
-DIGIT: "0".."9"
+UNKNOWN: "?"
 
-NUMBER: DIGIT+
+SEQUENCE: NT+
 
 NT: "a" | "c" | "g" | "t" | "u" | "r" | "y" | "k"
   | "m" | "s" | "w" | "b" | "d" | "h" | "v" | "n"

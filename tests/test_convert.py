@@ -5,8 +5,8 @@ Tests for the lark tree to dictionary converter.
 import pytest
 
 from hgvsparser.hgvs_parser import HgvsParser
-from hgvsparser.to_model import convert, location_to_model, \
-    variant_to_model, variants_to_model, inserted_to_model, reference_to_model
+from hgvsparser.to_model import convert, _location_to_model, \
+    _variant_to_model, _variants_to_model, _inserted_to_model, _reference_to_model
 
 
 def get_tests(tests):
@@ -29,12 +29,12 @@ REFERENCES = {
 @pytest.mark.parametrize('reference, model', get_tests(REFERENCES))
 def test_reference_to_model(reference, model):
     parser = HgvsParser(start_rule='reference')
-    assert reference_to_model(parser.parse(reference)) == model
+    assert _reference_to_model(parser.parse(reference)) == model
 
 
 LOCATIONS = {
     '1': {'type': 'point',
-           'position': 1},
+          'position': 1},
     '10': {'type': 'point',
            'position': 10},
     '100': {'type': 'point',
@@ -200,10 +200,34 @@ LOCATIONS = {
 }
 
 
+LENGTHS = {
+    '6': {'value': 6,
+          'type': 'point'},
+    '10': {'value': 10,
+           'type': 'point'},
+    '20': {'type': 'point',
+           'value': 20},
+    '(10)': {'value': 10,
+             'type': 'point'},
+    '(10_20)': {'type': 'range',
+                'uncertain': True,
+                'start': {'type': 'point',
+                          'value': 10},
+                'end': {'type': 'point',
+                        'value': 20}},
+    '(?_20)': {'type': 'range',
+               'uncertain': True,
+               'start': {'type': 'point',
+                         'uncertain': True},
+               'end': {'type': 'point',
+                       'value': 20}},
+}
+
+
 @pytest.mark.parametrize('description, model', get_tests(LOCATIONS))
 def test_location_to_model(description, model):
     parser = HgvsParser(start_rule='location')
-    assert location_to_model(parser.parse(description)) == model
+    assert _location_to_model(parser.parse(description)) == model
 
 
 INSERTED = {
@@ -211,6 +235,12 @@ INSERTED = {
            'source': 'description'}],
     'GA': [{'sequence': 'GA',
             'source': 'description'}],
+    '10': [{'length': LENGTHS['10']}],
+    '(10)': [{'length': LENGTHS['(10)']}],
+    '(10_20)': [{'length': LENGTHS['(10_20)']}],
+    '(?_20)': [{'length': LENGTHS['(?_20)']}],
+    '10_20': [{'source': 'reference',
+               'location': LOCATIONS['10_20']}],
     '[A;10_20]': [{'sequence': 'A',
                    'source': 'description'},
                   {'source': 'reference',
@@ -243,11 +273,13 @@ INSERTED = {
                                             'location': LOCATIONS['200_300']}]
 }
 
+DELETED = {}
+
 
 @pytest.mark.parametrize('description, model', get_tests(INSERTED))
 def test_inserted_to_model(description, model):
     parser = HgvsParser(start_rule='inserted')
-    assert inserted_to_model(parser.parse(description)) == model
+    assert _inserted_to_model(parser.parse(description)) == model
 
 
 VARIANTS = {
@@ -285,9 +317,8 @@ VARIANTS = {
     '10_15del6': {'type': 'deletion',
                   'source': 'reference',
                   'location': LOCATIONS['10_15'],
-                  'deleted': [{'length': {'value': '6',
-                                          'type': 'point'
-                                          }}]},
+                  'deleted': [{'length': {'value': 6,
+                                          'type': 'point'}}]},
     # Duplications
     '10dup': {'type': 'duplication',
               'source': 'reference',
@@ -361,8 +392,8 @@ VARIANTS = {
     '10_20del10insGA': {'type': 'deletion_insertion',
                         'source': 'reference',
                         'location': LOCATIONS['10_20'],
-                        'deleted': [{'length': 10,
-                                     'source': 'description'}],
+                        'deleted': [{'length': {'value': 10,
+                                                'type': 'point'}}],
                         'inserted': INSERTED['GA']},
     '10delAinsGA': {'type': 'deletion_insertion',
                     'source': 'reference',
@@ -394,19 +425,22 @@ VARIANTS = {
     '10_20=': {'type': 'equal',
                'source': 'reference',
                'location': LOCATIONS['10_20']},
-
     '10del20': {'type': 'deletion',
                 'source': 'reference',
                 'location': LOCATIONS['10'],
-                'inserted': [{'length': {'type': 'point',
-                                         'value': '20'}}]}
+                'deleted': [{'length': LENGTHS['20']}]},
+    '10del10_20': {'type': 'deletion',
+                   'source': 'reference',
+                   'location': LOCATIONS['10'],
+                   'deleted': [{'source': 'reference',
+                                'location': LOCATIONS['10_20']}]}
 }
 
 
 @pytest.mark.parametrize('variant, model', get_tests(VARIANTS))
 def test_variants_to_model(variant, model):
     parser = HgvsParser(start_rule='variant')
-    assert variant_to_model(parser.parse(variant)) == model
+    assert _variant_to_model(parser.parse(variant)) == model
 
 
 DESCRIPTIONS = {
@@ -426,5 +460,43 @@ DESCRIPTIONS = {
 
 @pytest.mark.parametrize('description, model', get_tests(DESCRIPTIONS))
 def test_convert(description, model):
+    parser = HgvsParser()
+    assert convert(parser.parse(description)) == model
+
+
+OPERATIONS_MIX = {
+    '>': 'substitution',
+    'ins': 'insertion',
+    'delins': 'deletion_insertion'
+}
+
+
+def compose_description_model(reference, location, operation, insert):
+    description = '{}:{}{}{}'.format(reference, location, operation, insert)
+    model = {
+        'reference': REFERENCES[reference],
+        'variants': [{
+            'type': OPERATIONS_MIX[operation],
+            'source': 'reference',
+            'location': LOCATIONS[location],
+            'inserted': INSERTED[insert],
+        }]
+    }
+    return {description: model}
+
+
+def get_mix():
+    descriptions = {}
+    for operation in OPERATIONS_MIX:
+        for reference in REFERENCES:
+            for location in LOCATIONS:
+                for insert in INSERTED:
+                    descriptions.update(compose_description_model(
+                        reference, location, operation, insert))
+    return descriptions
+
+
+@pytest.mark.parametrize('description, model', get_tests(get_mix()))
+def test_mix(description, model):
     parser = HgvsParser()
     assert convert(parser.parse(description)) == model

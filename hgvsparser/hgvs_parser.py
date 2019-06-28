@@ -19,7 +19,7 @@ class HgvsParser:
                  start_rule='description', ignore_white_spaces=True):
         if grammar_path == 'local':
             self._grammar_path = os.path.join(os.path.dirname(__file__),
-                                              'ebnf/hgvs_mutalyzer_open.g')
+                                              'ebnf/hgvs_mutalyzer_3.g')
         else:
             self._grammar_path = grammar_path
         self._parser_type = parser_type
@@ -43,7 +43,8 @@ class HgvsParser:
         parser = None
         try:
             parser = Lark(grammar, parser='earley',
-                          start=self._start_rule, ambiguity='resolve')
+                          start=self._start_rule,
+                          ambiguity='explicit')
         except Exception as exc:
             print('Lark parser not generated from the \'%s\' grammar file.'
                   % self._grammar_path)
