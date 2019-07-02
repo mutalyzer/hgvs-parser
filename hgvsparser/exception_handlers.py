@@ -43,14 +43,16 @@ TERMINALS = {
 
 
 def unexpected_characters(exception, parser, description):
-    print('Error!\nUnexpected input: %s\n' % description[exception.pos_in_stream])
+    print(exception)
+    print('Unexpected input: "{}"\n'.format(
+        description[exception.pos_in_stream]))
     print(exception.get_context(description))
     print('Expecting:')
     for allowed in exception.allowed:
-        if TERMINALS.get(allowed.name):
-            print("  - %s" % TERMINALS[allowed.name])
+        if TERMINALS.get(allowed):
+            print('  - {}'.format(TERMINALS[allowed]))
         else:
-            print("  - %s" % allowed.name)
+            print('  - {}'.format(allowed))
 
 
 def parse_error_handler(exception, description):
