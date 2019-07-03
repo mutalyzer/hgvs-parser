@@ -4,10 +4,10 @@ Module to parse HGVS variant descriptions.
 
 import os
 from lark import Lark
-from lark.exceptions import ParseError, UnexpectedCharacters
-from hgvsparser.pyparsing_based_parser import PyparsingParser
-from hgvsparser.exception_handlers import parse_error_handler
-from hgvsparser.exception_handlers import unexpected_characters
+from lark.exceptions import UnexpectedCharacters, ParseError
+from .pyparsing_based_parser import PyparsingParser
+from .exceptions import UnexpectedCharacter, NoParserDefined,\
+    UnsupportedParserType, parse_error, ParsingError
 
 
 class HgvsParser:
@@ -29,6 +29,9 @@ class HgvsParser:
             self._create_lark_parser()
         elif parser_type == 'pyparsing':
             self._create_pyparsing_parser()
+        else:
+            raise UnsupportedParserType(
+                'Not supported parser type: {}'.format(self._parser_type))
 
     def _create_lark_parser(self):
         """
@@ -40,28 +43,15 @@ class HgvsParser:
         if self._ignore_whitespaces:
             grammar += '\n%import common.WS\n%ignore WS'
 
-        parser = None
-        try:
-            parser = Lark(grammar, parser='earley',
-                          start=self._start_rule,
-                          ambiguity='explicit')
-        except Exception as exc:
-            print('Lark parser not generated from the \'%s\' grammar file.'
-                  % self._grammar_path)
-            print(exc)
-        self._parser = parser
+        self._parser = Lark(grammar, parser='earley',
+                            start=self._start_rule,
+                            ambiguity='explicit')
 
     def _create_pyparsing_parser(self):
         """
         Pyparsing based parser instantiation.
         """
-        parser = None
-        try:
-            parser = PyparsingParser()
-        except Exception as exc:
-            print('Pyparsing based parser not generated.')
-            print(exc)
-        self._parser = parser
+        self._parser = PyparsingParser()
 
     def parse(self, description):
         """
@@ -70,17 +60,14 @@ class HgvsParser:
         :return: The parse tree directly (should it be changed to return
                  another format?).
         """
-        parse_tree = None
         if self._parser is None:
-            print('No parsing defined')
+            raise NoParserDefined('No parser defined.')
         try:
             parse_tree = self._parser.parse(description)
         except UnexpectedCharacters as exception:
-            unexpected_characters(exception, self._parser, description)
-        except ParseError as exception:
-            parse_error_handler(exception, description)
-        except Exception as exception:
-            print(exception)
+            raise UnexpectedCharacter(exception, description)
+        except ParseError as e:
+            parse_error(e)
         return parse_tree
 
     def status(self):

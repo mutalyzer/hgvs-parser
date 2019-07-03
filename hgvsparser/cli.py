@@ -8,7 +8,8 @@ import json
 from . import usage, version
 from hgvsparser.hgvs_parser import HgvsParser
 from hgvsparser.to_model import convert
-from lark import ParseError
+from hgvsparser.exceptions import UnexpectedCharacter, ParsingError
+from lark import ParseError, GrammarError
 from lark.tree import pydot__tree_to_png
 
 
@@ -22,8 +23,6 @@ def _pyparsing_parser(description):
     if parse_tree is not None:
         print("Successful parsing.")
         print(parse_tree.dump())
-    else:
-        print("Parse error.")
 
 
 def _hgvs_parser(description, convert_to_model,
@@ -37,13 +36,24 @@ def _hgvs_parser(description, convert_to_model,
     :param save_png: Save parse tree as png.
     :param convert_to_model:
     """
+    params = {}
     if grammar_file:
-        parser = HgvsParser(grammar_path=grammar_file, start_rule=start_rule)
-    else:
-        parser = HgvsParser()
+        params = {'grammar_path': grammar_file, 'start_rule': start_rule}
+
+    try:
+        parser = HgvsParser(**params)
+    except GrammarError as e:
+        print('Parser not generated due to a grammar error:\n {}'.format(e))
+        return
+    except FileNotFoundError as e:
+        print(e)
+        return
+
     try:
         parse_tree = parser.parse(description)
-    except ParseError as e:
+    except ParsingError as e:
+        print(e)
+    except UnexpectedCharacter as e:
         print(e)
     else:
         if parse_tree is not None:

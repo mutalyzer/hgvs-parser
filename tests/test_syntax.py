@@ -9,14 +9,10 @@ from hgvsparser.hgvs_parser import HgvsParser
 
 @pytest.fixture
 def parser():
-    def parse(description, correct):
+    def parse(description):
         parse_tree = HgvsParser().parse(description)
-        if correct:
-            if parse_tree is None:
-                pytest.fail('failed to parse: `%s`' % description)
-        else:
-            if parse_tree is not None:
-                pytest.fail('should not parse: `%s`' % description)
+        if parse_tree is None:
+            pytest.fail('failed to parse: `%s`' % description)
     return parse
 
 
@@ -163,7 +159,7 @@ def test_correct_syntax(parser, description):
     """
     These descriptions should be successfully parsed.
     """
-    parser(description, correct=True)
+    parser(description)
 
 
 @pytest.mark.parametrize('description', [
@@ -231,10 +227,12 @@ def test_correct_syntax(parser, description):
     'NM_004006.2:c.[296T>G;476T>C];[476T>C](;)1083A>C',
     'LRG_199t1:c.[296T>G];[476T>C](;)1083G>C(;)1406del',
     'NC_000014.8:g.101179660TG[14];[18]',
+    'NC_000014.8:g.100d>'
 ])
 def test_incorrect_syntax(parser, description):
     """
     The parser should fail for these descriptions.
     """
-    parser(description, correct=False)
+    with pytest.raises(Exception):
+        HgvsParser().parse(description)
 
