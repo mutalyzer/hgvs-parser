@@ -145,6 +145,22 @@ def _solve_variant_ambiguity(variant):
         return variant.children[1]
 
 
+def _repeat_to_model(repeats):
+    model_repeats = []
+    make_new_inserted = True
+    for repeat in repeats:
+        if make_new_inserted:
+            inserted = {}
+            make_new_inserted = False
+        if isinstance(repeat, Token):
+            inserted['sequence'] = repeat.value
+        elif isinstance(repeat, Tree):
+            inserted['length'] = _length_to_model(repeat)
+            model_repeats.append(inserted)
+            make_new_inserted = True
+    return model_repeats
+
+
 def _variant_to_model(variant_tree):
     if variant_tree.data == '_ambig':
         variant_tree = _solve_variant_ambiguity(variant_tree)
@@ -155,7 +171,9 @@ def _variant_to_model(variant_tree):
         variant_tree = variant_tree.children[1]
         variant['type'] = variant_tree.data
         variant['source'] = 'reference'
-        if len(variant_tree.children) == 1:
+        if variant_tree.data == 'repeat':
+            variant['inserted'] = _repeat_to_model(variant_tree.children)
+        elif len(variant_tree.children) == 1:
             if variant_tree.data == 'deletion':
                 variant['deleted'] = _deleted_to_model(
                     variant_tree.children[0])
@@ -223,12 +241,11 @@ def _length_point_to_model(length_point_token):
 
 
 def _length_to_model(length_tree):
-    if length_tree.data == 'length':
-        length_tree = length_tree.children[0]
-        if isinstance(length_tree, Token):
-            return _length_point_to_model(length_tree)
-        elif length_tree.data == 'exact_range':
-            return {'type': 'range',
-                    'start': _length_point_to_model(length_tree.children[0]),
-                    'end': _length_point_to_model(length_tree.children[1]),
-                    'uncertain': True}
+    length_tree = length_tree.children[0]
+    if isinstance(length_tree, Token):
+        return _length_point_to_model(length_tree)
+    elif length_tree.data == 'exact_range':
+        return {'type': 'range',
+                'start': _length_point_to_model(length_tree.children[0]),
+                'end': _length_point_to_model(length_tree.children[1]),
+                'uncertain': True}

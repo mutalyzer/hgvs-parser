@@ -50,7 +50,7 @@ inversion: "inv" inserted?
 
 substitution: SEQUENCE? ">" inserted
 
-repeat: "[" repeat_number "]" | (SEQUENCE "[" repeat_number "]")+
+repeat: (SEQUENCE? "[" repeat_number "]")+
 
 equal: "="
 
