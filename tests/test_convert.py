@@ -6,7 +6,8 @@ import pytest
 
 from hgvsparser.hgvs_parser import HgvsParser
 from hgvsparser.to_model import convert, _location_to_model, \
-    _variant_to_model, _variants_to_model, _inserted_to_model, _reference_to_model
+    _variant_to_model, _variants_to_model, _inserted_to_model,\
+    _reference_to_model
 
 
 def get_tests(tests):
@@ -201,9 +202,13 @@ LOCATIONS = {
 
 
 LENGTHS = {
+    '4': {'value': 4,
+          'type': 'point'},
     '6': {'value': 6,
           'type': 'point'},
     '10': {'value': 10,
+           'type': 'point'},
+    '19': {'value': 19,
            'type': 'point'},
     '20': {'type': 'point',
            'value': 20},
@@ -406,17 +411,18 @@ VARIANTS = {
                               'location': LOCATIONS['10_11'],
                               'inserted': INSERTED['R2:g.10_15']},
     # Repeats
-    # '10GA[20]': {'type': 'repeat',
-    #              'location': LOCATIONS['10'],
-    #              'inserted': [{'sequence': 'GA',
-    #                            'length': 20}]},
-    # '123_191CAG[19]CAA[4]': {'type': 'repeat',
-    #                          'location': {'start': {'position': 123},
-    #                                       'end': {'position': 191}},
-    #                          'inserted': [{'sequence': 'CAG',
-    #                                        'length': 19},
-    #                                       {'sequence': 'CAA',
-    #                                        'length': 4}]},
+    '10GA[20]': {'type': 'repeat',
+                 'source': 'reference',
+                 'location': LOCATIONS['10'],
+                 'inserted': [{'sequence': 'GA',
+                               'length': LENGTHS['20']}]},
+    '123_191CAG[19]CAA[4]': {'type': 'repeat',
+                             'source': 'reference',
+                             'location':  LOCATIONS['123_191'],
+                             'inserted': [{'sequence': 'CAG',
+                                           'length': LENGTHS['19']},
+                                          {'sequence': 'CAA',
+                                           'length': LENGTHS['4']}]},
     # No changes (equal)
     # '=': [],
     '10=': {'type': 'equal'
