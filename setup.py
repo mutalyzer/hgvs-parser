@@ -3,16 +3,16 @@ import sys
 import os
 
 
-package = 'hgvsparser'
-package_name = 'hgvsparser'
+package = 'mutalyzer_hgvs_parser'
+package_name = 'mutalyzer_hgvs_parser'
 description = '{}: HGVS variant description parser.'.format(package_name)
 documentation = 'README.md'
 license = 'MIT License'
 keywords = ['bioinformatics']
 
 dependencies = [
-    'lark-parser',
-    'pyparsing'
+    'lark-parser==0.7.5',
+    'pyparsing==2.2.0'
 ]
 
 supported = [(3, 5)]

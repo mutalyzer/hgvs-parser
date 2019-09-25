@@ -4,8 +4,8 @@ Tests for the lark tree to dictionary converter.
 
 import pytest
 
-from hgvsparser.hgvs_parser import HgvsParser
-from hgvsparser.to_model import convert, _location_to_model, \
+from mutalyzer_hgvs_parser.hgvs_parser import HgvsParser
+from mutalyzer_hgvs_parser.convert import description_to_model, _location_to_model, \
     _variant_to_model, _variants_to_model, _inserted_to_model,\
     _reference_to_model
 
@@ -467,7 +467,7 @@ DESCRIPTIONS = {
 @pytest.mark.parametrize('description, model', get_tests(DESCRIPTIONS))
 def test_convert(description, model):
     parser = HgvsParser()
-    assert convert(parser.parse(description)) == model
+    assert description_to_model(parser.parse(description)) == model
 
 
 OPERATIONS_MIX = {
@@ -505,4 +505,4 @@ def get_mix():
 @pytest.mark.parametrize('description, model', get_tests(get_mix()))
 def test_mix(description, model):
     parser = HgvsParser()
-    assert convert(parser.parse(description)) == model
+    assert description_to_model(parser.parse(description)) == model

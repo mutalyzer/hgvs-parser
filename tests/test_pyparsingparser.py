@@ -4,7 +4,7 @@ Tests for the previously employed Mutalyzer grammar module, based on pyparsing.
 
 import pytest
 
-from hgvsparser.pyparsing_based_parser import PyparsingParser
+from mutalyzer_hgvs_parser.pyparsing_based_parser import PyparsingParser
 
 
 @pytest.fixture

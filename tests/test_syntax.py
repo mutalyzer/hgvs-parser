@@ -4,7 +4,7 @@ Syntax tests for the lark based HGVS parser - taken from the HGVS website.
 
 import pytest
 
-from hgvsparser.hgvs_parser import HgvsParser
+from mutalyzer_hgvs_parser.hgvs_parser import HgvsParser
 
 
 @pytest.fixture

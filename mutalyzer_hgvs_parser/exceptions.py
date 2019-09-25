@@ -1,5 +1,47 @@
 
 
+class UnexpectedCharacter(Exception):
+    def __init__(self, exception, description):
+        self.line = exception.line
+        self.column = exception.column
+        self.allowed = exception.allowed
+        self.considered_tokens = exception.considered_tokens
+        self.pos_in_stream = exception.pos_in_stream
+        self.state = exception.state
+        self.unexpected_character = description[self.pos_in_stream]
+        self.description = description
+        self.expecting = get_expecting(exception.allowed)
+
+        message = 'Unexpected character \'{}\' at position {}:\n'.format(
+            self.unexpected_character, self.column)
+        message += self.get_context()
+        message += '\nExpecting:'
+        for expecting in self.expecting:
+            message += '\n - {}'.format(expecting)
+        super(UnexpectedCharacter, self).__init__(message)
+
+    def get_context(self):
+        return '\n {}\n {}{}'.format(
+            self.description, ' ' * self.pos_in_stream, '^')
+
+
+def parse_error(e):
+    """
+    Todo: This should be revisited (lark does not offer the same
+          info as for the UnexpectedCharacters above).
+    """
+    print(vars(e))
+    if 'Unexpected end of input!' in str(e):
+        lark_terminals = list(set(
+            [val for i, val in enumerate(str(e).split(':')[1].split('\''))
+             if i % 2 == 1]))
+        expecting = get_expecting(lark_terminals)
+        message = 'Lark ParseError: Unexpected end of input!\nExpecting:'
+        for expecting in expecting:
+            message += '\n - {}'.format(expecting)
+        raise ParsingError(message)
+
+
 def get_expecting(lark_terminal_list):
     expecting = []
     for lark_terminal in lark_terminal_list:
@@ -54,47 +96,6 @@ TERMINALS = {
     'UCASE_LETTER': 'upper case letter',
     'UNKNOWN': '?'
 }
-
-
-class UnexpectedCharacter(Exception):
-    def __init__(self, exception, description):
-        self.line = exception.line
-        self.column = exception.column
-        self.allowed = exception.allowed
-        self.considered_tokens = exception.considered_tokens
-        self.pos_in_stream = exception.pos_in_stream
-        self.state = exception.state
-        self.unexpected_character = description[self.pos_in_stream]
-        self.description = description
-        self.expecting = get_expecting(exception.allowed)
-
-        message = 'Unexpected character \'{}\' at position {}:\n'.format(
-            self.unexpected_character, self.column)
-        message += self.get_context()
-        message += '\nExpecting:'
-        for expecting in self.expecting:
-            message += '\n - {}'.format(expecting)
-        super(UnexpectedCharacter, self).__init__(message)
-
-    def get_context(self):
-        return '\n {}\n {}{}'.format(
-            self.description, ' ' * self.pos_in_stream, '^')
-
-
-def parse_error(e):
-    """
-    Todo: This should be revisited (lark does not offer the same
-          info as for the UnexpectedCharacters above).
-    """
-    if 'Unexpected end of input!' in str(e):
-        lark_terminals = list(set(
-            [val for i, val in enumerate(str(e).split(':')[1].split('\''))
-             if i % 2 == 1]))
-        expecting = get_expecting(lark_terminals)
-        message = 'Lark ParseError: Unexpected end of input!\nExpecting:'
-        for expecting in expecting:
-            message += '\n - {}'.format(expecting)
-        raise ParsingError(message)
 
 
 class ParsingError(Exception):

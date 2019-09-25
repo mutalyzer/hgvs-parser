@@ -1,5 +1,5 @@
 """
-hgvsparser: Parser for HGVS variant descriptions.
+mutalyzer_hgvs_parser: Parser for HGVS variant descriptions.
 
 
 Copyright (c) 2018 Leiden University Medical Center <humgen@lumc.nl>

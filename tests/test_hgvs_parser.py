@@ -5,7 +5,7 @@ Mutalyzer tests.
 
 import pytest
 
-from hgvsparser.hgvs_parser import HgvsParser
+from mutalyzer_hgvs_parser.hgvs_parser import HgvsParser
 
 
 @pytest.fixture

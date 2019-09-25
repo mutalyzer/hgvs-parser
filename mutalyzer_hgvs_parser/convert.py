@@ -6,7 +6,7 @@ from lark import Tree
 from lark.lexer import Token
 
 
-def convert(parse_tree):
+def description_to_model(parse_tree):
     """
     Converts the lark tree obtained by parsing an HGVS description to
     a nested dictionary model.
