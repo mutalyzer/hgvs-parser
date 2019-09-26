@@ -117,3 +117,7 @@ class NoParserDefined(Exception):
 
 class UnsupportedParserType(Exception):
     pass
+
+
+class UnsupportedStartRule(Exception):
+    pass

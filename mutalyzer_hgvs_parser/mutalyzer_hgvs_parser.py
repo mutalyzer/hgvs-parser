@@ -1,5 +1,5 @@
 from .hgvs_parser import HgvsParser
-from .convert import description_to_model
+from .convert import to_model
 from .exceptions import UnexpectedCharacter, ParsingError
 from lark import GrammarError
 
@@ -48,7 +48,7 @@ def parse_description_to_model(description,
 
     if not errors:
         try:
-            model = description_to_model(parse_tree)
+            model = to_model(parse_tree)
         except Exception as e:
             errors.append({'Some error.': str(e)})
     if errors:

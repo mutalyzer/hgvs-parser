@@ -4,6 +4,24 @@ Module for converting lark parse trees to their equivalent dictionary models.
 
 from lark import Tree
 from lark.lexer import Token
+from .exceptions import UnsupportedStartRule
+
+
+def to_model(parse_tree, start_rule=None):
+    """
+    Entry point for conversions.
+    """
+    if start_rule is None:
+        return description_to_model(parse_tree)
+    if start_rule == 'reference':
+        return _reference_to_model(parse_tree)
+    elif start_rule == 'variants':
+        return _variants_to_model(parse_tree)
+    elif start_rule == 'variant':
+        return _variant_to_model(parse_tree)
+    elif start_rule == 'location':
+        return _variant_to_model(parse_tree)
+    raise UnsupportedStartRule
 
 
 def description_to_model(parse_tree):
