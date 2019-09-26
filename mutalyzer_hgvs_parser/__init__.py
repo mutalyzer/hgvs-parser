@@ -8,24 +8,31 @@ Copyright (c) 2019 Mihai Lefter <m.lefter@lumc.nl>
 
 ...
 """
+from configparser import ConfigParser
+from os.path import dirname, abspath
+
 from .mutalyzer_hgvs_parser import parse_description,\
     parse_description_to_model
 
-__version_info__ = ('0', '0', '1')
 
+config = ConfigParser()
+config.read_file(open('{}/setup.cfg'.format(dirname(abspath(__file__)))))
 
-__version__ = '.'.join(__version_info__)
-__author__ = 'LUMC, Mihai Lefter, Jeroen Laros, Martijn Vermaat'
-__contact__ = 'M.Lefter@lumc.nl'
-__homepage__ = 'https://github.com/mutalyzer/hgvs-parser'
+_copyright_notice = 'Copyright (c) {} {} <{}>'.format(
+    config.get('metadata', 'copyright'),
+    config.get('metadata', 'author'),
+    config.get('metadata', 'author_email'))
 
-usage = __doc__.split("\n\n\n")
+usage = [config.get('metadata', 'description'), _copyright_notice]
 
 
 def doc_split(func):
-    return func.__doc__.split("\n\n")[0]
+    return func.__doc__.split('\n\n')[0]
 
 
 def version(name):
-    return "%s version %s\n\nAuthor   : %s <%s>\nHomepage : %s" % \
-           (name, __version__, __author__, __contact__, __homepage__)
+    return '{} version {}\n\n{}\nHomepage: {}'.format(
+        config.get('metadata', 'name'),
+        config.get('metadata', 'version'),
+        _copyright_notice,
+        config.get('metadata', 'url'))

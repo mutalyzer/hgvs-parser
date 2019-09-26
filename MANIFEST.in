@@ -1,1 +1,1 @@
-include hgvsparser/ebnf/*.g
+include mutalyzer_hgvs_parser/ebnf/hgvs_mutalyzer_3.g
