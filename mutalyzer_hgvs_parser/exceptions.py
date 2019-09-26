@@ -24,22 +24,35 @@ class UnexpectedCharacter(Exception):
         return '\n {}\n {}{}'.format(
             self.description, ' ' * self.pos_in_stream, '^')
 
+    def serialize(self):
+        return {'line': self.line,
+                'column': self.column,
+                'pos_in_stream': self.pos_in_stream,
+                'unexpected_character': self.unexpected_character,
+                'description': self.description,
+                'expecting': self.expecting}
 
-def parse_error(e):
-    """
-    Todo: This should be revisited (lark does not offer the same
-          info as for the UnexpectedCharacters above).
-    """
-    print(vars(e))
-    if 'Unexpected end of input!' in str(e):
-        lark_terminals = list(set(
-            [val for i, val in enumerate(str(e).split(':')[1].split('\''))
-             if i % 2 == 1]))
-        expecting = get_expecting(lark_terminals)
-        message = 'Lark ParseError: Unexpected end of input!\nExpecting:'
-        for expecting in expecting:
-            message += '\n - {}'.format(expecting)
-        raise ParsingError(message)
+
+class ParsingError(Exception):
+    def __init__(self, exception):
+        """
+        Todo: This should be revisited (lark does not offer the same
+              info as for the UnexpectedCharacters above).
+        """
+        if 'Unexpected end of input!' in str(exception):
+            lark_terminals = list(set(
+                [val for i, val in enumerate(str(exception).
+                                             split(':')[1].split('\''))
+                 if i % 2 == 1]))
+            self.expecting = get_expecting(lark_terminals)
+            self.message = 'Lark ParseError: Unexpected end of input!' \
+                           '\nExpecting:'
+            for expecting in self.expecting:
+                self.message += '\n - {}'.format(expecting)
+
+    def serialize(self):
+        return {'details': 'Unexpected end of input',
+                'expecting': self.expecting}
 
 
 def get_expecting(lark_terminal_list):
@@ -96,10 +109,6 @@ TERMINALS = {
     'UCASE_LETTER': 'upper case letter',
     'UNKNOWN': '?'
 }
-
-
-class ParsingError(Exception):
-    pass
 
 
 class NoParserDefined(Exception):

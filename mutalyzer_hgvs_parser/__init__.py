@@ -2,12 +2,14 @@
 mutalyzer_hgvs_parser: Parser for HGVS variant descriptions.
 
 
-Copyright (c) 2018 Leiden University Medical Center <humgen@lumc.nl>
-Copyright (c) 2018 Mihai Lefter <m.lefter@lumc.nl>
+Copyright (c) 2019 Leiden University Medical Center <humgen@lumc.nl>
+Copyright (c) 2019 Mihai Lefter <m.lefter@lumc.nl>
 
 
 ...
 """
+from .mutalyzer_hgvs_parser import parse_description,\
+    parse_description_to_model
 
 __version_info__ = ('0', '0', '1')
 

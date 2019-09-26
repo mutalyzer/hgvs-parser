@@ -7,7 +7,7 @@ from lark import Lark
 from lark.exceptions import UnexpectedCharacters, ParseError
 from .pyparsing_based_parser import PyparsingParser
 from .exceptions import UnexpectedCharacter, NoParserDefined,\
-    UnsupportedParserType, parse_error, ParsingError
+    UnsupportedParserType, ParsingError
 
 
 class HgvsParser:
@@ -64,10 +64,10 @@ class HgvsParser:
             raise NoParserDefined('No parser defined.')
         try:
             parse_tree = self._parser.parse(description)
-        except UnexpectedCharacters as exception:
-            raise UnexpectedCharacter(exception, description)
+        except UnexpectedCharacters as e:
+            raise UnexpectedCharacter(e, description)
         except ParseError as e:
-            parse_error(e)
+            raise ParsingError(e)
         return parse_tree
 
     def status(self):
