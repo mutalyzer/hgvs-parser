@@ -1,4 +1,4 @@
-# Mutalyzer HGVS parser
+# Mutalyzer HGVS Parser
 
 Package to parse HGVS variant descriptions and to convert them into a
 dictionary model.
