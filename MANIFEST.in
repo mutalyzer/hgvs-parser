@@ -1,2 +1,1 @@
 include mutalyzer_hgvs_parser/ebnf/hgvs_mutalyzer_3.g
-include mutalyzer_hgvs_parser/setup.cfg

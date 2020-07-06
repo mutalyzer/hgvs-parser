@@ -1,38 +1,34 @@
-"""
-mutalyzer_hgvs_parser: Parser for HGVS variant descriptions.
-
-
-Copyright (c) 2019 Leiden University Medical Center <humgen@lumc.nl>
-Copyright (c) 2019 Mihai Lefter <m.lefter@lumc.nl>
-
-
-...
-"""
-from configparser import ConfigParser
-from os.path import dirname, abspath
+from pkg_resources import get_distribution
 
 from .mutalyzer_hgvs_parser import parse_description,\
     parse_description_to_model
 
 
-config = ConfigParser()
-config.read_file(open('{}/setup.cfg'.format(dirname(abspath(__file__)))))
+def _get_metadata(name):
+    pkg = get_distribution(__package__)
 
-_copyright_notice = 'Copyright (c) {} {} <{}>'.format(
-    config.get('metadata', 'copyright'),
-    config.get('metadata', 'author'),
-    config.get('metadata', 'author_email'))
+    for line in pkg.get_metadata_lines(pkg.PKG_INFO):
+        if line.startswith("{}: ".format(name)):
+            return line.split(": ")[1]
 
-usage = [config.get('metadata', 'description'), _copyright_notice]
+    return ""
+
+
+_copyright_notice = "Copyright (c) {} <{}>".format(
+    _get_metadata("Author"), _get_metadata("Author-email")
+)
+
+usage = [_get_metadata("Summary"), _copyright_notice]
 
 
 def doc_split(func):
-    return func.__doc__.split('\n\n')[0]
+    return func.__doc__.split("\n\n")[0]
 
 
 def version(name):
-    return '{} version {}\n\n{}\nHomepage: {}'.format(
-        config.get('metadata', 'name'),
-        config.get('metadata', 'version'),
+    return "{} version {}\n\n{}\nHomepage: {}".format(
+        _get_metadata("Name"),
+        _get_metadata("Version"),
         _copyright_notice,
-        config.get('metadata', 'url'))
+        _get_metadata("Home-page"),
+    )
