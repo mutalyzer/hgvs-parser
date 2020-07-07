@@ -1,8 +1,8 @@
 language: python
-sudo: false
-cache: pip
-python: "3.5"
-before_install:
-  - pip install -r requirements.txt
+python:
+  - "3.5"
+  - "3.6"
+  - "3.7"
+  - "3.8"
 install: pip install .
-script: py.test
+script: pytest
