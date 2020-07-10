@@ -120,4 +120,6 @@ class UnsupportedParserType(Exception):
 
 
 class UnsupportedStartRule(Exception):
-    pass
+    def __init__(self, start_rule):
+        self.message = 'Start rule \'{}\' not supported.'.format(start_rule)
+        super().__init__(self.message)
