@@ -1,3 +1,5 @@
+Mutalyzer HGVS Parser
+=====================
 
 Check HGVS variant descriptions syntax and convert them into a dictionary model.
 
