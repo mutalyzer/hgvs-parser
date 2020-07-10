@@ -20,8 +20,8 @@ def to_model(parse_tree, start_rule=None):
     elif start_rule == 'variant':
         return _variant_to_model(parse_tree)
     elif start_rule == 'location':
-        return _variant_to_model(parse_tree)
-    raise UnsupportedStartRule
+        return _location_to_model(parse_tree)
+    raise UnsupportedStartRule(start_rule)
 
 
 def description_to_model(parse_tree):
