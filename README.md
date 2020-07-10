@@ -8,6 +8,6 @@ the EBNF grammar is written directly in Python, as well as the `lark` based
 approach, which accepts the grammar written using the EBNF notation in a
 separate file.
 
-Please see [ReadTheDocs](RTD) for the latest documentation.
+Please see [ReadTheDocs][RTD] for the latest documentation.
 
 [RTD]: https://mutalyzer-hgvs-parser.readthedocs.io/en/latest/
