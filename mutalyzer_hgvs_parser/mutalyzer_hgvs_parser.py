@@ -1,7 +1,8 @@
-from .hgvs_parser import HgvsParser
+from lark import GrammarError, ParseError
+
 from .convert import to_model
-from .exceptions import UnexpectedCharacter, ParsingError, UnsupportedStartRule
-from lark import GrammarError
+from .exceptions import UnexpectedCharacter, UnexpectedEnd, UnsupportedStartRule
+from .hgvs_parser import HgvsParser
 
 
 def parse_description(description, grammar_file=None, start_rule=None):
@@ -15,16 +16,15 @@ def parse_description(description, grammar_file=None, start_rule=None):
     """
     params = {}
     if grammar_file:
-        params['grammar_path'] = grammar_file
+        params["grammar_path"] = grammar_file
     if start_rule:
-        params['start_rule'] = start_rule
+        params["start_rule"] = start_rule
 
     parser = HgvsParser(**params)
     return parser.parse(description)
 
 
-def parse_description_to_model(description,
-                               grammar_file=None, start_rule=None):
+def parse_description_to_model(description, grammar_file=None, start_rule=None):
     """
     Parse a description and convert the resulted parse tree into a
     dictionary model.
@@ -37,23 +37,40 @@ def parse_description_to_model(description,
     errors = []
     try:
         parse_tree = parse_description(description, grammar_file, start_rule)
-    except GrammarError as e:
-        errors.append({'Parser not generated due to a grammar error.': str(e)})
-    except FileNotFoundError as e:
-        errors.append({'Grammar file not found.': str(e)})
+    except GrammarError:
+        errors.append(
+            {
+                "code": "EGRAMMAR",
+                "details": "Parser not generated due to a grammar error.",
+            }
+        )
+    except FileNotFoundError:
+        errors.append({"code": "EGRAMMARFILE", "details": "Grammar file not found. {}"})
     except UnexpectedCharacter as e:
-        errors.append({'Unexpected character.': e.serialize()})
-    except ParsingError as e:
-        errors.append({'Parsing error.': e.serialize()})
+        errors.append(
+            dict(
+                {"code": "ESYNTAXUC", "details": "Unexpected character."},
+                **e.serialize()
+            )
+        )
+    except UnexpectedEnd as e:
+        errors.append(
+            dict(
+                {"code": "ESYNTAXUEOF", "details": "Unexpected end of input."},
+                **e.serialize()
+            )
+        )
+    except ParseError as e:
+        errors.append({"code": "ESYNTAXP", "details": "Parsing error."})
 
     if not errors:
         try:
             model = to_model(parse_tree, start_rule)
         except UnsupportedStartRule as e:
-            errors.append({'UnsupportedStartRule': str(e)})
+            errors.append({"UnsupportedStartRule": str(e)})
         except Exception as e:
-            errors.append({'Some error.': str(e)})
+            errors.append({"Some error.": str(e)})
     if errors:
-        return {'errors': errors}
+        return {"errors": errors}
     else:
         return model
