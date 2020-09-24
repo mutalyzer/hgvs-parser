@@ -2,7 +2,7 @@ description: reference ":" (COORDINATE_SYSTEM ".")? variants
 
 reference: ID reference? | "(" ID reference? ")"
 
-ID: LETTER (LETTER | DIGIT | "." | "_" | "-")*
+ID: (LETTER | DIGIT) (LETTER | DIGIT | "." | "_" | "-")*
 
 COORDINATE_SYSTEM:  "g" | "o" | "m" | "c" | "n" | "r" | "p"
 
