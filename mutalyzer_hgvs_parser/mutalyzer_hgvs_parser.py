@@ -1,7 +1,4 @@
-from lark import GrammarError, ParseError
-
 from .convert import to_model
-from .exceptions import UnexpectedCharacter, UnexpectedEnd, UnsupportedStartRule
 from .hgvs_parser import HgvsParser
 
 
@@ -34,43 +31,5 @@ def parse_description_to_model(description, grammar_file=None, start_rule=None):
     :param start_rule: Root rule for the grammar.
     :return: Dictionary model.
     """
-    errors = []
-    try:
-        parse_tree = parse_description(description, grammar_file, start_rule)
-    except GrammarError:
-        errors.append(
-            {
-                "code": "EGRAMMAR",
-                "details": "Parser not generated due to a grammar error.",
-            }
-        )
-    except FileNotFoundError:
-        errors.append({"code": "EGRAMMARFILE", "details": "Grammar file not found. {}"})
-    except UnexpectedCharacter as e:
-        errors.append(
-            dict(
-                {"code": "ESYNTAXUC", "details": "Unexpected character."},
-                **e.serialize()
-            )
-        )
-    except UnexpectedEnd as e:
-        errors.append(
-            dict(
-                {"code": "ESYNTAXUEOF", "details": "Unexpected end of input."},
-                **e.serialize()
-            )
-        )
-    except ParseError as e:
-        errors.append({"code": "ESYNTAXP", "details": "Parsing error."})
-
-    if not errors:
-        try:
-            model = to_model(parse_tree, start_rule)
-        except UnsupportedStartRule as e:
-            errors.append({"UnsupportedStartRule": str(e)})
-        except Exception as e:
-            errors.append({"Some error.": str(e)})
-    if errors:
-        return {"errors": errors}
-    else:
-        return model
+    parse_tree = parse_description(description, grammar_file, start_rule)
+    return to_model(parse_tree, start_rule)
