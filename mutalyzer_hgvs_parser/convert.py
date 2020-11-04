@@ -204,12 +204,12 @@ def _repeat_to_model(repeats):
     make_new_inserted = True
     for repeat in repeats:
         if make_new_inserted:
-            inserted = {}
+            inserted = {"source": "description"}
             make_new_inserted = False
         if isinstance(repeat, Token):
             inserted["sequence"] = repeat.value
         elif isinstance(repeat, Tree):
-            inserted["length"] = _length_to_model(repeat)
+            inserted["repeat_number"] = _length_to_model(repeat)
             model_repeats.append(inserted)
             make_new_inserted = True
     return model_repeats
