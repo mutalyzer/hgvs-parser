@@ -180,7 +180,6 @@ def test_correct_syntax(parser, description):
     'REF:*?+?_(',
     'REF:*?+?_(+1+_',
     'REF:*?+?_(*1+?_1_)',
-    'REF:1A',
     'REF:1Ax',
     'REF:1A>',
     'REF:1A>x',

@@ -87,16 +87,14 @@ def _variant_to_model(variant_tree):
     :return: Dictionary model.
     """
     if variant_tree.data == "_ambig":
-        variant_tree = _solve_del_variant_ambiguity(variant_tree)
+        variant_tree = _solve_variant_ambiguity(variant_tree)
 
     variant = {"location": _location_to_model(variant_tree.children[0])}
     if len(variant_tree.children) == 2:
         variant_tree = variant_tree.children[1]
         variant["type"] = variant_tree.data
         variant["source"] = "reference"
-        if variant_tree.data == "repeat":
-            variant["inserted"] = _repeat_to_model(variant_tree.children)
-        elif len(variant_tree.children) == 1:
+        if len(variant_tree.children) == 1:
             if variant_tree.data == "deletion":
                 variant["deleted"] = _deleted_to_model(variant_tree.children[0])
             else:
@@ -108,15 +106,23 @@ def _variant_to_model(variant_tree):
     return variant
 
 
-def _solve_del_variant_ambiguity(variant):
+def _solve_variant_ambiguity(variant):
     """
-    Deals with the following type of ambiguity:
-        REF1:100delinsREF2:100_200
-    where this variant can be seen as a deletion in which insREF2 is
-    wrongly interpreted as a reference, or as a deletion insertion, case
-    in which REF2 is the reference (correct).
+    Deals with the following type of ambiguities:
+        - `REF1:100insREF2:100_200`
+          where the variant can be seen as a repeat in which `insREF2` is
+          wrongly interpreted as a reference, or as an insertion (correct).
+          This applies to other variant types also.
+        - `REF1:100delinsREF2:100_200`
+          where this variant can be seen as a deletion in which `insREF2` is
+          wrongly interpreted as a reference, or as a deletion insertion, case
+          in which `REF2` is the reference (correct).
     """
-    if (
+    if variant.children[0].children[1].data == "repeat":
+        return variant.children[1]
+    elif variant.children[1].children[1].data == "repeat":
+        return variant.children[0]
+    elif (
         variant.children[0].children[1].data == "deletion_insertion"
         and variant.children[1].children[1].data == "deletion"
     ):
@@ -190,29 +196,6 @@ def _point_to_model(point_tree):
             else:
                 point["offset"] = {"value": int(token.value)}
     return point
-
-
-def _repeat_to_model(repeats):
-    """
-    Converts a lark tree corresponding to a repeat rule to a
-    dictionary model.
-
-    :param repeats: Lark parse tree.
-    :return: Dictionary model.
-    """
-    model_repeats = []
-    make_new_inserted = True
-    for repeat in repeats:
-        if make_new_inserted:
-            inserted = {"source": "description"}
-            make_new_inserted = False
-        if isinstance(repeat, Token):
-            inserted["sequence"] = repeat.value
-        elif isinstance(repeat, Tree):
-            inserted["repeat_number"] = _length_to_model(repeat)
-            model_repeats.append(inserted)
-            make_new_inserted = True
-    return model_repeats
 
 
 def _length_to_model(length_tree):
@@ -289,6 +272,8 @@ def _inserted_to_model(inserted_tree):
                     insert["source"] = "reference"
                 elif insert_part.data == "length":
                     insert["length"] = _length_to_model(insert_part)
+                elif insert_part.data == "repeat_number":
+                    insert["repeat_number"] = int(insert_part.children[0])
                 elif insert_part.data == "description":
                     for description_part in insert_part.children:
                         if (
