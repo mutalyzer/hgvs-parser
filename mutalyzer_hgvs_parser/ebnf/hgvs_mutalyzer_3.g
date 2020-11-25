@@ -29,12 +29,15 @@ conversion: "con" inserted
 
 inserted: ("[" (insert (";" insert)*) "]") | insert
 
-insert: (SEQUENCE | description | location | length) ((INVERTED? ("[" repeat_number "]")?)
-                                                     | (("[" repeat_number "]")? INVERTED?))?
+insert: ((SEQUENCE | description | location | length) ((INVERTED? ("[" repeat_number "]")?)
+                                                     | (("[" repeat_number "]")? INVERTED?))?)
+        | repeat_mixed+
 
 INVERTED: "inv"
 
 repeat_number: NUMBER | UNKNOWN | exact_range
+
+repeat_mixed: SEQUENCE "[" repeat_number "]"
 
 length: NUMBER | UNKNOWN | "(" (NUMBER | UNKNOWN | exact_range) ")"
 

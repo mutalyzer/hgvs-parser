@@ -255,46 +255,66 @@ def _inserted_to_model(inserted_tree):
     """
     inserted = []
     for inserted_subtree in inserted_tree.children:
-        insert = {}
         if inserted_subtree.data == "_ambig":
             inserted_subtree = _solve_insert_ambiguity(inserted_subtree)
-        for insert_part in inserted_subtree.children:
-            if isinstance(insert_part, Token):
-                if insert_part.type == "SEQUENCE":
-                    insert.update(
-                        {"sequence": insert_part.value, "source": "description"}
-                    )
-                elif insert_part.type == "INVERTED":
-                    insert["inverted"] = True
-            elif isinstance(insert_part, Tree):
-                if insert_part.data == "location":
-                    insert["location"] = _location_to_model(insert_part)
-                    insert["source"] = "reference"
-                elif insert_part.data == "length":
-                    insert["length"] = _length_to_model(insert_part)
-                elif insert_part.data == "repeat_number":
-                    insert["repeat_number"] = int(insert_part.children[0])
-                elif insert_part.data == "description":
-                    for description_part in insert_part.children:
-                        if (
+        inserted.extend(_insert_to_model(inserted_subtree))
+    return inserted
+
+
+def _insert_to_model(insert_tree):
+    """
+    Converts a lark tree corresponding to the insert rule to its
+    equivalent dictionary model.
+
+    :param insert_tree: Lark parse tree.
+    :return: Dictionary model.
+    """
+    if isinstance(insert_tree.children[0], Tree) and \
+            insert_tree.children[0].data == "repeat_mixed":
+        insert = []
+        for insert_part in insert_tree.children:
+            insert.append(
+                {"sequence": insert_part.children[0].value,
+                 "source": "description",
+                 "repeat_number": int(insert_part.children[1].children[0])})
+        return insert
+    insert = {}
+    for insert_part in insert_tree.children:
+        if isinstance(insert_part, Token):
+            if insert_part.type == "SEQUENCE":
+                insert.update(
+                    {"sequence": insert_part.value, "source": "description"}
+                )
+            elif insert_part.type == "INVERTED":
+                insert["inverted"] = True
+        elif isinstance(insert_part, Tree):
+            if insert_part.data == "location":
+                insert["location"] = _location_to_model(insert_part)
+                insert["source"] = "reference"
+            elif insert_part.data == "length":
+                insert["length"] = _length_to_model(insert_part)
+            elif insert_part.data == "repeat_number":
+                insert["repeat_number"] = int(insert_part.children[0])
+            elif insert_part.data == "description":
+                for description_part in insert_part.children:
+                    if (
                             isinstance(description_part, Token)
                             and description_part.type == "COORDINATE_SYSTEM"
-                        ):
-                            insert["coordinate_system"] = description_part.value
-                        elif description_part.data == "variants":
-                            if len(description_part.children) != 1:
-                                raise Exception("Nested descriptions?")
-                            variant = description_part.children[0]
-                            if len(variant.children) != 1:
-                                raise Exception("Nested descriptions?")
-                            else:
-                                insert["location"] = _location_to_model(
-                                    variant.children[0]
-                                )
-                        elif description_part.data == "reference":
-                            insert["source"] = _reference_to_model(description_part)
-        inserted.append(insert)
-    return inserted
+                    ):
+                        insert["coordinate_system"] = description_part.value
+                    elif description_part.data == "variants":
+                        if len(description_part.children) != 1:
+                            raise Exception("Nested descriptions?")
+                        variant = description_part.children[0]
+                        if len(variant.children) != 1:
+                            raise Exception("Nested descriptions?")
+                        else:
+                            insert["location"] = _location_to_model(
+                                variant.children[0]
+                            )
+                    elif description_part.data == "reference":
+                        insert["source"] = _reference_to_model(description_part)
+    return [insert]
 
 
 def _solve_insert_ambiguity(insert):
