@@ -276,7 +276,9 @@ def _insert_to_model(insert_tree):
             insert.append(
                 {"sequence": insert_part.children[0].value,
                  "source": "description",
-                 "repeat_number": int(insert_part.children[1].children[0])})
+                 "repeat_number": _length_to_model(insert_part.children[1])})
+            if len(insert_part.children) == 3:
+                insert[-1]['inverted'] = True
         return insert
     insert = {}
     for insert_part in insert_tree.children:
@@ -294,7 +296,7 @@ def _insert_to_model(insert_tree):
             elif insert_part.data == "length":
                 insert["length"] = _length_to_model(insert_part)
             elif insert_part.data == "repeat_number":
-                insert["repeat_number"] = int(insert_part.children[0])
+                insert["repeat_number"] = _length_to_model(insert_part)
             elif insert_part.data == "description":
                 for description_part in insert_part.children:
                     if (
