@@ -37,7 +37,7 @@ INVERTED: "inv"
 
 repeat_number: NUMBER | UNKNOWN | exact_range
 
-repeat_mixed: SEQUENCE "[" repeat_number "]" INVERTED?
+repeat_mixed: (SEQUENCE  | location) "[" repeat_number "]" INVERTED?
 
 length: NUMBER | UNKNOWN | "(" (NUMBER | UNKNOWN | exact_range) ")"
 

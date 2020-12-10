@@ -272,13 +272,8 @@ def _insert_to_model(insert_tree):
     if isinstance(insert_tree.children[0], Tree) and \
             insert_tree.children[0].data == "repeat_mixed":
         insert = []
-        for insert_part in insert_tree.children:
-            insert.append(
-                {"sequence": insert_part.children[0].value,
-                 "source": "description",
-                 "repeat_number": _length_to_model(insert_part.children[1])})
-            if len(insert_part.children) == 3:
-                insert[-1]['inverted'] = True
+        for repeat_mixed in insert_tree.children:
+            insert.extend(_insert_to_model(repeat_mixed))
         return insert
     insert = {}
     for insert_part in insert_tree.children:
