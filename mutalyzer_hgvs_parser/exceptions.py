@@ -8,7 +8,7 @@ class UnexpectedCharacter(Exception):
         self.state = exception.state
         self.unexpected_character = description[self.pos_in_stream]
         self.description = description
-        self.expecting = get_expecting(exception.allowed)
+        self.expecting = _get_expecting(exception.allowed)
 
         message = "Unexpected character '{}' at position {}:\n".format(
             self.unexpected_character, self.column
@@ -38,7 +38,7 @@ class UnexpectedEnd(Exception):
         self.pos_in_stream = len(description)
         self.description = description
         lark_terminals = [terminal.name for terminal in exception.expected]
-        self.expecting = get_expecting(lark_terminals)
+        self.expecting = _get_expecting(lark_terminals)
 
         message = "Unexpected character end of input"
         message += self.get_context()
@@ -59,14 +59,14 @@ class UnexpectedEnd(Exception):
         }
 
 
-def get_expecting(lark_terminal_list):
-    expecting = []
+def _get_expecting(lark_terminal_list):
+    expecting = set()
     for lark_terminal in lark_terminal_list:
         if TERMINALS.get(lark_terminal):
-            expecting.append(TERMINALS[lark_terminal])
+            expecting.add(TERMINALS[lark_terminal])
         else:
-            expecting.append(lark_terminal)
-    return expecting
+            expecting.add(lark_terminal)
+    return list(expecting)
 
 
 TERMINALS = {
@@ -110,15 +110,11 @@ TERMINALS = {
 }
 
 
-class NoParserDefined(Exception):
-    pass
-
-
-class UnsupportedParserType(Exception):
-    pass
-
-
 class UnsupportedStartRule(Exception):
     def __init__(self, start_rule):
         self.message = "Start rule '{}' not supported.".format(start_rule)
         super().__init__(self.message)
+
+
+class NestedDescriptions(Exception):
+    pass
