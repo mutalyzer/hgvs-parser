@@ -13,9 +13,10 @@ def to_model(parse_tree, start_rule=None):
     Converts the lark tree obtained by parsing an HGVS description
     (or an HGVS description part) to a nested dictionary model.
 
-    :arg lark.Tree parse_tree: Lark parse tree.
+    :arg lark.Tree parse_tree: Parse tree.
     :arg str start_rule: Alternative start rule.
-    :returns dict: Nested dictionary equivalent for the parse tree.
+    :returns: Description dictionary model.
+    :rtype: dict
     """
     if start_rule is None:
         return _description_to_model(parse_tree)
@@ -38,7 +39,8 @@ def _description_to_model(parse_tree):
     a nested dictionary model.
 
     :arg parse_tree lark.Tree: Lark based parse tree.
-    :returns dict: Nested dictionary equivalent for the parse tree.
+    :returns: Dictionary model.
+    :rtype: dict
     """
     model = {}
     if isinstance(parse_tree, Tree):
@@ -60,7 +62,8 @@ def _reference_to_model(reference_tree):
     dictionary model.
 
     :args: lark.Tree reference_tree: Lark reference parse tree.
-    :returns dict: Dictionary model.
+    :returns: Dictionary model.
+    :rtype: dict
     """
     if len(reference_tree.children) == 1:
         return {"id": reference_tree.children[0].value}
@@ -77,7 +80,8 @@ def _variants_to_model(variants_tree):
     dictionary model.
 
     :args: lark.Tree  variants_tree: Lark parse tree.
-    :returns dict: Dictionary model.
+    :returns: Dictionary model.
+    :rtype: dict
     """
     variants = []
     for variant in variants_tree.children:
@@ -91,7 +95,8 @@ def _variant_to_model(variant_tree):
     dictionary model.
 
     :args: lark.Tree  variant_tree: Lark parse tree.
-    :returns dict: Dictionary model.
+    :returns: Dictionary model.
+    :rtype: dict
     """
     if variant_tree.data == "_ambig":
         variant_tree = _solve_variant_ambiguity(variant_tree)
@@ -147,7 +152,8 @@ def _location_to_model(location_tree):
     dictionary model.
 
     :arg lark.Tree location_tree: Lark parse tree.
-    :returns dict: Dictionary model.
+    :returns: Dictionary model.
+    :rtype: dict
     """
     location_tree = location_tree.children[0]
     if location_tree.data == "range":
@@ -245,7 +251,8 @@ def _deleted_to_model(deleted):
     tree that corresponds to a deleted instance.
 
     :arg lark.Tree/lark.lexer.Token deleted: Lark parse tree / token.
-    :returns dict: Dictionary model.
+    :returns: Dictionary model.
+    :rtype: dict
     """
     if isinstance(deleted, Token):
         return [{"sequence": deleted.value, "source": "description"}]
@@ -258,7 +265,8 @@ def _inserted_to_model(inserted_tree):
     equivalent dictionary model.
 
     :arg lark.Tree inserted_tree: Lark parse tree.
-    :returns dict: Dictionary model.
+    :returns: Dictionary model.
+    :rtype: dict
     """
     inserted = []
     for inserted_subtree in inserted_tree.children:

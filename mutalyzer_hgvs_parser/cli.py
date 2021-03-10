@@ -54,7 +54,7 @@ def main():
         "-g", help="alternative input grammar file path (do not use with -c)")
 
     cli.add_argument(
-        "-s", help="save the parse tree as a PNG image (pydot required!)")
+        "-i", help="save the parse tree as a PNG image (pydot required!)")
 
     args = cli.parse_args()
 
@@ -63,9 +63,9 @@ def main():
     else:
         parse_tree = _parse(args.description, args.g, args.r)
 
-    if args.s and parse_tree:
-        pydot__tree_to_png(parse_tree, args.s)
-        print("Parse tree image saved to:\n {}".format(args.s))
+    if args.i and parse_tree:
+        pydot__tree_to_png(parse_tree, args.i)
+        print("Parse tree image saved to:\n {}".format(args.i))
 
 
 if __name__ == "__main__":
