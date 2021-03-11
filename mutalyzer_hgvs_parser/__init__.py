@@ -1,7 +1,7 @@
 from pkg_resources import get_distribution
 
-from .mutalyzer_hgvs_parser import parse_description,\
-    parse_description_to_model
+from .hgvs_parser import parse
+from .convert import to_model
 
 
 def _get_metadata(name):

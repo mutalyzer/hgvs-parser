@@ -1,55 +1,26 @@
-"""
-Module to parse HGVS variant descriptions.
-"""
-
 import os
 
 from lark import Lark
-from lark.exceptions import ParseError, UnexpectedCharacters, UnexpectedEOF
+from lark.exceptions import UnexpectedCharacters, UnexpectedEOF
 
-from .exceptions import (
-    NoParserDefined,
-    UnexpectedCharacter,
-    UnexpectedEnd,
-    UnsupportedParserType,
-)
-from .pyparsing_based_parser import PyparsingParser
+from .exceptions import UnexpectedCharacter, UnexpectedEnd
 
 
 class HgvsParser:
-    """
-    Either the pyparsing method or the lark one.
-    """
-
-    def __init__(
-        self,
-        parser_type="lark",
-        grammar_path="local",
-        start_rule="description",
-        ignore_white_spaces=True,
-    ):
-        if grammar_path == "local":
-            self._grammar_path = os.path.join(
-                os.path.dirname(__file__), "ebnf/hgvs_mutalyzer_3.g"
-            )
-        else:
+    def __init__(self, grammar_path=None, start_rule=None, ignore_white_spaces=True):
+        if grammar_path:
             self._grammar_path = grammar_path
-        self._parser_type = parser_type
-        self._start_rule = start_rule
-        self._ignore_whitespaces = ignore_white_spaces
-        if parser_type == "lark":
-            self._create_lark_parser()
-        elif parser_type == "pyparsing":
-            self._create_pyparsing_parser()
         else:
-            raise UnsupportedParserType(
-                "Not supported parser type: {}".format(self._parser_type)
-            )
+            self._grammar_path = os.path.join(
+                os.path.dirname(__file__), "ebnf/hgvs_mutalyzer_3.g")
+        if start_rule:
+            self._start_rule = start_rule
+        else:
+            self._start_rule = "description"
+        self._ignore_whitespaces = ignore_white_spaces
+        self._create_parser()
 
-    def _create_lark_parser(self):
-        """
-        Lark based parser instantiation.
-        """
+    def _create_parser(self):
         with open(self._grammar_path) as grammar_file:
             grammar = grammar_file.read()
 
@@ -60,21 +31,14 @@ class HgvsParser:
             grammar, parser="earley", start=self._start_rule, ambiguity="explicit"
         )
 
-    def _create_pyparsing_parser(self):
-        """
-        Pyparsing based parser instantiation.
-        """
-        self._parser = PyparsingParser()
-
     def parse(self, description):
         """
-        Parse the actual description. It requires the parser to be already set.
-        :param description: HGVS description (str).
-        :return: The parse tree directly (should it be changed to return
-                 another format?).
+        Parse the provided description.
+
+        :arg str description: An HGVS description.
+        :returns: A parse tree.
+        :rtype: lark.Tree
         """
-        if self._parser is None:
-            raise NoParserDefined("No parser defined.")
         try:
             parse_tree = self._parser.parse(description)
         except UnexpectedCharacters as e:
@@ -85,7 +49,7 @@ class HgvsParser:
 
     def status(self):
         """
-        Prints status information.
+        Print parser's status information.
         """
         print("Parser type: %s" % self._parser_type)
         if self._parser_type == "lark":
@@ -100,3 +64,19 @@ class HgvsParser:
             print(
                 "  Propagate positions: %s" % self._parser.options.propagate_positions
             )
+
+
+def parse(description, grammar_path=None, start_rule=None):
+    """
+    Parse the provided HGVS `description`, or the description part,
+    e.g., a location, a variants list, etc., if an appropriate alternative
+    `start_rule` is provided.
+
+    :arg str description: Description (or description part) to be parsed.
+    :arg str grammar_path: Path towards a different grammar file.
+    :arg str start_rule: Alternative start rule for the grammar.
+    :returns: Parse tree.
+    :rtype: lark.Tree
+    """
+    parser = HgvsParser(grammar_path, start_rule)
+    return parser.parse(description)

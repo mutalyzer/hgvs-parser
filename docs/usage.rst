@@ -6,9 +6,20 @@ use ``-h``.
 
 .. code-block:: console
 
-    $ hgvsparser -h
-    usage: hgvsparser [-h] [-v] [-c] [-g G] [-r R] [-s S] [-p] description
-    ...
+    $ mutalyzer_hgvs_parser -h
+    usage: mutalyzer_hgvs_parser [-h] [-v] [-r R] [-c | -g G] [-i I] description
+
+    positional arguments:
+      description  the HGVS variant description to be parsed
+
+    optional arguments:
+      -h, --help   show this help message and exit
+      -v           show program's version number and exit
+      -r R         alternative start (top) rule for the grammar
+      -c           convert the description to the model
+      -g G         alternative input grammar file path
+      -i I         save the parse tree as a PNG image (pydot required!)
+
 
 Syntax check
 ------------
@@ -17,15 +28,15 @@ To only check if a description can be successfully parsed.
 
 .. code-block:: console
 
-    $ hgvsparser 'NG_012337.1(SDHD_v001):c.274G>T'
+    $ mutalyzer_hgvs_parser 'NG_012337.1(SDHD_v001):c.274G>T'
     Successfully parsed:
      NG_012337.1(SDHD_v001):c.274G>T
 
-Variant description model
+
+Description model
 -------------------------
 
-To also obtain the variant description model of the description, add the
-``-c`` flag.
+To obtain the model of a description add the ``-c`` flag.
 
 .. code-block:: console
 
@@ -66,11 +77,31 @@ To also obtain the variant description model of the description, add the
 Grammar start rule
 ------------------
 
-By default, the Mutalyzer 3 grammar is employed, with the ``description`` start
-rule. It is however possible to choose a different start rule with the ``r`` option.
+By default, the Mutalyzer grammar is used, with ``description`` as the start (top)
+rule. It is however possible to choose a different start rule with the ``-r`` option.
 
 .. code-block:: console
 
     $ mutalyzer_hgvs_parser -r variant '274G>T'
     Successfully parsed:
      274G>T
+
+
+Parse tree representation
+-------------------------
+
+If pydot_ is installed, an image of the lark parse tree can be obtained
+with the ``-i`` option.
+
+.. code-block:: console
+
+    $ mutalyzer_hgvs_parser "274del" -r variant -i tree.png
+    Successfully parsed:
+     274del
+    Parse tree image saved to:
+     tree.png
+
+.. image:: images/tree.png
+  :alt: Parse tree representation.
+
+.. _pydot: https://pypi.org/project/pydot/
