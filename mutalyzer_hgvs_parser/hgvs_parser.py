@@ -3,7 +3,6 @@ import os
 from lark import Lark
 from lark.exceptions import UnexpectedCharacters, UnexpectedEOF
 
-from .convert import to_model
 from .exceptions import UnexpectedCharacter, UnexpectedEnd
 
 
@@ -81,19 +80,3 @@ def parse(description, grammar_path=None, start_rule=None):
     """
     parser = HgvsParser(grammar_path, start_rule)
     return parser.parse(description)
-
-
-def parse_to_model(description, start_rule=None):
-    """
-    Parse the provided HGVS `description`, or the description part,
-    e.g., a location, a variants list, etc., if an appropriate alternative
-    `start_rule` is provided, and convert the resulted parse tree into a
-    dictionary.
-
-    :arg str description: Description (or description part) to be parsed.
-    :arg str start_rule: Alternative start rule for the grammar.
-    :returns: Dictionary model.
-    :rtype: dict
-    """
-    parse_tree = parse(description, start_rule=start_rule)
-    return to_model(parse_tree, start_rule)

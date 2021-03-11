@@ -4,7 +4,6 @@ Tests for the lark tree to dictionary converter.
 
 import pytest
 
-from mutalyzer_hgvs_parser.hgvs_parser import HgvsParser, parse_to_model
 from mutalyzer_hgvs_parser.convert import to_model
 from mutalyzer_hgvs_parser.exceptions import UnsupportedStartRule, NestedDescriptions
 
@@ -28,7 +27,7 @@ REFERENCES = {
 
 @pytest.mark.parametrize("reference, model", _get_tests(REFERENCES))
 def test_reference_to_model(reference, model):
-    assert parse_to_model(reference, "reference") == model
+    assert to_model(reference, "reference") == model
 
 
 LOCATIONS = {
@@ -231,7 +230,7 @@ LENGTHS = {
 
 @pytest.mark.parametrize("description, model", _get_tests(LOCATIONS))
 def test_location_to_model(description, model):
-    assert parse_to_model(description, "location") == model
+    assert to_model(description, "location") == model
 
 
 INSERTED = {
@@ -280,7 +279,7 @@ DELETED = {}
 
 @pytest.mark.parametrize("description, model", _get_tests(INSERTED))
 def test_inserted_to_model(description, model):
-    assert parse_to_model(description, "inserted") == model
+    assert to_model(description, "inserted") == model
 
 
 VARIANTS = {
@@ -619,14 +618,14 @@ VARIANTS = {
 
 @pytest.mark.parametrize("variant, model", _get_tests(VARIANTS))
 def test_variant_to_model(variant, model):
-    assert parse_to_model(variant, "variant") == model
+    assert to_model(variant, "variant") == model
 
 
 @pytest.mark.parametrize(
     "variants, model",
     [("[{}]".format(";".join(VARIANTS.keys())), list(VARIANTS.values()))])
 def test_variants_to_model(variants, model):
-    assert parse_to_model(variants, "variants") == model
+    assert to_model(variants, "variants") == model
 
 
 DESCRIPTIONS = {
@@ -646,7 +645,7 @@ DESCRIPTIONS = {
 
 @pytest.mark.parametrize("description, model", _get_tests(DESCRIPTIONS))
 def test_convert(description, model):
-    assert parse_to_model(description) == model
+    assert to_model(description) == model
 
 
 OPERATIONS_MIX = {
@@ -683,13 +682,12 @@ def _get_mix():
 
 @pytest.mark.parametrize("description, model", _get_tests(_get_mix()))
 def test_mix(description, model):
-    assert parse_to_model(description) == model
+    assert to_model(description) == model
 
 
 def test_unsupported_start_rule():
-    parser = HgvsParser()
     with pytest.raises(UnsupportedStartRule):
-        to_model(parser.parse("R1:1del"), "no_rule")
+        to_model("10_20", "range")
 
 
 @pytest.mark.parametrize(
@@ -697,4 +695,4 @@ def test_unsupported_start_rule():
     ["R1:1delinsR2:2del", "R1:1del[R2:2del]", "R1:[1del;10_11insR2:2del]"])
 def test_nested_descriptions(description):
     with pytest.raises(NestedDescriptions):
-        parse_to_model(description)
+        to_model(description)

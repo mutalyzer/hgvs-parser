@@ -7,13 +7,29 @@ from lark.lexer import Token
 
 from .exceptions import NestedDescriptions, UnsupportedStartRule
 
+from .hgvs_parser import parse
 
-def to_model(parse_tree, start_rule=None):
+
+def to_model(description, start_rule=None):
     """
-    Converts the lark tree obtained by parsing an HGVS description
-    (or an HGVS description part) to a nested dictionary model.
+    Convert an  HGVS description, or parts of it, e.g., a location,
+    a variants list, etc., if an appropriate alternative `start_rule`
+    is provided, to a nested dictionary model.
 
-    :arg lark.Tree parse_tree: Parse tree.
+    :arg str description: HGVS description.
+    :arg str start_rule: Alternative start rule.
+    :returns: Description dictionary model.
+    :rtype: dict
+    """
+    parse_tree = parse(description, start_rule=start_rule)
+    return _parse_tree_to_model(parse_tree, start_rule)
+
+
+def _parse_tree_to_model(parse_tree, start_rule=None):
+    """
+    Convert a parse tree to a nested dictionary model.
+
+    :arg lark.Tree parse_tree: HGVS description.
     :arg str start_rule: Alternative start rule.
     :returns: Description dictionary model.
     :rtype: dict
@@ -35,10 +51,10 @@ def to_model(parse_tree, start_rule=None):
 
 def _description_to_model(parse_tree):
     """
-    Converts the lark tree obtained by parsing an HGVS description to
+    Convert a lark tree obtained by parsing an HGVS description to
     a nested dictionary model.
 
-    :arg parse_tree lark.Tree: Lark based parse tree.
+    :arg lark.Tree parse_tree: Lark based parse tree.
     :returns: Dictionary model.
     :rtype: dict
     """
@@ -56,66 +72,66 @@ def _description_to_model(parse_tree):
     return model
 
 
-def _reference_to_model(reference_tree):
+def _reference_to_model(reference):
     """
-    Converts the lark tree corresponding to the `reference` rule to its
+    Convert a lark tree corresponding to the `reference` rule to its
     dictionary model.
 
-    :args: lark.Tree reference_tree: Lark reference parse tree.
+    :arg lark.Tree reference: Lark reference parse tree.
     :returns: Dictionary model.
     :rtype: dict
     """
-    if len(reference_tree.children) == 1:
-        return {"id": reference_tree.children[0].value}
-    elif len(reference_tree.children) == 2:
+    if len(reference.children) == 1:
+        return {"id": reference.children[0].value}
+    elif len(reference.children) == 2:
         return {
-            "id": reference_tree.children[0].value,
-            "selector": _reference_to_model(reference_tree.children[1]),
+            "id": reference.children[0].value,
+            "selector": _reference_to_model(reference.children[1]),
         }
 
 
-def _variants_to_model(variants_tree):
+def _variants_to_model(variants):
     """
-    Converts the lark tree corresponding to the `variants` rule to its
+    Convert a lark tree corresponding to the `variants` rule to its
     dictionary model.
 
-    :args: lark.Tree  variants_tree: Lark parse tree.
+    :arg lark.Tree variants: Lark parse tree.
     :returns: Dictionary model.
     :rtype: dict
     """
-    variants = []
-    for variant in variants_tree.children:
-        variants.append(_variant_to_model(variant))
-    return variants
+    output = []
+    for variant in variants.children:
+        output.append(_variant_to_model(variant))
+    return output
 
 
-def _variant_to_model(variant_tree):
+def _variant_to_model(variant):
     """
     Converts the lark tree corresponding to the `variant` rule to its
     dictionary model.
 
-    :args: lark.Tree  variant_tree: Lark parse tree.
+    :arg lark.Tree variant: Lark parse tree.
     :returns: Dictionary model.
     :rtype: dict
     """
-    if variant_tree.data == "_ambig":
-        variant_tree = _solve_variant_ambiguity(variant_tree)
+    if variant.data == "_ambig":
+        variant = _solve_variant_ambiguity(variant)
 
-    variant = {"location": _location_to_model(variant_tree.children[0])}
-    if len(variant_tree.children) == 2:
-        variant_tree = variant_tree.children[1]
-        variant["type"] = variant_tree.data
-        variant["source"] = "reference"
-        if len(variant_tree.children) == 1:
-            if variant_tree.data == "deletion":
-                variant["deleted"] = _deleted_to_model(variant_tree.children[0])
+    output = {"location": _location_to_model(variant.children[0])}
+    if len(variant.children) == 2:
+        variant = variant.children[1]
+        output["type"] = variant.data
+        output["source"] = "reference"
+        if len(variant.children) == 1:
+            if variant.data == "deletion":
+                output["deleted"] = _deleted_to_model(variant.children[0])
             else:
-                variant["inserted"] = _inserted_to_model(variant_tree.children[0])
-        elif len(variant_tree.children) == 2:
-            variant["deleted"] = _deleted_to_model(variant_tree.children[0])
-            variant["inserted"] = _inserted_to_model(variant_tree.children[1])
+                output["inserted"] = _inserted_to_model(variant.children[0])
+        elif len(variant.children) == 2:
+            output["deleted"] = _deleted_to_model(variant.children[0])
+            output["inserted"] = _inserted_to_model(variant.children[1])
 
-    return variant
+    return output
 
 
 def _solve_variant_ambiguity(variant):
@@ -129,6 +145,9 @@ def _solve_variant_ambiguity(variant):
           where this variant can be seen as a deletion in which `insREF2` is
           wrongly interpreted as a reference, or as a deletion insertion, case
           in which `REF2` is the reference (correct).
+    :arg lark.Tree variant: Lark parse tree.
+    :returns: Valid tree path.
+    :rtype: lark.Tree
     """
     if variant.children[0].children[1].data == "repeat":
         return variant.children[1]
@@ -146,69 +165,82 @@ def _solve_variant_ambiguity(variant):
         return variant.children[1]
 
 
-def _location_to_model(location_tree):
+def _location_to_model(location):
     """
     Converts the lark tree corresponding to the location rule to its
     dictionary model.
 
-    :arg lark.Tree location_tree: Lark parse tree.
+    :arg lark.Tree location: Lark parse tree.
     :returns: Dictionary model.
     :rtype: dict
     """
-    location_tree = location_tree.children[0]
-    if location_tree.data == "range":
-        return _range_to_model(location_tree)
-    elif location_tree.data in ["point", "uncertain_point"]:
-        return _point_to_model(location_tree)
+    location = location.children[0]
+    if location.data == "range":
+        return _range_to_model(location)
+    elif location.data in ["point", "uncertain_point"]:
+        return _point_to_model(location)
 
 
-def _range_to_model(range_tree):
+def _range_to_model(range_location):
     """
-    Converts the lark tree corresponding to a `range` rule to its
-    dictionary model.
+    Converts the lark tree corresponding to a `range` location
+    rule to its dictionary model.
 
-    :arg lark.Tree range_tree: Lark parse tree.
+    :arg lark.Tree range_location: Lark parse tree.
     :returns dict: Dictionary model.
     """
     range_location = {
         "type": "range",
-        "start": _point_to_model(range_tree.children[0]),
-        "end": _point_to_model(range_tree.children[1]),
+        "start": _point_to_model(range_location.children[0]),
+        "end": _point_to_model(range_location.children[1]),
     }
     return range_location
 
 
-def _point_to_model(point_tree):
+def _point_to_model(point):
     """
     Converts a lark tree corresponding to a point/uncertain point rule
     to a dictionary model.
 
-    :arg lark.Tree point_tree: Lark parse tree.
+    :arg lark.Tree point: Point parse tree.
     :returns dict: Dictionary model.
     """
-    if point_tree.data == "uncertain_point":
-        return {**_range_to_model(point_tree), **{"uncertain": True}}
-    point = {"type": "point"}
-    for token in point_tree.children:
+    if point.data == "uncertain_point":
+        return {**_range_to_model(point), **{"uncertain": True}}
+    output = {"type": "point"}
+    for token in point.children:
         if token.type == "OUTSIDE_CDS":
             if token.value == "*":
-                point["outside_cds"] = "downstream"
+                output["outside_cds"] = "downstream"
             elif token.value == "-":
-                point["outside_cds"] = "upstream"
+                output["outside_cds"] = "upstream"
         elif token.type == "NUMBER":
-            point["position"] = int(token.value)
+            output["position"] = int(token.value)
         elif token.type == "UNKNOWN":
-            point["uncertain"] = True
+            output["uncertain"] = True
         elif token.type == "OFFSET":
-            if "?" in token.value:
-                point["offset"] = {"uncertain": True}
-                if "+" in token.value:
-                    point["offset"]["downstream"] = True
-                elif "-" in token.value:
-                    point["offset"]["upstream"] = True
-            else:
-                point["offset"] = {"value": int(token.value)}
-    return point
+            output["offset"] = _offset_to_model(token)
+    return output
+
+
+def _offset_to_model(offset):
+    """
+    Converts a lark token corresponding to a point offset
+    to a dictionary model.
+
+    :arg lark.lexer.Token offset: Point offset token.
+    :returns dict: Dictionary model.
+    """
+    output = {}
+    if "?" in offset.value:
+        output["uncertain"] = True
+        if "+" in offset.value:
+            output["downstream"] = True
+        elif "-" in offset.value:
+            output["upstream"] = True
+    else:
+        output["value"] = int(offset.value)
+    return output
 
 
 def _length_to_model(length):
@@ -216,7 +248,7 @@ def _length_to_model(length):
     Converts a lark tree corresponding to a length rule to a
     dictionary model.
 
-    :arg lark.Tree/lark.lexer.Token: Lark parse tree / token.
+    :arg lark.Tree_or_lark.lexer.Token: Lark parse tree / token.
     :returns dict: Dictionary model.
     """
     length = length.children[0]
@@ -231,18 +263,18 @@ def _length_to_model(length):
         }
 
 
-def _length_point_to_model(length_point_token):
+def _length_point_to_model(length_point):
     """
     Generates a point dictionary model from a lark token that
     corresponds to a length instance.
 
-    :arg lark.lexer.Token length_point_token: Lark token.
+    :arg lark.lexer.Token length_point: Length point token.
     :returns dict: Dictionary model.
     """
-    if length_point_token.type == "UNKNOWN":
+    if length_point.type == "UNKNOWN":
         return {"type": "point", "uncertain": True}
-    if length_point_token.type == "NUMBER":
-        return {"type": "point", "value": int(length_point_token.value)}
+    if length_point.type == "NUMBER":
+        return {"type": "point", "value": int(length_point.value)}
 
 
 def _deleted_to_model(deleted):
@@ -259,74 +291,110 @@ def _deleted_to_model(deleted):
     return _inserted_to_model(deleted)
 
 
-def _inserted_to_model(inserted_tree):
+def _inserted_to_model(inserted):
     """
     Converts a lark tree corresponding to the inserted rule to its
     equivalent dictionary model.
 
-    :arg lark.Tree inserted_tree: Lark parse tree.
+    :arg lark.Tree inserted: Inserted parse tree.
     :returns: Dictionary model.
     :rtype: dict
     """
-    inserted = []
-    for inserted_subtree in inserted_tree.children:
+    output = []
+    for inserted_subtree in inserted.children:
         if inserted_subtree.data == "_ambig":
             inserted_subtree = _solve_insert_ambiguity(inserted_subtree)
-        inserted.extend(_insert_to_model(inserted_subtree))
-    return inserted
+        output.extend(_insert_to_model(inserted_subtree))
+    return output
 
 
-def _insert_to_model(insert_tree):
+def _insert_to_model(insert):
     """
-    Converts a lark tree corresponding to the insert rule to its
+    Converts a lark tree corresponding to the `insert` rule to its
     equivalent dictionary model.
 
-    :arg lark.Tree insert_tree: Lark parse tree.
+    :arg lark.Tree insert: Lark parse tree.
     :returns dict: Dictionary model.
     """
-    if isinstance(insert_tree.children[0], Tree) and \
-            insert_tree.children[0].data == "repeat_mixed":
-        insert = []
-        for repeat_mixed in insert_tree.children:
-            insert.extend(_insert_to_model(repeat_mixed))
-        return insert
-    insert = {}
-    for insert_part in insert_tree.children:
+    if (
+        isinstance(insert.children[0], Tree)
+        and insert.children[0].data == "repeat_mixed"
+    ):
+        return _repeat_mixed_to_model(insert)
+    output = {}
+    for insert_part in insert.children:
         if isinstance(insert_part, Token):
             if insert_part.type == "SEQUENCE":
-                insert.update(
-                    {"sequence": insert_part.value, "source": "description"}
-                )
+                output.update({"sequence": insert_part.value, "source": "description"})
             elif insert_part.type == "INVERTED":
-                insert["inverted"] = True
+                output["inverted"] = True
         elif isinstance(insert_part, Tree):
-            if insert_part.data == "location":
-                insert["location"] = _location_to_model(insert_part)
-                insert["source"] = "reference"
-            elif insert_part.data == "length":
-                insert["length"] = _length_to_model(insert_part)
-            elif insert_part.data == "repeat_number":
-                insert["repeat_number"] = _length_to_model(insert_part)
-            elif insert_part.data == "description":
-                for description_part in insert_part.children:
-                    if (
-                            isinstance(description_part, Token)
-                            and description_part.type == "COORDINATE_SYSTEM"
-                    ):
-                        insert["coordinate_system"] = description_part.value
-                    elif description_part.data == "variants":
-                        if len(description_part.children) != 1:
-                            raise NestedDescriptions()
-                        variant = description_part.children[0]
-                        if len(variant.children) != 1:
-                            raise NestedDescriptions()
-                        else:
-                            insert["location"] = _location_to_model(
-                                variant.children[0]
-                            )
-                    elif description_part.data == "reference":
-                        insert["source"] = _reference_to_model(description_part)
-    return [insert]
+            output.update(_insert_tree_part_to_model(insert_part))
+    return [output]
+
+
+def _insert_tree_part_to_model(insert_part):
+    """
+    Converts a lark tree corresponding to an insert part to its
+    equivalent dictionary model.
+
+    :arg lark.Tree insert_part: Insert part parse tree.
+    :returns dict: Dictionary model.
+    """
+    output = {}
+    if insert_part.data == "location":
+        output["location"] = _location_to_model(insert_part)
+        output["source"] = "reference"
+    elif insert_part.data == "length":
+        output["length"] = _length_to_model(insert_part)
+    elif insert_part.data == "repeat_number":
+        output["repeat_number"] = _length_to_model(insert_part)
+    elif insert_part.data == "description":
+        output.update(_insert_description_to_model(insert_part))
+    return output
+
+
+def _repeat_mixed_to_model(insert):
+    """
+    Converts a lark tree corresponding to a mixed repeat insert,
+    e.g., `AA[50][60]` equivalent dictionary model.
+
+    :arg lark.Tree insert: Lark parse tree.
+    :returns dict: Dictionary model.
+    """
+    output = []
+    for repeat_mixed in insert.children:
+        output.extend(_insert_to_model(repeat_mixed))
+    return output
+
+
+def _insert_description_to_model(insert_description):
+    """
+    Converts a lark tree corresponding to an insert description part, e.g,
+    `R1:500` to its equivalent dictionary model.
+
+    :arg lark.Tree insert_description: Lark parse tree.
+    :returns dict: Dictionary model.
+    """
+    output = {}
+    for description_part in insert_description.children:
+        if (
+                isinstance(description_part, Token)
+                and description_part.type == "COORDINATE_SYSTEM"
+        ):
+            output["coordinate_system"] = description_part.value
+        elif description_part.data == "variants":
+            if len(description_part.children) != 1:
+                raise NestedDescriptions()
+            variant = description_part.children[0]
+            if len(variant.children) != 1:
+                raise NestedDescriptions()
+            else:
+                output["location"] = _location_to_model(variant.children[0])
+        elif description_part.data == "reference":
+            output["source"] = _reference_to_model(description_part)
+    print(output)
+    return output
 
 
 def _solve_insert_ambiguity(insert):
