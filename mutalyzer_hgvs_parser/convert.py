@@ -6,7 +6,6 @@ from lark import Tree
 from lark.lexer import Token
 
 from .exceptions import NestedDescriptions, UnsupportedStartRule
-
 from .hgvs_parser import parse
 
 
@@ -379,14 +378,16 @@ def _insert_description_to_model(insert_description):
     output = {}
     for description_part in insert_description.children:
         if (
-                isinstance(description_part, Token)
-                and description_part.type == "COORDINATE_SYSTEM"
+            isinstance(description_part, Token)
+            and description_part.type == "COORDINATE_SYSTEM"
         ):
             output["coordinate_system"] = description_part.value
         elif description_part.data == "variants":
             if len(description_part.children) != 1:
                 raise NestedDescriptions()
             variant = description_part.children[0]
+            if variant.data == "_ambig":
+                variant = _solve_variant_ambiguity(variant)
             if len(variant.children) != 1:
                 raise NestedDescriptions()
             else:
