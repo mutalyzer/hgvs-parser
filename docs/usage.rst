@@ -1,24 +1,7 @@
 Usage
 =====
 
-This package provides a command line interface. To see the full options list,
-use ``-h``.
-
-.. code-block:: console
-
-    $ mutalyzer_hgvs_parser -h
-    usage: mutalyzer_hgvs_parser [-h] [-v] [-r R] [-c | -g G] [-i I] description
-
-    positional arguments:
-      description  the HGVS variant description to be parsed
-
-    optional arguments:
-      -h, --help   show this help message and exit
-      -v           show program's version number and exit
-      -r R         alternative start (top) rule for the grammar
-      -c           convert the description to the model
-      -g G         alternative input grammar file path
-      -i I         save the parse tree as a PNG image (pydot required!)
+This package provides a :doc:`command line interface <cli>`.
 
 
 Syntax check
@@ -34,7 +17,7 @@ To only check if a description can be successfully parsed.
 
 
 Description model
--------------------------
+-----------------
 
 To obtain the model of a description add the ``-c`` flag.
 
@@ -77,14 +60,42 @@ To obtain the model of a description add the ``-c`` flag.
 Grammar start rule
 ------------------
 
-By default, the Mutalyzer grammar is used, with ``description`` as the start (top)
-rule. It is however possible to choose a different start rule with the ``-r`` option.
+By default, the Mutalyzer
+:download:`grammar <../mutalyzer_hgvs_parser/ebnf/hgvs_mutalyzer_3.g>` is used,
+with ``description`` as the start (top) rule. It is however possible
+to choose a different start rule with the ``-r`` option.
 
 .. code-block:: console
 
     $ mutalyzer_hgvs_parser -r variant '274G>T'
     Successfully parsed:
      274G>T
+
+The ``-c`` flag can be employed together with a different start rule.
+
+.. code-block:: console
+
+    $ mutalyzer_hgvs_parser -c -r variant '274G>T'
+    {
+      "location": {
+        "type": "point",
+        "position": 274
+      },
+      "type": "substitution",
+      "source": "reference",
+      "deleted": [
+        {
+          "sequence": "G",
+          "source": "description"
+        }
+      ],
+      "inserted": [
+        {
+          "sequence": "T",
+          "source": "description"
+        }
+      ]
+    }
 
 
 Parse tree representation

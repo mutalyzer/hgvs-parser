@@ -1,3 +1,7 @@
+"""
+Module for parsing HGVS variant descriptions.
+"""
+
 import os
 
 from lark import Lark
@@ -7,12 +11,22 @@ from .exceptions import UnexpectedCharacter, UnexpectedEnd
 
 
 class HgvsParser:
+    """
+    HGVS parser object.
+    """
+
     def __init__(self, grammar_path=None, start_rule=None, ignore_white_spaces=True):
+        """
+        :arg str grammar_path: Path to a different EBNF grammar file.
+        :arg str start_rule: Alternative start rule for the grammar.
+        :arg bool ignore_white_spaces: Ignore or not white spaces in the description.
+        """
         if grammar_path:
             self._grammar_path = grammar_path
         else:
             self._grammar_path = os.path.join(
-                os.path.dirname(__file__), "ebnf/hgvs_mutalyzer_3.g")
+                os.path.dirname(__file__), "ebnf/hgvs_mutalyzer_3.g"
+            )
         if start_rule:
             self._start_rule = start_rule
         else:

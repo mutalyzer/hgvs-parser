@@ -1,7 +1,7 @@
 Installation
 ============
 
-The software is distributed via PyPI_, it can be installed with ``pip``:
+The software is distributed via PyPI_ and can be installed with ``pip``:
 
 .. code-block:: console
 

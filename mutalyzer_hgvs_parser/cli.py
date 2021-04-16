@@ -31,33 +31,40 @@ def _to_model(description, start_rule):
     return parse_tree
 
 
-def main():
-    cli = argparse.ArgumentParser(
+def _arg_parser():
+    """
+    Command line argument parsing.
+    """
+    parser = argparse.ArgumentParser(
         description=usage[0],
         epilog=usage[1],
-        formatter_class=argparse.RawDescriptionHelpFormatter)
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
 
-    cli.add_argument("-v", action="version", version=version(cli.prog))
+    parser.add_argument("description", help="the HGVS variant description to be parsed")
 
-    cli.add_argument(
-        "description", help="the HGVS variant description to be parsed")
-
-    cli.add_argument(
-        "-r", help="alternative start (top) rule for the grammar")
-
-    alt = cli.add_mutually_exclusive_group()
+    alt = parser.add_mutually_exclusive_group()
 
     alt.add_argument(
-        "-c", action="store_true", help="convert the parse tree to the model")
+        "-c", action="store_true", help="convert the description to the model"
+    )
+
+    parser.add_argument("-r", help="alternative start (top) rule for the grammar")
 
     alt.add_argument(
-        "-g", help="alternative input grammar file path (do not use with -c)")
+        "-g", help="alternative input grammar file path (do not use with -c)"
+    )
 
-    cli.add_argument(
-        "-i", help="save the parse tree as a PNG image (pydot required!)")
+    parser.add_argument(
+        "-i", help="save the parse tree as a PNG image (pydot required!)"
+    )
 
-    args = cli.parse_args()
+    parser.add_argument("-v", action="version", version=version(parser.prog))
 
+    return parser
+
+
+def _cli(args):
     if args.c:
         parse_tree = _to_model(args.description, args.r)
     else:
@@ -66,6 +73,15 @@ def main():
     if args.i and parse_tree:
         pydot__tree_to_png(parse_tree, args.i)
         print("Parse tree image saved to:\n {}".format(args.i))
+
+
+def main():
+
+    parser = _arg_parser()
+
+    args = parser.parse_args()
+
+    _cli(args)
 
 
 if __name__ == "__main__":
