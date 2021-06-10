@@ -1,12 +1,97 @@
 import os
 
-from lark import Lark
+from lark import Lark, Transformer, Tree, Visitor
+
+from .convert import parse_tree_to_model
+
+
+def _in(tree, data):
+    for sub_tree in tree.children:
+        if sub_tree.data == data:
+            return True
+    return False
+
+
+class AmbigTransformer(Transformer):
+    def _ambig(self, children):
+        if (
+            len(children) == 2
+            and children[0].data == children[1].data == "p_variant"
+            and _in(children[0], "p_repeat")
+            and _in(children[1], "p_substitution")
+        ):
+            print("done")
+            return children[1]
+        return Tree("_ambig", children)
+
+
+class ProteinTransformer(Transformer):
+    def p_variants(self, children):
+        if len(children) == 1 and children[0].data == "p_variants_certain":
+            return Tree("variants", children[0].children)
+        return Tree("variants", children)
+
+    def p_variant(self, children):
+        return Tree("variant", children)
+
+    def p_location(self, children):
+        return Tree("location", children)
+
+    def p_range(self, children):
+        return Tree("range", children)
+
+    def p_point(self, children):
+        return Tree("point", children)
+
+    def p_deletion(self, children):
+        return Tree("deletion", children)
+
+    def p_deletion_insertion(self, children):
+        return Tree("deletion_insertion", children)
+
+    def p_duplication(self, children):
+        return Tree("duplication", children)
+
+    def p_equal(self, children):
+        return Tree("equal", children)
+
+    def insertion(self, children):
+        return Tree("insertion", children)
+
+    def p_repeat(self, children):
+        return Tree("repeat", children)
+
+    def p_substitution(self, children):
+        return Tree("substitution", children)
+
+    def p_inserted(self, children):
+        return Tree("inserted", children)
+
+    def p_insert(self, children):
+        return Tree("insert", children)
+
+    def p_repeat_number(self, children):
+        return Tree("repeat_number", children)
+
+    def p_repeat_mixed(self, children):
+        return Tree("repeat_mixed", children)
+
+    def p_repeat_number(self, children):
+        return Tree("length", children)
+
+
+def read_files(file_name):
+    grammar_path = os.path.join(os.path.dirname(__file__), f"ebnf/{file_name}")
+    with open(grammar_path) as grammar_file:
+        return grammar_file.read()
 
 
 def create_protein_parser(start_rule="description", ignore_whitespaces=True):
-    grammar_path = os.path.join(os.path.dirname(__file__), "ebnf/protein.g")
-    with open(grammar_path) as grammar_file:
-        grammar = grammar_file.read()
+    grammar = read_files("top.g")
+    grammar += read_files("dna.g")
+    grammar += read_files("protein.g")
+    grammar += read_files("reference.g")
+    grammar += read_files("common.g")
 
     if ignore_whitespaces:
         grammar += "\n%import common.WS\n%ignore WS"
@@ -16,4 +101,19 @@ def create_protein_parser(start_rule="description", ignore_whitespaces=True):
 
 def parse_protein(description):
     protein_parser = create_protein_parser()
-    return protein_parser.parse(description)
+    parse_tree = protein_parser.parse(description)
+    # print("------")
+    # print(parse_tree)
+    # print("------")
+    # new_parse_tree = parse_tree
+    # new_parse_tree = AmbigTransformer().transform(parse_tree)
+    new_parse_tree = ProteinTransformer().transform(
+        AmbigTransformer().transform(parse_tree)
+    )
+    # print(new_parse_tree)
+    # print("------")
+    return new_parse_tree
+
+
+def parse_protein_to_model(description):
+    return parse_tree_to_model(parse_protein(description))

@@ -1,70 +1,63 @@
-description: reference ":" (COORDINATE_SYSTEM ".")? variants
-
-reference: ID reference? | "(" ID reference? ")"
-
-ID: (LETTER | DIGIT) (LETTER | DIGIT | "." | "_" | "-")*
-
-COORDINATE_SYSTEM: "p"
+description_protein: reference ":" (COORDINATE_SYSTEM ".")? p_variants
 
 // -----
 
-variants: ("[" (variant (";" variant)*) "]") | variant | "="
 
-variant: variant_certain | variant_uncertain
+p_variants: p_variants_certain | p_variants_predicted
 
-variant_uncertain: "(" variant_certain ")"
+p_variants_certain: "[" p_variant (";" p_variant)* "]" | p_variant | "="
 
-variant_certain: (location (deletion | deletion_insertion | duplication
-                           | equal  | frame_shift | insertion
-                           | substitution)?)
-                           | extension
+p_variants_predicted: "[(" p_variant (";" p_variant)* ")]" | "(" p_variant ")"
 
-location: point | range
-
-point: (AA? NUMBER) | UNKNOWN
-
-range: point "_" point
+p_variant: (p_location (p_deletion | p_deletion_insertion | p_duplication
+                        | p_equal | frame_shift | p_insertion | p_repeat
+                        | p_substitution)?)
+                        | extension
 
 // -----
 
-deletion: "del" inserted?
+p_location: p_point | p_range
 
-deletion_insertion: "delins" inserted?
+p_point: (AA? NUMBER) | UNKNOWN
 
-duplication: "dup" inserted?
+p_range: p_point "_" p_point
 
-equal: "=" inserted?
+// -----
 
-extension: "Met1" "ext" "-" NUMBER | ("*" | "Ter") point PSEQUENCE "ext" ("*" | "Ter") point
+p_deletion: "del" p_inserted?
 
-frame_shift: "fs" | AA "fs" ("*" | "Ter") location
+p_deletion_insertion: "delins" p_inserted?
 
-insertion: "ins" inserted
+p_duplication: "dup" p_inserted?
 
-substitution: inserted?
+p_equal: "=" p_inserted?
 
-// ----
+extension: "Met1" "ext" "-" NUMBER | ("*" | "Ter") p_point P_SEQUENCE "ext" ("*" | "Ter") p_point
 
-inserted: ("[" (insert (";" insert)*) "]") | insert
+frame_shift: "fs" | AA "fs" ("*" | "Ter") p_location
 
-insert: (PSEQUENCE | description | location | length) ("[" repeat_number "]")?
-        | repeat_mixed+
+p_insertion: "ins" p_inserted
 
-repeat_number: NUMBER | UNKNOWN
+p_repeat: p_inserted
 
-repeat_mixed: (PSEQUENCE  | location) "[" repeat_number "]"
-
-length: NUMBER | UNKNOWN | "(" (NUMBER | UNKNOWN ) ")"
+p_substitution: p_inserted?
 
 // ----
 
-LETTER: UCASE_LETTER | LCASE_LETTER
+p_inserted: ("[" (p_insert (";" p_insert)*) "]") | p_insert
 
-LCASE_LETTER: "a".."z"
+p_insert: (P_SEQUENCE | description_protein | p_location | p_length) ("[" p_repeat_number "]")?
+        | p_repeat_mixed+
 
-UCASE_LETTER: "A".."Z"
+p_repeat_number: NUMBER | UNKNOWN
 
-DIGIT: "0".."9"
+p_repeat_mixed: (P_SEQUENCE  | p_location) "[" p_repeat_number "]"
+
+p_length: NUMBER | UNKNOWN | "(" (NUMBER | UNKNOWN ) ")"
+
+// ----
+
+P_SEQUENCE: AA+
 
 AA: "Ala" | "Arg" | "Asn" | "Asp" | "Cys" | "Gln" | "Glu"
   | "Gly" | "His" | "Ile" | "Leu" | "Lys" | "Met" | "Phe"
@@ -75,9 +68,3 @@ AA: "Ala" | "Arg" | "Asn" | "Asp" | "Cys" | "Gln" | "Glu"
   | "P"   | "S"   | "T"   | "W"    | "Y"  | "V"
   | "*"
   | "X"
-
-PSEQUENCE: AA+
-
-NUMBER: DIGIT+
-
-UNKNOWN: "?"

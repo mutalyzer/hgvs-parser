@@ -21,10 +21,10 @@ def to_model(description, start_rule=None):
     :rtype: dict
     """
     parse_tree = parse(description, start_rule=start_rule)
-    return _parse_tree_to_model(parse_tree, start_rule)
+    return parse_tree_to_model(parse_tree, start_rule)
 
 
-def _parse_tree_to_model(parse_tree, start_rule=None):
+def parse_tree_to_model(parse_tree, start_rule=None):
     """
     Convert a parse tree to a nested dictionary model.
 
@@ -58,7 +58,16 @@ def _description_to_model(parse_tree):
     :rtype: dict
     """
     model = {}
+    print("=-=-=-")
     if isinstance(parse_tree, Tree):
+        if (
+            parse_tree.data == "description"
+            and len(parse_tree.children) == 1
+            and parse_tree.children[0].data
+            in ["description_dna", "description_protein"]
+        ):
+            model["type"] = parse_tree.children[0].data
+            parse_tree = parse_tree.children[0]
         for child in parse_tree.children:
             if isinstance(child, Token):
                 if child.type == "COORDINATE_SYSTEM":
@@ -67,7 +76,14 @@ def _description_to_model(parse_tree):
                 if child.data == "reference":
                     model["reference"] = _reference_to_model(child)
                 elif child.data == "variants":
-                    model["variants"] = _variants_to_model(child)
+                    if (
+                        len(child.children) == 1
+                        and child.children[0].data == "p_variants_predicted"
+                    ):
+                        model["variants"] = _variants_to_model(child.children[0])
+                        model["predicted"] = True
+                    else:
+                        model["variants"] = _variants_to_model(child)
     return model
 
 
@@ -117,6 +133,9 @@ def _variant_to_model(variant):
         variant = _solve_variant_ambiguity(variant)
 
     output = {"location": _location_to_model(variant.children[0])}
+    print(variant.data)
+    if variant.data == "p_variant_predicted":
+        output["predicted"] == True
     if len(variant.children) == 2:
         variant = variant.children[1]
         output["type"] = variant.data
@@ -300,6 +319,7 @@ def _inserted_to_model(inserted):
     :rtype: dict
     """
     output = []
+    print(inserted)
     for inserted_subtree in inserted.children:
         if inserted_subtree.data == "_ambig":
             inserted_subtree = _solve_insert_ambiguity(inserted_subtree)
@@ -323,7 +343,7 @@ def _insert_to_model(insert):
     output = {}
     for insert_part in insert.children:
         if isinstance(insert_part, Token):
-            if insert_part.type == "SEQUENCE":
+            if insert_part.type in ["SEQUENCE", "P_SEQUENCE"]:
                 output.update({"sequence": insert_part.value, "source": "description"})
             elif insert_part.type == "INVERTED":
                 output["inverted"] = True
