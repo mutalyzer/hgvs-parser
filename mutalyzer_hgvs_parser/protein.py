@@ -40,6 +40,9 @@ class ProteinTransformer(Transformer):
     def p_range(self, children):
         return Tree("range", children)
 
+    def p_length(self, children):
+        return Tree("length", children)
+
     def p_point(self, children):
         return Tree("point", children)
 
@@ -55,7 +58,7 @@ class ProteinTransformer(Transformer):
     def p_equal(self, children):
         return Tree("equal", children)
 
-    def insertion(self, children):
+    def p_insertion(self, children):
         return Tree("insertion", children)
 
     def p_repeat(self, children):

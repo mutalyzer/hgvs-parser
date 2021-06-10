@@ -75,7 +75,7 @@ def _cli(args):
             parse_tree = parse_protein(args.description)
             print(parse_tree)
             print("======")
-            print(parse_tree_to_model(parse_tree))
+            print(json.dumps(parse_tree_to_model(parse_tree), indent=2))
         else:
             parse_tree = _parse(args.description, args.g, args.r)
 
