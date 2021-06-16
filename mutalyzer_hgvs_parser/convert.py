@@ -139,7 +139,7 @@ def _variant_to_model(variant):
 
     output = {"location": _location_to_model(variant.children[0])}
     if variant.data == "p_variant_predicted":
-        output["predicted"] == True
+        output["predicted"] = True
     if len(variant.children) == 2:
         variant = variant.children[1]
         output["type"] = variant.data
@@ -371,7 +371,7 @@ def _insert_tree_part_to_model(insert_part):
         output["length"] = _length_to_model(insert_part)
     elif insert_part.data == "repeat_number":
         output["repeat_number"] = _length_to_model(insert_part)
-    elif insert_part.data == "description":
+    elif insert_part.data in ["description", "description_dna", "description_protein"]:
         output.update(_insert_description_to_model(insert_part))
     return output
 
@@ -417,6 +417,8 @@ def _insert_description_to_model(insert_description):
                 output["location"] = _location_to_model(variant.children[0])
         elif description_part.data == "reference":
             output["source"] = _reference_to_model(description_part)
+    if insert_description.data in ["description_dna", "description_protein"]:
+        output["type"] = insert_description.data
     return output
 
 
