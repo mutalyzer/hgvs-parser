@@ -2,7 +2,6 @@ description_protein: reference ":" (COORDINATE_SYSTEM ".")? p_variants
 
 // -----
 
-
 p_variants: p_variants_certain | p_variants_predicted
 
 p_variants_certain: "[" p_variant (";" p_variant)* "]" | p_variant | "="

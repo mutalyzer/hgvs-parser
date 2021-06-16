@@ -1,6 +1,7 @@
 import os
 
-from lark import Lark, Transformer, Tree, Visitor
+from lark import Lark, Transformer, Tree
+from lark.tree import pydot__tree_to_png
 
 from .convert import parse_tree_to_model
 
@@ -14,14 +15,41 @@ def _in(tree, data):
 
 class AmbigTransformer(Transformer):
     def _ambig(self, children):
-        if (
-            len(children) == 2
-            and children[0].data == children[1].data == "p_variant"
-            and _in(children[0], "p_repeat")
-            and _in(children[1], "p_substitution")
-        ):
-            print("done")
-            return children[1]
+        # pydot__tree_to_png(Tree("_ambig", children), "ambig.png")
+        if children[0].data == children[1].data == "p_variant":
+            if _in(children[0], "p_repeat") and _in(children[1], "p_substitution"):
+                if (
+                    children[1].children[1].data == "p_substitution"
+                    and children[1].children[1].children[0].data == "p_inserted"
+                    and children[1].children[1].children[0].children[0].data
+                    == "p_insert"
+                    and len(children[1].children[1].children[0].children[0].children)
+                    == 1
+                    and isinstance(
+                        children[1].children[1].children[0].children[0].children[0],
+                        Tree,
+                    )
+                    and children[1].children[1].children[0].children[0].children[0].data
+                    == "p_length"
+                ):
+                    return children[0]
+                return children[1]
+            elif (
+                _in(children[0], "p_substitution")
+                and len(children[1].children) == 1
+                and _in(children[1], "p_location")
+            ):
+                return children[1]
+        elif children[0].data == children[1].data == "description":
+            if _in(children[0], "description_dna") and _in(
+                children[1], "description_protein"
+            ):
+                return children[0]
+        elif children[0].data == children[1].data == "p_insert":
+            if _in(children[0], "p_length") and _in(children[1], "p_location"):
+                return children[0]
+            elif _in(children[0], "p_location") and _in(children[1], "p_length"):
+                return children[1]
         return Tree("_ambig", children)
 
 
@@ -82,6 +110,9 @@ class ProteinTransformer(Transformer):
     def p_repeat_number(self, children):
         return Tree("length", children)
 
+    # def frame_shift(self, children):
+    #     return Tree("frame_shift", [Tree("inserted", [Tree("insert", children)])])
+
 
 def read_files(file_name):
     grammar_path = os.path.join(os.path.dirname(__file__), f"ebnf/{file_name}")
@@ -105,16 +136,9 @@ def create_protein_parser(start_rule="description", ignore_whitespaces=True):
 def parse_protein(description):
     protein_parser = create_protein_parser()
     parse_tree = protein_parser.parse(description)
-    # print("------")
-    # print(parse_tree)
-    # print("------")
-    # new_parse_tree = parse_tree
-    # new_parse_tree = AmbigTransformer().transform(parse_tree)
     new_parse_tree = ProteinTransformer().transform(
         AmbigTransformer().transform(parse_tree)
     )
-    # print(new_parse_tree)
-    # print("------")
     return new_parse_tree
 
 

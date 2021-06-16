@@ -595,11 +595,35 @@ HGVS_NOMENCLATURE = {
     "NP_003997.1:p.[Arg49=//Ser]": {},
     # Repeated sequences
     # -
-    "PREF:p.Ala2[10]": {},
+    "PREF:p.Ala2[10]": {
+        "type": "description_protein",
+        "reference": {"id": "PREF"},
+        "coordinate_system": "p",
+        "variants": [
+            {
+                "location": {"type": "point", "position": 2},
+                "type": "repeat",
+                "source": "reference",
+                "inserted": [{"length": {"type": "point", "value": 10}}],
+            },
+        ],
+    },
     # -
     "PREF:p.Ala2[10];[11]": {},
     # -
-    "PREF:p.Gln18[23]": {},
+    "PREF:p.Gln18[23]": {
+        "type": "description_protein",
+        "reference": {"id": "PREF"},
+        "coordinate_system": "p",
+        "variants": [
+            {
+                "location": {"type": "point", "position": 18},
+                "type": "repeat",
+                "source": "reference",
+                "inserted": [{"length": {"type": "point", "value": 23}}],
+            },
+        ],
+    },
     # -
     "PREF:p.(Gln18)[(70_80)]": {},
     # Frame shift
@@ -617,7 +641,7 @@ HGVS_NOMENCLATURE = {
     # -
     "PREF:p.Gln151Thrfs*9": {},
     "PREF:p.His150Hisfs*10": {},
-    # Frame shift
+    # Extension
     # -
     "PREF:p.Met1ext-5": {},
     # -
@@ -639,7 +663,8 @@ HGVS_NOMENCLATURE = {
     HGVS_NOMENCLATURE.keys(),
 )
 def test_hgvs_protein_parse(description):
-    assert parse_protein(description) is not None
+    if HGVS_NOMENCLATURE.get(description):
+        assert parse_protein(description) is not None
 
 
 @pytest.mark.parametrize(
@@ -647,4 +672,5 @@ def test_hgvs_protein_parse(description):
     HGVS_NOMENCLATURE.keys(),
 )
 def test_hgvs_protein_convert(description):
-    assert parse_protein_to_model(description) == HGVS_NOMENCLATURE[description]
+    if HGVS_NOMENCLATURE.get(description):
+        assert parse_protein_to_model(description) == HGVS_NOMENCLATURE[description]

@@ -58,7 +58,6 @@ def _description_to_model(parse_tree):
     :rtype: dict
     """
     model = {}
-    print("=-=-=-")
     if isinstance(parse_tree, Tree):
         if (
             parse_tree.data == "description"
@@ -79,6 +78,12 @@ def _description_to_model(parse_tree):
                     if (
                         len(child.children) == 1
                         and child.children[0].data == "p_variants_predicted"
+                    ):
+                        model["variants"] = _variants_to_model(child.children[0])
+                        model["predicted"] = True
+                    elif (
+                        len(child.children) == 1
+                        and child.children[0].data == "p_variants_certain"
                     ):
                         model["variants"] = _variants_to_model(child.children[0])
                         model["predicted"] = True
@@ -133,7 +138,6 @@ def _variant_to_model(variant):
         variant = _solve_variant_ambiguity(variant)
 
     output = {"location": _location_to_model(variant.children[0])}
-    print(variant.data)
     if variant.data == "p_variant_predicted":
         output["predicted"] == True
     if len(variant.children) == 2:
@@ -319,7 +323,6 @@ def _inserted_to_model(inserted):
     :rtype: dict
     """
     output = []
-    print(inserted)
     for inserted_subtree in inserted.children:
         if inserted_subtree.data == "_ambig":
             inserted_subtree = _solve_insert_ambiguity(inserted_subtree)
@@ -414,7 +417,6 @@ def _insert_description_to_model(insert_description):
                 output["location"] = _location_to_model(variant.children[0])
         elif description_part.data == "reference":
             output["source"] = _reference_to_model(description_part)
-    print(output)
     return output
 
 
