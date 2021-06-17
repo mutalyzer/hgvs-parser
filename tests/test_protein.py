@@ -657,20 +657,38 @@ HGVS_NOMENCLATURE = {
     "PREF:p.*327Argext*?": {},
 }
 
+OTHER = {
+    "PREF:p.(=)": {
+        "type": "description_protein",
+        "reference": {"id": "PREF"},
+        "coordinate_system": "p",
+        "variants": [],
+        "predicted": True,
+    },
+    "PREF:p.=": {
+        "type": "description_protein",
+        "reference": {"id": "PREF"},
+        "coordinate_system": "p",
+        "variants": [],
+    },
+}
+
+TESTS = {**HGVS_NOMENCLATURE, **OTHER}
+
 
 @pytest.mark.parametrize(
     "description",
-    HGVS_NOMENCLATURE.keys(),
+    TESTS.keys(),
 )
 def test_hgvs_protein_parse(description):
-    if HGVS_NOMENCLATURE.get(description):
+    if TESTS.get(description):
         assert parse_protein(description) is not None
 
 
 @pytest.mark.parametrize(
     "description",
-    HGVS_NOMENCLATURE.keys(),
+    TESTS.keys(),
 )
 def test_hgvs_protein_convert(description):
-    if HGVS_NOMENCLATURE.get(description):
-        assert parse_protein_to_model(description) == HGVS_NOMENCLATURE[description]
+    if TESTS.get(description):
+        assert parse_protein_to_model(description) == TESTS[description]
