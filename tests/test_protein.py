@@ -11,7 +11,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 24},
+                "location": {"type": "point", "position": 24, "sequence": "Trp"},
                 "type": "substitution",
                 "source": "reference",
                 "inserted": [{"sequence": "Cys", "source": "description"}],
@@ -25,7 +25,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 24},
+                "location": {"type": "point", "position": 24, "sequence": "Trp"},
                 "type": "substitution",
                 "source": "reference",
                 "inserted": [{"sequence": "Cys", "source": "description"}],
@@ -40,7 +40,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 188},
+                "location": {"type": "point", "position": 188, "sequence": "Cys"},
                 "type": "equal",
                 "source": "reference",
             }
@@ -61,8 +61,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 2},
-                    "end": {"type": "point", "position": 124},
+                    "start": {"type": "point", "position": 2, "sequence": "Leu"},
+                    "end": {"type": "point", "position": 124, "sequence": "Met"},
                 },
                 "type": "deletion",
                 "source": "reference",
@@ -78,8 +78,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 1},
-                    "end": {"type": "point", "position": 2},
+                    "start": {"type": "point", "position": 1, "sequence": "Met"},
+                    "end": {"type": "point", "position": 2, "sequence": "Leu"},
                 },
                 "type": "insertion",
                 "source": "reference",
@@ -103,7 +103,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 7},
+                "location": {"type": "point", "position": 7, "sequence": "Val"},
                 "type": "deletion",
                 "source": "reference",
             }
@@ -115,7 +115,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 7},
+                "location": {"type": "point", "position": 7, "sequence": "Val"},
                 "type": "deletion",
                 "source": "reference",
             }
@@ -128,7 +128,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 4},
+                "location": {"type": "point", "position": 4, "sequence": "Trp"},
                 "type": "deletion",
                 "source": "reference",
             }
@@ -143,8 +143,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 23},
-                    "end": {"type": "point", "position": 25},
+                    "start": {"type": "point", "position": 23, "sequence": "Lys"},
+                    "end": {"type": "point", "position": 25, "sequence": "Val"},
                 },
                 "type": "deletion",
                 "source": "reference",
@@ -159,8 +159,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 458},
-                    "end": {"type": "point", "position": 460},
+                    "start": {"type": "point", "position": 458, "sequence": "Pro"},
+                    "end": {"type": "point", "position": 460, "sequence": "Gly"},
                 },
                 "type": "deletion",
                 "source": "reference",
@@ -177,8 +177,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 2},
-                    "end": {"type": "point", "position": 46},
+                    "start": {"type": "point", "position": 2, "sequence": "Gly"},
+                    "end": {"type": "point", "position": 46, "sequence": "Met"},
                 },
                 "type": "deletion",
                 "source": "reference",
@@ -192,7 +192,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 26},
+                "location": {"type": "point", "position": 26, "sequence": "Trp"},
                 "type": "substitution",
                 "source": "reference",
                 "inserted": [{"sequence": "Ter", "source": "description"}],
@@ -205,7 +205,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 26},
+                "location": {"type": "point", "position": 26, "sequence": "Trp"},
                 "type": "substitution",
                 "source": "reference",
                 "inserted": [{"sequence": "*", "source": "description"}],
@@ -222,7 +222,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 3},
+                "location": {"type": "point", "position": 3, "sequence": "Ala"},
                 "type": "duplication",
                 "source": "reference",
             }
@@ -235,7 +235,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 3},
+                "location": {"type": "point", "position": 3, "sequence": "Ala"},
                 "type": "duplication",
                 "source": "reference",
             }
@@ -251,8 +251,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 3},
-                    "end": {"type": "point", "position": 5},
+                    "start": {"type": "point", "position": 3, "sequence": "Ala"},
+                    "end": {"type": "point", "position": 5, "sequence": "Ser"},
                 },
                 "type": "duplication",
                 "source": "reference",
@@ -266,7 +266,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 6},
+                "location": {"type": "point", "position": 6, "sequence": "Ser"},
                 "type": "duplication",
                 "source": "reference",
             }
@@ -282,8 +282,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 4},
-                    "end": {"type": "point", "position": 5},
+                    "start": {"type": "point", "position": 4, "sequence": "His"},
+                    "end": {"type": "point", "position": 5, "sequence": "Gln"},
                 },
                 "type": "insertion",
                 "source": "reference",
@@ -300,8 +300,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 2},
-                    "end": {"type": "point", "position": 3},
+                    "start": {"type": "point", "position": 2, "sequence": "Lys"},
+                    "end": {"type": "point", "position": 3, "sequence": "Gly"},
                 },
                 "type": "insertion",
                 "source": "reference",
@@ -318,8 +318,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 3},
-                    "end": {"type": "point", "position": 4},
+                    "start": {"type": "point", "position": 3, "sequence": "Met"},
+                    "end": {"type": "point", "position": 4, "sequence": "His"},
                 },
                 "type": "insertion",
                 "source": "reference",
@@ -337,8 +337,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 78},
-                    "end": {"type": "point", "position": 79},
+                    "start": {"type": "point", "position": 78, "sequence": "Arg"},
+                    "end": {"type": "point", "position": 79, "sequence": "Gly"},
                 },
                 "type": "insertion",
                 "source": "reference",
@@ -362,8 +362,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 332},
-                    "end": {"type": "point", "position": 333},
+                    "start": {"type": "point", "position": 332, "sequence": "Ser"},
+                    "end": {"type": "point", "position": 333, "sequence": "Ser"},
                 },
                 "type": "insertion",
                 "source": "reference",
@@ -380,8 +380,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 332},
-                    "end": {"type": "point", "position": 333},
+                    "start": {"type": "point", "position": 332, "sequence": "Ser"},
+                    "end": {"type": "point", "position": 333, "sequence": "Ser"},
                 },
                 "type": "insertion",
                 "source": "reference",
@@ -399,8 +399,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 582},
-                    "end": {"type": "point", "position": 583},
+                    "start": {"type": "point", "position": 582, "sequence": "Val"},
+                    "end": {"type": "point", "position": 583, "sequence": "Asn"},
                 },
                 "type": "insertion",
                 "source": "reference",
@@ -417,8 +417,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 582},
-                    "end": {"type": "point", "position": 583},
+                    "start": {"type": "point", "position": 582, "sequence": "Val"},
+                    "end": {"type": "point", "position": 583, "sequence": "Asn"},
                 },
                 "type": "insertion",
                 "source": "reference",
@@ -435,7 +435,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 28},
+                "location": {"type": "point", "position": 28, "sequence": "Cys"},
                 "type": "deletion_insertion",
                 "source": "reference",
                 "inserted": [{"sequence": "TrpVal", "source": "description"}],
@@ -451,8 +451,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 28},
-                    "end": {"type": "point", "position": 29},
+                    "start": {"type": "point", "position": 28, "sequence": "Cys"},
+                    "end": {"type": "point", "position": 29, "sequence": "Lys"},
                 },
                 "type": "deletion_insertion",
                 "source": "reference",
@@ -469,8 +469,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 578},
-                    "end": {"type": "point", "position": 579},
+                    "start": {"type": "point", "position": 578, "sequence": "Pro"},
+                    "end": {"type": "point", "position": 579, "sequence": "Lys"},
                 },
                 "type": "deletion_insertion",
                 "source": "reference",
@@ -488,8 +488,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 559},
-                    "end": {"type": "point", "position": 561},
+                    "start": {"type": "point", "position": 559, "sequence": "Val"},
+                    "end": {"type": "point", "position": 561, "sequence": "Glu"},
                 },
                 "type": "deletion",
                 "source": "reference",
@@ -506,8 +506,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 125},
-                    "end": {"type": "point", "position": 132},
+                    "start": {"type": "point", "position": 125, "sequence": "Glu"},
+                    "end": {"type": "point", "position": 132, "sequence": "Ala"},
                 },
                 "type": "deletion_insertion",
                 "source": "reference",
@@ -525,13 +525,13 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 44},
+                "location": {"type": "point", "position": 44, "sequence": "Ser"},
                 "type": "substitution",
                 "source": "reference",
                 "inserted": [{"sequence": "Arg", "source": "description"}],
             },
             {
-                "location": {"type": "point", "position": 46},
+                "location": {"type": "point", "position": 46, "sequence": "Trp"},
                 "type": "substitution",
                 "source": "reference",
                 "inserted": [{"sequence": "Arg", "source": "description"}],
@@ -546,13 +546,13 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 68},
+                "location": {"type": "point", "position": 68, "sequence": "Ser"},
                 "type": "substitution",
                 "source": "reference",
                 "inserted": [{"sequence": "Arg", "source": "description"}],
             },
             {
-                "location": {"type": "point", "position": 594},
+                "location": {"type": "point", "position": 594, "sequence": "Asn"},
                 "type": "deletion",
                 "source": "reference",
             },
@@ -564,13 +564,13 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 68},
+                "location": {"type": "point", "position": 68, "sequence": "Ser"},
                 "type": "substitution",
                 "source": "reference",
                 "inserted": [{"sequence": "Arg", "source": "description"}],
             },
             {
-                "location": {"type": "point", "position": 594},
+                "location": {"type": "point", "position": 594, "sequence": "Asn"},
                 "type": "deletion",
                 "source": "reference",
             },
@@ -601,7 +601,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 2},
+                "location": {"type": "point", "position": 2, "sequence": "Ala"},
                 "type": "repeat",
                 "source": "reference",
                 "inserted": [{"length": {"type": "point", "value": 10}}],
@@ -617,7 +617,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 18},
+                "location": {"type": "point", "position": 18, "sequence": "Gln"},
                 "type": "repeat",
                 "source": "reference",
                 "inserted": [{"length": {"type": "point", "value": 23}}],

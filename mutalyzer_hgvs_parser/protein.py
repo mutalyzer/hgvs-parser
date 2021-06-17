@@ -133,8 +133,8 @@ def create_protein_parser(start_rule="description", ignore_whitespaces=True):
     return Lark(grammar, parser="earley", start=start_rule, ambiguity="explicit")
 
 
-def parse_protein(description):
-    protein_parser = create_protein_parser()
+def parse_protein(description, start_rule="description"):
+    protein_parser = create_protein_parser(start_rule)
     parse_tree = protein_parser.parse(description)
     new_parse_tree = ProteinTransformer().transform(
         AmbigTransformer().transform(parse_tree)
@@ -142,5 +142,5 @@ def parse_protein(description):
     return new_parse_tree
 
 
-def parse_protein_to_model(description):
-    return parse_tree_to_model(parse_protein(description))
+def parse_protein_to_model(description, start_rule="description"):
+    return parse_tree_to_model(parse_protein(description, start_rule))

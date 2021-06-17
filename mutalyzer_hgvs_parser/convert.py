@@ -231,6 +231,7 @@ def _point_to_model(point):
         return {**_range_to_model(point), **{"uncertain": True}}
     output = {"type": "point"}
     for token in point.children:
+        print(token)
         if token.type == "OUTSIDE_CDS":
             if token.value == "*":
                 output["outside_cds"] = "downstream"
@@ -242,6 +243,8 @@ def _point_to_model(point):
             output["uncertain"] = True
         elif token.type == "OFFSET":
             output["offset"] = _offset_to_model(token)
+        elif token.type == "AA":
+            output["sequence"] = token.value
     return output
 
 
