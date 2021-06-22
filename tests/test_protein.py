@@ -11,7 +11,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 24, "sequence": "Trp"},
+                "location": {"type": "point", "position": 24, "amino_acid": "Trp"},
                 "type": "substitution",
                 "source": "reference",
                 "inserted": [{"sequence": "Cys", "source": "description"}],
@@ -25,7 +25,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 24, "sequence": "Trp"},
+                "location": {"type": "point", "position": 24, "amino_acid": "Trp"},
                 "type": "substitution",
                 "source": "reference",
                 "inserted": [{"sequence": "Cys", "source": "description"}],
@@ -40,7 +40,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 188, "sequence": "Cys"},
+                "location": {"type": "point", "position": 188, "amino_acid": "Cys"},
                 "type": "equal",
                 "source": "reference",
             }
@@ -61,8 +61,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 2, "sequence": "Leu"},
-                    "end": {"type": "point", "position": 124, "sequence": "Met"},
+                    "start": {"type": "point", "position": 2, "amino_acid": "Leu"},
+                    "end": {"type": "point", "position": 124, "amino_acid": "Met"},
                 },
                 "type": "deletion",
                 "source": "reference",
@@ -78,8 +78,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 1, "sequence": "Met"},
-                    "end": {"type": "point", "position": 2, "sequence": "Leu"},
+                    "start": {"type": "point", "position": 1, "amino_acid": "Met"},
+                    "end": {"type": "point", "position": 2, "amino_acid": "Leu"},
                 },
                 "type": "insertion",
                 "source": "reference",
@@ -103,7 +103,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 7, "sequence": "Val"},
+                "location": {"type": "point", "position": 7, "amino_acid": "Val"},
                 "type": "deletion",
                 "source": "reference",
             }
@@ -115,7 +115,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 7, "sequence": "Val"},
+                "location": {"type": "point", "position": 7, "amino_acid": "Val"},
                 "type": "deletion",
                 "source": "reference",
             }
@@ -128,7 +128,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 4, "sequence": "Trp"},
+                "location": {"type": "point", "position": 4, "amino_acid": "Trp"},
                 "type": "deletion",
                 "source": "reference",
             }
@@ -143,8 +143,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 23, "sequence": "Lys"},
-                    "end": {"type": "point", "position": 25, "sequence": "Val"},
+                    "start": {"type": "point", "position": 23, "amino_acid": "Lys"},
+                    "end": {"type": "point", "position": 25, "amino_acid": "Val"},
                 },
                 "type": "deletion",
                 "source": "reference",
@@ -159,8 +159,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 458, "sequence": "Pro"},
-                    "end": {"type": "point", "position": 460, "sequence": "Gly"},
+                    "start": {"type": "point", "position": 458, "amino_acid": "Pro"},
+                    "end": {"type": "point", "position": 460, "amino_acid": "Gly"},
                 },
                 "type": "deletion",
                 "source": "reference",
@@ -177,8 +177,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 2, "sequence": "Gly"},
-                    "end": {"type": "point", "position": 46, "sequence": "Met"},
+                    "start": {"type": "point", "position": 2, "amino_acid": "Gly"},
+                    "end": {"type": "point", "position": 46, "amino_acid": "Met"},
                 },
                 "type": "deletion",
                 "source": "reference",
@@ -192,7 +192,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 26, "sequence": "Trp"},
+                "location": {"type": "point", "position": 26, "amino_acid": "Trp"},
                 "type": "substitution",
                 "source": "reference",
                 "inserted": [{"sequence": "Ter", "source": "description"}],
@@ -205,7 +205,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 26, "sequence": "Trp"},
+                "location": {"type": "point", "position": 26, "amino_acid": "Trp"},
                 "type": "substitution",
                 "source": "reference",
                 "inserted": [{"sequence": "*", "source": "description"}],
@@ -222,7 +222,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 3, "sequence": "Ala"},
+                "location": {"type": "point", "position": 3, "amino_acid": "Ala"},
                 "type": "duplication",
                 "source": "reference",
             }
@@ -235,7 +235,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 3, "sequence": "Ala"},
+                "location": {"type": "point", "position": 3, "amino_acid": "Ala"},
                 "type": "duplication",
                 "source": "reference",
             }
@@ -251,8 +251,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 3, "sequence": "Ala"},
-                    "end": {"type": "point", "position": 5, "sequence": "Ser"},
+                    "start": {"type": "point", "position": 3, "amino_acid": "Ala"},
+                    "end": {"type": "point", "position": 5, "amino_acid": "Ser"},
                 },
                 "type": "duplication",
                 "source": "reference",
@@ -266,7 +266,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 6, "sequence": "Ser"},
+                "location": {"type": "point", "position": 6, "amino_acid": "Ser"},
                 "type": "duplication",
                 "source": "reference",
             }
@@ -282,8 +282,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 4, "sequence": "His"},
-                    "end": {"type": "point", "position": 5, "sequence": "Gln"},
+                    "start": {"type": "point", "position": 4, "amino_acid": "His"},
+                    "end": {"type": "point", "position": 5, "amino_acid": "Gln"},
                 },
                 "type": "insertion",
                 "source": "reference",
@@ -300,8 +300,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 2, "sequence": "Lys"},
-                    "end": {"type": "point", "position": 3, "sequence": "Gly"},
+                    "start": {"type": "point", "position": 2, "amino_acid": "Lys"},
+                    "end": {"type": "point", "position": 3, "amino_acid": "Gly"},
                 },
                 "type": "insertion",
                 "source": "reference",
@@ -318,8 +318,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 3, "sequence": "Met"},
-                    "end": {"type": "point", "position": 4, "sequence": "His"},
+                    "start": {"type": "point", "position": 3, "amino_acid": "Met"},
+                    "end": {"type": "point", "position": 4, "amino_acid": "His"},
                 },
                 "type": "insertion",
                 "source": "reference",
@@ -337,8 +337,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 78, "sequence": "Arg"},
-                    "end": {"type": "point", "position": 79, "sequence": "Gly"},
+                    "start": {"type": "point", "position": 78, "amino_acid": "Arg"},
+                    "end": {"type": "point", "position": 79, "amino_acid": "Gly"},
                 },
                 "type": "insertion",
                 "source": "reference",
@@ -362,8 +362,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 332, "sequence": "Ser"},
-                    "end": {"type": "point", "position": 333, "sequence": "Ser"},
+                    "start": {"type": "point", "position": 332, "amino_acid": "Ser"},
+                    "end": {"type": "point", "position": 333, "amino_acid": "Ser"},
                 },
                 "type": "insertion",
                 "source": "reference",
@@ -380,8 +380,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 332, "sequence": "Ser"},
-                    "end": {"type": "point", "position": 333, "sequence": "Ser"},
+                    "start": {"type": "point", "position": 332, "amino_acid": "Ser"},
+                    "end": {"type": "point", "position": 333, "amino_acid": "Ser"},
                 },
                 "type": "insertion",
                 "source": "reference",
@@ -399,8 +399,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 582, "sequence": "Val"},
-                    "end": {"type": "point", "position": 583, "sequence": "Asn"},
+                    "start": {"type": "point", "position": 582, "amino_acid": "Val"},
+                    "end": {"type": "point", "position": 583, "amino_acid": "Asn"},
                 },
                 "type": "insertion",
                 "source": "reference",
@@ -417,8 +417,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 582, "sequence": "Val"},
-                    "end": {"type": "point", "position": 583, "sequence": "Asn"},
+                    "start": {"type": "point", "position": 582, "amino_acid": "Val"},
+                    "end": {"type": "point", "position": 583, "amino_acid": "Asn"},
                 },
                 "type": "insertion",
                 "source": "reference",
@@ -435,7 +435,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 28, "sequence": "Cys"},
+                "location": {"type": "point", "position": 28, "amino_acid": "Cys"},
                 "type": "deletion_insertion",
                 "source": "reference",
                 "inserted": [{"sequence": "TrpVal", "source": "description"}],
@@ -451,8 +451,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 28, "sequence": "Cys"},
-                    "end": {"type": "point", "position": 29, "sequence": "Lys"},
+                    "start": {"type": "point", "position": 28, "amino_acid": "Cys"},
+                    "end": {"type": "point", "position": 29, "amino_acid": "Lys"},
                 },
                 "type": "deletion_insertion",
                 "source": "reference",
@@ -469,8 +469,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 578, "sequence": "Pro"},
-                    "end": {"type": "point", "position": 579, "sequence": "Lys"},
+                    "start": {"type": "point", "position": 578, "amino_acid": "Pro"},
+                    "end": {"type": "point", "position": 579, "amino_acid": "Lys"},
                 },
                 "type": "deletion_insertion",
                 "source": "reference",
@@ -488,8 +488,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 559, "sequence": "Val"},
-                    "end": {"type": "point", "position": 561, "sequence": "Glu"},
+                    "start": {"type": "point", "position": 559, "amino_acid": "Val"},
+                    "end": {"type": "point", "position": 561, "amino_acid": "Glu"},
                 },
                 "type": "deletion",
                 "source": "reference",
@@ -506,8 +506,8 @@ HGVS_NOMENCLATURE = {
             {
                 "location": {
                     "type": "range",
-                    "start": {"type": "point", "position": 125, "sequence": "Glu"},
-                    "end": {"type": "point", "position": 132, "sequence": "Ala"},
+                    "start": {"type": "point", "position": 125, "amino_acid": "Glu"},
+                    "end": {"type": "point", "position": 132, "amino_acid": "Ala"},
                 },
                 "type": "deletion_insertion",
                 "source": "reference",
@@ -525,13 +525,13 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 44, "sequence": "Ser"},
+                "location": {"type": "point", "position": 44, "amino_acid": "Ser"},
                 "type": "substitution",
                 "source": "reference",
                 "inserted": [{"sequence": "Arg", "source": "description"}],
             },
             {
-                "location": {"type": "point", "position": 46, "sequence": "Trp"},
+                "location": {"type": "point", "position": 46, "amino_acid": "Trp"},
                 "type": "substitution",
                 "source": "reference",
                 "inserted": [{"sequence": "Arg", "source": "description"}],
@@ -546,13 +546,13 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 68, "sequence": "Ser"},
+                "location": {"type": "point", "position": 68, "amino_acid": "Ser"},
                 "type": "substitution",
                 "source": "reference",
                 "inserted": [{"sequence": "Arg", "source": "description"}],
             },
             {
-                "location": {"type": "point", "position": 594, "sequence": "Asn"},
+                "location": {"type": "point", "position": 594, "amino_acid": "Asn"},
                 "type": "deletion",
                 "source": "reference",
             },
@@ -564,13 +564,13 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 68, "sequence": "Ser"},
+                "location": {"type": "point", "position": 68, "amino_acid": "Ser"},
                 "type": "substitution",
                 "source": "reference",
                 "inserted": [{"sequence": "Arg", "source": "description"}],
             },
             {
-                "location": {"type": "point", "position": 594, "sequence": "Asn"},
+                "location": {"type": "point", "position": 594, "amino_acid": "Asn"},
                 "type": "deletion",
                 "source": "reference",
             },
@@ -601,7 +601,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 2, "sequence": "Ala"},
+                "location": {"type": "point", "position": 2, "amino_acid": "Ala"},
                 "type": "repeat",
                 "source": "reference",
                 "inserted": [{"length": {"type": "point", "value": 10}}],
@@ -617,7 +617,7 @@ HGVS_NOMENCLATURE = {
         "coordinate_system": "p",
         "variants": [
             {
-                "location": {"type": "point", "position": 18, "sequence": "Gln"},
+                "location": {"type": "point", "position": 18, "amino_acid": "Gln"},
                 "type": "repeat",
                 "source": "reference",
                 "inserted": [{"length": {"type": "point", "value": 23}}],
@@ -665,12 +665,13 @@ OTHER = {
         "variants": [],
         "predicted": True,
     },
-    "PREF:p.=": {
-        "type": "description_protein",
-        "reference": {"id": "PREF"},
-        "coordinate_system": "p",
-        "variants": [],
-    },
+    # TODO: perform the check in the normalizer.
+    # "PREF:p.=": {
+    #     "type": "description_protein",
+    #     "reference": {"id": "PREF"},
+    #     "coordinate_system": "p",
+    #     "variants": [],
+    # },
 }
 
 TESTS = {**HGVS_NOMENCLATURE, **OTHER}
