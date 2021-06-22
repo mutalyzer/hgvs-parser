@@ -1,6 +1,6 @@
 import os
 
-from lark import Lark, Transformer, Tree
+from lark import Lark, Token, Transformer, Tree
 from lark.tree import pydot__tree_to_png
 
 from .convert import parse_tree_to_model
@@ -86,6 +86,18 @@ class ProteinTransformer(Transformer):
     def p_equal(self, children):
         return Tree("equal", children)
 
+    def frame_shift(self, children):
+        new_children = []
+        for child in children:
+            if isinstance(child, Token):
+                new_children.append(Tree("insert", [Token("P_SEQUENCE", child.value)]))
+            else:
+                new_children.append(Tree("insert", [child]))
+        if new_children:
+            return Tree("frame_shift", [Tree("inserted", new_children)])
+        else:
+            return Tree("frame_shift", [])
+
     def p_insertion(self, children):
         return Tree("insertion", children)
 
@@ -109,9 +121,6 @@ class ProteinTransformer(Transformer):
 
     def p_repeat_number(self, children):
         return Tree("length", children)
-
-    # def frame_shift(self, children):
-    #     return Tree("frame_shift", [Tree("inserted", [Tree("insert", children)])])
 
 
 def read_files(file_name):

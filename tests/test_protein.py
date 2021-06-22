@@ -628,19 +628,155 @@ HGVS_NOMENCLATURE = {
     "PREF:p.(Gln18)[(70_80)]": {},
     # Frame shift
     # -
-    "PREF:p.Arg97ProfsTer23": {},
-    "PREF:p.Arg97fs"
+    "PREF:p.Arg97ProfsTer23": {
+        "type": "description_protein",
+        "reference": {"id": "PREF"},
+        "coordinate_system": "p",
+        "variants": [
+            {
+                "location": {"type": "point", "amino_acid": "Arg", "position": 97},
+                "type": "frame_shift",
+                "source": "reference",
+                "inserted": [
+                    {"sequence": "Pro", "source": "description"},
+                    {
+                        "location": {"type": "point", "position": 23},
+                        "source": "reference",
+                    },
+                ],
+            }
+        ],
+    },
+    "PREF:p.Arg97fs": {
+        "type": "description_protein",
+        "reference": {"id": "PREF"},
+        "coordinate_system": "p",
+        "variants": [
+            {
+                "location": {"type": "point", "amino_acid": "Arg", "position": 97},
+                "type": "frame_shift",
+                "source": "reference",
+            }
+        ],
+    },
     # -
-    "PREF:p.(Tyr4*)": {},
+    "PREF:p.(Tyr4*)": {
+        "type": "description_protein",
+        "reference": {"id": "PREF"},
+        "coordinate_system": "p",
+        "variants": [
+            {
+                "location": {"type": "point", "amino_acid": "Tyr", "position": 4},
+                "type": "substitution",
+                "source": "reference",
+                "inserted": [{"sequence": "*", "source": "description"}],
+            }
+        ],
+        "predicted": True,
+    },
     # -
-    "PREF:p.Glu5ValfsTer5": {},
-    "PREF:p.Glu5fs": {},
+    "PREF:p.Glu5ValfsTer5": {
+        "type": "description_protein",
+        "reference": {"id": "PREF"},
+        "coordinate_system": "p",
+        "variants": [
+            {
+                "location": {"type": "point", "amino_acid": "Glu", "position": 5},
+                "type": "frame_shift",
+                "source": "reference",
+                "inserted": [
+                    {"sequence": "Val", "source": "description"},
+                    {
+                        "location": {"type": "point", "position": 5},
+                        "source": "reference",
+                    },
+                ],
+            }
+        ],
+    },
+    "PREF:p.Glu5fs": {
+        "type": "description_protein",
+        "reference": {"id": "PREF"},
+        "coordinate_system": "p",
+        "variants": [
+            {
+                "location": {"type": "point", "amino_acid": "Glu", "position": 5},
+                "type": "frame_shift",
+                "source": "reference",
+            }
+        ],
+    },
     # -
-    "PREF:p.Ile327Argfs*?": {},
-    "PREF:p.Ile327fs": {},
+    "PREF:p.Ile327Argfs*?": {
+        "type": "description_protein",
+        "reference": {"id": "PREF"},
+        "coordinate_system": "p",
+        "variants": [
+            {
+                "location": {"type": "point", "amino_acid": "Ile", "position": 327},
+                "type": "frame_shift",
+                "source": "reference",
+                "inserted": [
+                    {"sequence": "Arg", "source": "description"},
+                    {
+                        "location": {"type": "point", "uncertain": True},
+                        "source": "reference",
+                    },
+                ],
+            }
+        ],
+    },
+    "PREF:p.Ile327fs": {
+        "type": "description_protein",
+        "reference": {"id": "PREF"},
+        "coordinate_system": "p",
+        "variants": [
+            {
+                "location": {"type": "point", "amino_acid": "Ile", "position": 327},
+                "type": "frame_shift",
+                "source": "reference",
+            }
+        ],
+    },
     # -
-    "PREF:p.Gln151Thrfs*9": {},
-    "PREF:p.His150Hisfs*10": {},
+    "PREF:p.Gln151Thrfs*9": {
+        "type": "description_protein",
+        "reference": {"id": "PREF"},
+        "coordinate_system": "p",
+        "variants": [
+            {
+                "location": {"type": "point", "amino_acid": "Gln", "position": 151},
+                "type": "frame_shift",
+                "source": "reference",
+                "inserted": [
+                    {"sequence": "Thr", "source": "description"},
+                    {
+                        "location": {"type": "point", "position": 9},
+                        "source": "reference",
+                    },
+                ],
+            }
+        ],
+    },
+    "PREF:p.His150Hisfs*10": {
+        "type": "description_protein",
+        "reference": {"id": "PREF"},
+        "coordinate_system": "p",
+        "variants": [
+            {
+                "location": {"type": "point", "amino_acid": "His", "position": 150},
+                "type": "frame_shift",
+                "source": "reference",
+                "inserted": [
+                    {"sequence": "His", "source": "description"},
+                    {
+                        "location": {"type": "point", "position": 10},
+                        "source": "reference",
+                    },
+                ],
+            }
+        ],
+    },
     # Extension
     # -
     "PREF:p.Met1ext-5": {},
