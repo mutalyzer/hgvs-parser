@@ -86,6 +86,24 @@ class ProteinTransformer(Transformer):
     def p_equal(self, children):
         return Tree("equal", children)
 
+    def extension(self, children):
+        return Tree("extension", children)
+
+    def extension_n(self, children):
+        point = Tree(
+            "point", [Token("NUMBER", children[0].value), Token("OUTSIDE_CDS", "-")]
+        )
+        location = [Tree("location", [point])]
+        return Tree("inserted", [Tree("insert", location)])
+
+    def extension_c(self, children):
+        inserted = [Tree("insert", [Token("P_SEQUENCE", children[0]).value])]
+        if isinstance(children[1], Token):
+            inserted.append(Tree("insert", [Token("P_SEQUENCE", children[1].value)]))
+        else:
+            inserted.append(Tree("insert", [Tree("location", [children[1]])]))
+        return Tree("inserted", inserted)
+
     def frame_shift(self, children):
         new_children = []
         for child in children:
@@ -148,6 +166,7 @@ def parse_protein(description, start_rule="description"):
     new_parse_tree = ProteinTransformer().transform(
         AmbigTransformer().transform(parse_tree)
     )
+    # pydot__tree_to_png(new_parse_tree, "temp.png")
     return new_parse_tree
 
 

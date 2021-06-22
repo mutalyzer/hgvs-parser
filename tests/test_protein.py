@@ -779,15 +779,127 @@ HGVS_NOMENCLATURE = {
     },
     # Extension
     # -
-    "PREF:p.Met1ext-5": {},
+    "PREF:p.Met1ext-5": {
+        "type": "description_protein",
+        "reference": {"id": "PREF"},
+        "coordinate_system": "p",
+        "variants": [
+            {
+                "location": {"type": "point", "amino_acid": "Met", "position": 1},
+                "type": "extension",
+                "source": "reference",
+                "inserted": [
+                    {
+                        "location": {
+                            "type": "point",
+                            "position": 5,
+                            "outside_cds": "upstream",
+                        },
+                        "source": "reference",
+                    }
+                ],
+            }
+        ],
+    },
     # -
-    "PREF:p.Met1_Leu2insArgSerThrVal": {},
+    "PREF:p.Met1_Leu2insArgSerThrVal": {
+        "type": "description_protein",
+        "reference": {"id": "PREF"},
+        "coordinate_system": "p",
+        "variants": [
+            {
+                "location": {
+                    "type": "range",
+                    "start": {"type": "point", "amino_acid": "Met", "position": 1},
+                    "end": {"type": "point", "amino_acid": "Leu", "position": 2},
+                },
+                "type": "insertion",
+                "source": "reference",
+                "inserted": [{"sequence": "ArgSerThrVal", "source": "description"}],
+            }
+        ],
+    },
     # -
-    "PREF:p.Ter110GlnextTer17": {},
-    "PREF:p.*110Glnext*17": {},
+    "PREF:p.Ter110GlnextTer17": {
+        "type": "description_protein",
+        "reference": {"id": "PREF"},
+        "coordinate_system": "p",
+        "variants": [
+            {
+                "location": {"type": "point", "amino_acid": "Ter", "position": 110},
+                "type": "extension",
+                "source": "reference",
+                "inserted": [
+                    {"sequence": "Gln", "source": "description"},
+                    {
+                        "location": {
+                            "type": "point",
+                            "amino_acid": "Ter",
+                            "position": 17,
+                        },
+                        "source": "reference",
+                    },
+                ],
+            }
+        ],
+    },
+    "PREF:p.*110Glnext*17": {
+        "type": "description_protein",
+        "reference": {"id": "PREF"},
+        "coordinate_system": "p",
+        "variants": [
+            {
+                "location": {"type": "point", "amino_acid": "*", "position": 110},
+                "type": "extension",
+                "source": "reference",
+                "inserted": [
+                    {"sequence": "Gln", "source": "description"},
+                    {
+                        "location": {
+                            "type": "point",
+                            "amino_acid": "*",
+                            "position": 17,
+                        },
+                        "source": "reference",
+                    },
+                ],
+            }
+        ],
+    },
     # -
-    "PREF:p.(Ter315TyrextAsnLysGlyThrTer)": {},
-    "PREF:p.*315TyrextAsnLysGlyThr*": {},
+    "PREF:p.(Ter315TyrextAsnLysGlyThrTer)": {
+        "type": "description_protein",
+        "reference": {"id": "PREF"},
+        "coordinate_system": "p",
+        "variants": [
+            {
+                "location": {"type": "point", "amino_acid": "Ter", "position": 315},
+                "type": "extension",
+                "source": "reference",
+                "inserted": [
+                    {"sequence": "Tyr", "source": "description"},
+                    {"sequence": "AsnLysGlyThrTer", "source": "description"},
+                ],
+            }
+        ],
+        "predicted": True,
+    },
+    "PREF:p.*315TyrextAsnLysGlyThr*": {
+        "type": "description_protein",
+        "reference": {"id": "PREF"},
+        "coordinate_system": "p",
+        "variants": [
+            {
+                "location": {"type": "point", "amino_acid": "*", "position": 315},
+                "type": "extension",
+                "source": "reference",
+                "inserted": [
+                    {"sequence": "Tyr", "source": "description"},
+                    {"sequence": "AsnLysGlyThr*", "source": "description"},
+                ],
+            }
+        ],
+    },
     # -
     "PREF:p.Ter327Argext*?": {},
     "PREF:p.*327Argext*?": {},

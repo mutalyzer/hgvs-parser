@@ -137,6 +137,7 @@ def _variant_to_model(variant):
     if variant.data == "_ambig":
         variant = _solve_variant_ambiguity(variant)
 
+    print("----", variant)
     output = {"location": _location_to_model(variant.children[0])}
     if variant.data == "p_variant_predicted":
         output["predicted"] = True
