@@ -25,7 +25,7 @@ p_range: p_point "_" p_point
 
 p_deletion: "del" p_inserted?
 
-p_deletion_insertion: "delins" p_inserted?
+p_deletion_insertion: "del" p_inserted? "ins" p_inserted
 
 p_duplication: "dup" p_inserted?
 
@@ -62,6 +62,7 @@ AA: "Ala" | "Arg" | "Asn" | "Asp" | "Cys" | "Gln" | "Glu"
   | "Gly" | "His" | "Ile" | "Leu" | "Lys" | "Met" | "Phe"
   | "Pro" | "Ser" | "Thr" | "Trp" | "Tyr" | "Val"
   | "Ter"
+  | "Xaa"
   | "A"   | "R"   | "N"   | "D"   | "C"   | "Q"   | "E"
   | "G"   | "H"   | "I"   | "L"   | "K"   | "M"   | "F"
   | "P"   | "S"   | "T"   | "W"    | "Y"  | "V"
