@@ -143,6 +143,9 @@ class ProteinTransformer(Transformer):
     def p_repeat_number(self, children):
         return Tree("length", children)
 
+    def P_COORDINATE_SYSTEM(self, name):
+        return Token("COORDINATE_SYSTEM", name)
+
 
 def read_files(file_name):
     grammar_path = os.path.join(os.path.dirname(__file__), f"ebnf/{file_name}")

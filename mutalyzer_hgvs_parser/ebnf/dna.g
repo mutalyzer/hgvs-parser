@@ -1,5 +1,7 @@
 description_dna: reference ":" (COORDINATE_SYSTEM ".")? variants
 
+COORDINATE_SYSTEM: "g" | "m" | "o" | "c" | "n" | "r"
+
 // -----
 
 variants: ("[" ((variant (";" variant)*) | "=") "]") | variant | "="

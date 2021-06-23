@@ -1,4 +1,6 @@
-description_protein: reference ":" (COORDINATE_SYSTEM ".")? p_variants
+description_protein: reference ":" (P_COORDINATE_SYSTEM ".")? p_variants
+
+P_COORDINATE_SYSTEM: "p"
 
 // -----
 
