@@ -1,6 +1,6 @@
 import pytest
 
-from mutalyzer_hgvs_parser.protein import parse_protein, parse_protein_to_model
+from mutalyzer_hgvs_parser import parse, to_model
 
 HGVS_NOMENCLATURE = {
     # Substitution
@@ -931,7 +931,7 @@ TESTS = {**HGVS_NOMENCLATURE, **OTHER}
 )
 def test_hgvs_protein_parse(description):
     if TESTS.get(description):
-        assert parse_protein(description) is not None
+        assert parse(description) is not None
 
 
 @pytest.mark.parametrize(
@@ -940,4 +940,4 @@ def test_hgvs_protein_parse(description):
 )
 def test_hgvs_protein_convert(description):
     if TESTS.get(description):
-        assert parse_protein_to_model(description) == TESTS[description]
+        assert to_model(description) == TESTS[description]

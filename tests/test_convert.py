@@ -259,6 +259,7 @@ INSERTED = {
     "R2:g.10_15": [
         {
             "source": {"id": "R2"},
+            "type": "description_dna",
             "coordinate_system": "g",
             "location": LOCATIONS["10_15"],
         }
@@ -266,6 +267,7 @@ INSERTED = {
     "NG_000001.1(NM_000002.3):c.100": [
         {
             "source": REFERENCES["NG_000001.1(NM_000002.3)"],
+            "type": "description_dna",
             "coordinate_system": "c",
             "location": LOCATIONS["100"],
         }
@@ -273,6 +275,7 @@ INSERTED = {
     "NG_000001.1(NM_000002.3):c.(?_-20)_(30+1_30-1)": [
         {
             "source": REFERENCES["NG_000001.1(NM_000002.3)"],
+            "type": "description_dna",
             "coordinate_system": "c",
             "location": LOCATIONS["(?_-20)_(30+1_30-1)"],
         }
@@ -280,6 +283,7 @@ INSERTED = {
     "NG_000001.1(NM_000002.3):c.(170_?)_420+60[19]": [
         {
             "source": REFERENCES["NG_000001.1(NM_000002.3)"],
+            "type": "description_dna",
             "coordinate_system": "c",
             "location": LOCATIONS["(170_?)_420+60"],
             "repeat_number": LENGTHS["19"],
@@ -288,6 +292,7 @@ INSERTED = {
     "[R2:g.200_300;40_50]": [
         {
             "source": {"id": "R2"},
+            "type": "description_dna",
             "coordinate_system": "g",
             "location": LOCATIONS["200_300"],
         },
@@ -298,6 +303,7 @@ INSERTED = {
         {"source": "reference", "location": LOCATIONS["10_20"], "inverted": True},
         {
             "source": {"id": "NM_000001.1"},
+            "type": "description_dna",
             "coordinate_system": "c",
             "location": LOCATIONS["200_300"],
         },
@@ -448,6 +454,7 @@ VARIANTS = {
         "inserted": [
             {
                 "source": {"id": "NM_000001.1"},
+                "type": "description_dna",
                 "coordinate_system": "c",
                 "location": {
                     "type": "range",
@@ -469,6 +476,7 @@ VARIANTS = {
         "inserted": [
             {
                 "source": {"id": "NG_000001.1", "selector": {"id": "NM_000002.3"}},
+                "type": "description_dna",
                 "coordinate_system": "c",
                 "location": {"type": "point", "position": 100},
             }
@@ -735,11 +743,13 @@ DESCRIPTIONS = {
     "R1(R2(R3)):g.[10del;10_11delinsR2:g.10_15]": {
         "reference": REFERENCES["R1(R2(R3))"],
         "coordinate_system": "g",
+        "type": "description_dna",
         "variants": [VARIANTS["10del"], VARIANTS["10_11delinsR2:g.10_15"]],
     },
     "R1:g.[10=;10_11ins[T;10_20inv;NM_000001.1:c.200_300];10_20delinsGA]": {
         "reference": REFERENCES["R1"],
         "coordinate_system": "g",
+        "type": "description_dna",
         "variants": [
             VARIANTS["10="],
             VARIANTS["10_11ins[T;10_20inv;NM_000001.1:c.200_300]"],
@@ -765,6 +775,7 @@ def compose_description_model(reference, location, operation, insert):
     description = "{}:{}{}{}".format(reference, location, operation, insert)
     model = {
         "reference": REFERENCES[reference],
+        "type": "description_dna",
         "variants": [
             {
                 "type": OPERATIONS_MIX[operation],

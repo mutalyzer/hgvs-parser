@@ -10,7 +10,6 @@ from lark.tree import pydot__tree_to_png
 from . import usage, version
 from .convert import parse_tree_to_model
 from .hgvs_parser import parse
-from .protein import parse_protein
 
 
 def _parse(description, grammar_path, start_rule):
@@ -50,8 +49,6 @@ def _arg_parser():
         "-c", action="store_true", help="convert the description to the model"
     )
 
-    alt.add_argument("-p", action="store_true", help="is a protein description")
-
     parser.add_argument("-r", help="alternative start (top) rule for the grammar")
 
     alt.add_argument(
@@ -71,11 +68,7 @@ def _cli(args):
     if args.c:
         parse_tree = _to_model(args.description, args.r)
     else:
-        if args.p:
-            parse_tree = parse_protein(args.description)
-            print(json.dumps(parse_tree_to_model(parse_tree), indent=2))
-        else:
-            parse_tree = _parse(args.description, args.g, args.r)
+        parse_tree = _parse(args.description, args.g, args.r)
 
     if args.i and parse_tree:
         pydot__tree_to_png(parse_tree, args.i)
