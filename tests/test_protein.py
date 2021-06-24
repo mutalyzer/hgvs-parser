@@ -913,12 +913,38 @@ OTHER = {
         "variants": [],
         "predicted": True,
     },
-    # TODO: perform the check in the normalizer.
-    # "PREF:p.=": {
+    "PREF:p.=": {
+        "type": "description_protein",
+        "reference": {"id": "PREF"},
+        "coordinate_system": "p",
+        "variants": [],
+    },
+    "PREF:p.24Cys": {
+        "type": "description_protein",
+        "reference": {"id": "PREF"},
+        "coordinate_system": "p",
+        "variants": [
+            {
+                "location": {"type": "point", "position": 24},
+                "type": "substitution",
+                "source": "reference",
+                "inserted": [{"sequence": "Cys", "source": "description"}],
+            }
+        ],
+    },
+    # TODO: Should it be a protein or a dna description?
+    # "PREF:24Cys": {
     #     "type": "description_protein",
     #     "reference": {"id": "PREF"},
     #     "coordinate_system": "p",
-    #     "variants": [],
+    #     "variants": [
+    #         {
+    #             "location": {"type": "point", "position": 24},
+    #             "type": "substitution",
+    #             "source": "reference",
+    #             "inserted": [{"sequence": "Cys", "source": "description"}],
+    #         }
+    #     ],
     # },
 }
 
