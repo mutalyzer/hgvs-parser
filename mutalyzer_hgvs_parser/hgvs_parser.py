@@ -19,7 +19,17 @@ def _in(tree, data):
 
 class AmbigTransformer(Transformer):
     def _ambig(self, children):
-        if children[0].data == children[1].data == "p_variant":
+        if (
+            children[0].data == children[1].data == "variants"
+            and _in(children[0], "variants_certain")
+            and _in(children[1], "variants_predicted")
+            and len(children[0].children) == 1
+            and len(children[0].children[0].children) == 1
+            and _in(children[0].children[0].children[0], "location")
+        ):
+            # "R1:(1_2)": uncertain location instead of predicted variant
+            return children[0]
+        elif children[0].data == children[1].data == "p_variant":
             if _in(children[0], "p_repeat") and _in(children[1], "p_substitution"):
                 if (
                     children[1].children[1].data == "p_substitution"
@@ -57,10 +67,19 @@ class AmbigTransformer(Transformer):
 
 
 class ProteinTransformer(Transformer):
-    def p_variants(self, children):
-        if len(children) == 1 and children[0].data == "p_variants_certain":
+    def variants(self, children):
+        if len(children) == 1 and children[0].data == "variants_certain":
             return Tree("variants", children[0].children)
         return Tree("variants", children)
+
+    def p_variants(self, children):
+        return self.variants(children)
+
+    def p_variants_certain(self, children):
+        return Tree("variants_certain", children)
+
+    def p_variants_predicted(self, children):
+        return Tree("variants_predicted", children)
 
     def p_variant(self, children):
         return Tree("variant", children)

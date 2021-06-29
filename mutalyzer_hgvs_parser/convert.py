@@ -77,13 +77,7 @@ def _description_to_model(parse_tree):
                 elif child.data == "variants":
                     if (
                         len(child.children) == 1
-                        and child.children[0].data == "p_variants_predicted"
-                    ):
-                        model["variants"] = _variants_to_model(child.children[0])
-                        model["predicted"] = True
-                    elif (
-                        len(child.children) == 1
-                        and child.children[0].data == "p_variants_certain"
+                        and child.children[0].data == "variants_predicted"
                     ):
                         model["variants"] = _variants_to_model(child.children[0])
                         model["predicted"] = True

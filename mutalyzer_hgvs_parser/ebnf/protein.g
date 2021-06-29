@@ -8,7 +8,10 @@ p_variants: p_variants_certain | p_variants_predicted
 
 p_variants_certain: "[" p_variant (";" p_variant)* "]" | p_variant | "="
 
-p_variants_predicted: "[(" p_variant (";" p_variant)* ")]" | "(" p_variant ")" | "(=)"
+p_variants_predicted: "([" p_variant (";" p_variant)* "])"
+                    | "[(" p_variant (";" p_variant)* ")]"
+                    | "(" p_variant ")"
+                    | "(=)"
 
 p_variant: p_location (p_deletion | p_deletion_insertion | p_duplication
                        | p_equal | extension | frame_shift | p_insertion | p_repeat

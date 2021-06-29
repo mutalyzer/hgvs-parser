@@ -321,6 +321,7 @@ def test_inserted_to_model(description, model):
 VARIANTS = {
     "1": {"location": LOCATIONS["1"]},
     "10_15": {"location": LOCATIONS["10_15"]},
+    "(10_15)": {"location": LOCATIONS["(10_15)"]},
     # Substitutions
     "10C>A": {
         "type": "substitution",
@@ -745,6 +746,33 @@ DESCRIPTIONS = {
         "coordinate_system": "g",
         "type": "description_dna",
         "variants": [VARIANTS["10del"], VARIANTS["10_11delinsR2:g.10_15"]],
+    },
+    "R1(R2(R3)):g.([10del;10_11delinsR2:g.10_15])": {
+        "reference": REFERENCES["R1(R2(R3))"],
+        "coordinate_system": "g",
+        "type": "description_dna",
+        "variants": [VARIANTS["10del"], VARIANTS["10_11delinsR2:g.10_15"]],
+        "predicted": True,
+    },
+    "R1(R2(R3)):g.(10_11delinsR2:g.10_15)": {
+        "reference": REFERENCES["R1(R2(R3))"],
+        "coordinate_system": "g",
+        "type": "description_dna",
+        "variants": [VARIANTS["10_11delinsR2:g.10_15"]],
+        "predicted": True,
+    },
+    "R1(R2(R3)):g.(10_15)": {
+        "reference": REFERENCES["R1(R2(R3))"],
+        "coordinate_system": "g",
+        "type": "description_dna",
+        "variants": [VARIANTS["(10_15)"]],
+    },
+    "R1(R2(R3)):g.((10_15))": {
+        "reference": REFERENCES["R1(R2(R3))"],
+        "coordinate_system": "g",
+        "type": "description_dna",
+        "variants": [VARIANTS["(10_15)"]],
+        "predicted": True,
     },
     "R1:g.[10=;10_11ins[T;10_20inv;NM_000001.1:c.200_300];10_20delinsGA]": {
         "reference": REFERENCES["R1"],

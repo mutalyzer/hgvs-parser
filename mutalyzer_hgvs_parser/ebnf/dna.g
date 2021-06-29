@@ -4,7 +4,14 @@ COORDINATE_SYSTEM: "a" .. "o" | "q" .. "z"
 
 // -----
 
-variants: ("[" ((variant (";" variant)*) | "=") "]") | variant | "="
+variants: variants_certain | variants_predicted
+
+variants_certain: ("[" ((variant (";" variant)*) | "=") "]") | variant | "="
+
+variants_predicted: "([" variant (";" variant)* "])"
+                  |  "[(" variant (";" variant)* ")]"
+                  | "(" variant ")"
+                  | "(=)"
 
 variant: location (conversion | deletion | deletion_insertion | duplication
                   | equal | insertion | inversion | substitution | repeat)?
