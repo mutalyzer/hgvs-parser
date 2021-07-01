@@ -163,7 +163,7 @@ class ProteinTransformer(Transformer):
         return Tree("length", children)
 
     def P_COORDINATE_SYSTEM(self, name):
-        return Token("COORDINATE_SYSTEM", name)
+        return Token("COORDINATE_SYSTEM", name.value)
 
 
 def read_files(file_name):
