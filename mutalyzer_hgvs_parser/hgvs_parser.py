@@ -17,25 +17,60 @@ def _in(tree, data):
     return False
 
 
+def _is_uncertain_location(children):
+    """
+    # "R1:(1_2)": uncertain location instead of predicted variant
+    """
+    if (
+        children[0].data == children[1].data == "variants"
+        and _in(children[0], "variants_certain")
+        and _in(children[1], "variants_predicted")
+        and len(children[0].children) == 1
+        and len(children[0].children[0].children) == 1
+        and _in(children[0].children[0].children[0], "location")
+    ):
+        return True
+    else:
+        return False
+
+
+def _is_insert_length(children):
+    if (
+        children[0].data == children[1].data == "insert"
+        and _in(children[0], "length")
+        and _in(children[1], "location")
+    ):
+        return True
+    else:
+        return False
+
+
+def _is_insert_location(children):
+    if (
+        children[0].data == children[1].data == "insert"
+        and _in(children[0], "location")
+        and _in(children[1], "length")
+    ):
+        return True
+    else:
+        return False
+
+
 class AmbigTransformer(Transformer):
     def _ambig(self, children):
-        if (
-            children[0].data == children[1].data == "variants"
-            and _in(children[0], "variants_certain")
-            and _in(children[1], "variants_predicted")
-            and len(children[0].children) == 1
-            and len(children[0].children[0].children) == 1
-            and _in(children[0].children[0].children[0], "location")
-        ):
+        if _is_uncertain_location(children):
             # "R1:(1_2)": uncertain location instead of predicted variant
             return children[0]
-        elif children[0].data == children[1].data == "p_variant":
-            if _in(children[0], "p_repeat") and _in(children[1], "p_substitution"):
+        elif _is_insert_length(children):
+            return children[0]
+        elif _is_insert_location(children):
+            return children[1]
+        elif children[0].data == children[1].data == "variant_certain":
+            if _in(children[0], "repeat") and _in(children[1], "substitution"):
                 if (
-                    children[1].children[1].data == "p_substitution"
-                    and children[1].children[1].children[0].data == "p_inserted"
-                    and children[1].children[1].children[0].children[0].data
-                    == "p_insert"
+                    children[1].children[1].data == "substitution"
+                    and children[1].children[1].children[0].data == "inserted"
+                    and children[1].children[1].children[0].children[0].data == "insert"
                     and len(children[1].children[1].children[0].children[0].children)
                     == 1
                     and isinstance(
@@ -43,37 +78,51 @@ class AmbigTransformer(Transformer):
                         Tree,
                     )
                     and children[1].children[1].children[0].children[0].children[0].data
-                    == "p_length"
+                    == "length"
                 ):
+                    # "PREF:p.Ala2[10]"
                     return children[0]
-                return children[1]
+                else:
+                    # "PREF:p.Ser68Arg"
+                    return children[1]
             elif (
-                _in(children[0], "p_substitution")
+                _in(children[0], "substitution")
                 and len(children[1].children) == 1
-                and _in(children[1], "p_location")
+                and _in(children[1], "location")
             ):
+                return children[1]
+        elif (
+            children[0].data == children[1].data == "variants"
+            and _in(children[0], "variants_certain")
+            and _in(children[1], "variants_predicted")
+        ):
+            # "NP_003997.1:p.(Trp24Cys)": on uncertain variant
+            return children[1]
+        elif children[0].data == "variant":
+            if children[1].children[1].data == "repeat":
+                # variant start rule: "10_11insNM_000001.1:c.100_200"
+                return children[0]
+            elif (
+                children[1].children[1].data == "deletion_insertion"
+                and children[0].children[1].data == "deletion"
+            ):
+                # variant start rule: 10_11delinsR2:g.10_15
                 return children[1]
         elif children[0].data == children[1].data == "description":
             if _in(children[0], "description_dna") and _in(
                 children[1], "description_protein"
             ):
+                # "R1:100insA": we opt for "description_dna"
+                # TODO: Leave it undefined and do the check based on
+                #       the reference type?
                 return children[0]
-        elif children[0].data == children[1].data == "p_insert":
-            if _in(children[0], "p_length") and _in(children[1], "p_location"):
-                return children[0]
-            elif _in(children[0], "p_location") and _in(children[1], "p_length"):
-                return children[1]
+
         return Tree("_ambig", children)
 
 
 class ProteinTransformer(Transformer):
-    def variants(self, children):
-        if len(children) == 1 and children[0].data == "variants_certain":
-            return Tree("variants", children[0].children)
-        return Tree("variants", children)
-
     def p_variants(self, children):
-        return self.variants(children)
+        return Tree("variants", children)
 
     def p_variants_certain(self, children):
         return Tree("variants_certain", children)
@@ -83,6 +132,12 @@ class ProteinTransformer(Transformer):
 
     def p_variant(self, children):
         return Tree("variant", children)
+
+    def p_variant_certain(self, children):
+        return Tree("variant_certain", children)
+
+    def p_variant_predicted(self, children):
+        return Tree("variant_predicted", children)
 
     def p_location(self, children):
         return Tree("location", children)
@@ -164,6 +219,22 @@ class ProteinTransformer(Transformer):
 
     def P_COORDINATE_SYSTEM(self, name):
         return Token("COORDINATE_SYSTEM", name.value)
+
+
+class FinalTransformer(Transformer):
+    def variants(self, children):
+        if children[0].data == "variants_certain":
+            return Tree("variants", children[0].children)
+        if children[0].data == "variants_predicted":
+            return Tree("variants_predicted", children[0].children)
+        return Tree("variants", children)
+
+    def variant(self, children):
+        if children[0].data == "variant_certain":
+            return Tree("variant", children[0].children)
+        if children[0].data == "variant_predicted":
+            return Tree("variantspredicted", children[0].children)
+        return Tree("variants", children)
 
 
 def read_files(file_name):
@@ -256,7 +327,8 @@ def parse(description, grammar_path=None, start_rule=None):
     :rtype: lark.Tree
     """
     parser = HgvsParser(grammar_path, start_rule)
-
-    return ProteinTransformer().transform(
-        AmbigTransformer().transform(parser.parse(description))
+    return FinalTransformer().transform(
+        AmbigTransformer().transform(
+            ProteinTransformer().transform(parser.parse(description))
+        )
     )

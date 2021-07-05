@@ -13,7 +13,11 @@ p_variants_predicted: "([" p_variant (";" p_variant)* "])"
                     | "(" p_variant ")"
                     | "(=)"
 
-p_variant: p_location (p_deletion | p_deletion_insertion | p_duplication
+p_variant: p_variant_certain | p_variant_predicted
+
+p_variant_predicted: "(" p_variant_certain ")"
+
+p_variant_certain: p_location (p_deletion | p_deletion_insertion | p_duplication
                        | p_equal | extension | frame_shift | p_insertion | p_repeat
                        | p_substitution)?
 
