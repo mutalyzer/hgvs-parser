@@ -4,10 +4,20 @@ Module for parsing HGVS variant descriptions.
 
 import os
 
+from lark.tree import pydot__tree_to_png
+
 from lark import Lark, Token, Transformer, Tree
 from lark.exceptions import UnexpectedCharacters, UnexpectedEOF
 
 from .exceptions import UnexpectedCharacter, UnexpectedEnd
+
+
+def _all(conditions):
+    for condition in conditions:
+        print(condition)
+        if not condition:
+            return False
+    return True
 
 
 def _in(tree, data):
@@ -17,9 +27,19 @@ def _in(tree, data):
     return False
 
 
-def _is_uncertain_location(children):
+def debug(f):
+    def wrapper(*args):
+        t = f(*args)
+        if t:
+            print(f.__name__)
+        return t
+
+    return wrapper
+
+
+@debug
+def _is_uncertain_location_variants(children):
     """
-    # "R1:(1_2)": uncertain location instead of predicted variant
     """
     if (
         children[0].data == children[1].data == "variants"
@@ -34,6 +54,38 @@ def _is_uncertain_location(children):
         return False
 
 
+@debug
+def _is_uncertain_location_variants_2(children):
+    """
+    """
+    CONDITIONS = [
+        len(children) == 2,
+        children[0].data == children[1].data == "variants",
+        children[0].children[0].data == "variants_certain",
+        children[1].children[0].data == "variants_predicted",
+        children[0].children[0].children[0].data == "variant",
+        children[1].children[0].children[0].data == "variant"
+     ]
+    return _all(CONDITIONS)
+
+
+@debug
+def _is_uncertain_location_variant(children):
+    """
+    """
+    if (
+        children[0].data == children[1].data == "variant"
+        and _in(children[0], "variant_certain")
+        and _in(children[1], "variant_predicted")
+        and len(children[0].children) == 1
+        and _in(children[0].children[0], "location")
+    ):
+        return True
+    else:
+        return False
+
+
+@debug
 def _is_insert_length(children):
     if (
         children[0].data == children[1].data == "insert"
@@ -45,6 +97,7 @@ def _is_insert_length(children):
         return False
 
 
+@debug
 def _is_insert_location(children):
     if (
         children[0].data == children[1].data == "insert"
@@ -56,67 +109,212 @@ def _is_insert_location(children):
         return False
 
 
+@debug
+def _variant_certain_del_delins_repeat(children):
+    """
+    variant start rule: "10_11delinsR2:g.10_15"
+    deletion insertion
+    """
+    if (
+        len(children) == 3
+        and children[0].data == "variant_certain"
+        and children[1].data == "variant_certain"
+        and children[2].data == "variant_certain"
+        and _in(children[0], "deletion")
+        and _in(children[1], "deletion_insertion")
+        and _in(children[2], "repeat")
+    ):
+        return True
+    else:
+        return False
+
+
+@debug
+def _variant_certain_insertion_repeat(children):
+    """
+    variant start rule: "10_11delinsR2:g.10_15"
+    deletion insertion
+    """
+    if (
+        len(children) == 2
+        and children[0].data == "variant_certain"
+        and children[1].data == "variant_certain"
+        and _in(children[0], "insertion")
+        and _in(children[1], "repeat")
+    ):
+        return True
+    else:
+        return False
+
+@debug
+def _variant_certain_repeat_substitution(children):
+    """
+    """
+    return (
+        len(children) == 2
+        and children[0].data == children[1].data == "variant_certain"
+        and _in(children[0], "repeat")
+        and _in(children[1], "substitution")
+        and children[1].children[1].data == "substitution"
+        and children[1].children[1].children[0].data == "inserted"
+        and children[1].children[1].children[0].children[0].data == "insert"
+        and len(children[1].children[1].children[0].children[0].children) == 1
+        and isinstance(children[1].children[1].children[0].children[0].children[0], Tree)
+        and children[1].children[1].children[0].children[0].children[0].data == "length"
+    )
+
+
+@debug
+def _variant_certain_repeat_substitution_2(children):
+    """
+    """
+    return (
+        len(children) == 2
+        and children[0].data == "variant_certain"
+        and children[1].data == "variant_certain"
+        and _in(children[0], "repeat")
+        and _in(children[1], "substitution")
+        and children[1].children[1].data == "substitution"
+        and children[1].children[1].children[0].data == "inserted"
+        and children[1].children[1].children[0].children[0].data == "insert"
+        and len(children[1].children[1].children[0].children[0].children) == 1
+        and isinstance(children[1].children[1].children[0].children[0].children[0], Token)
+    )
+
+
+@debug
+def _variants_certain_predicted_uncertain_location(children):
+    """
+    R1(R2(R3)):g.(10_15)
+    """
+    if (
+        children[0].data == children[1].data == "variants"
+        and _in(children[0], "variants_certain")
+        and _in(children[1], "variants_predicted")
+        and children[0].children[0].children[0].data == "variant"
+        and len(children[0].children[0].children[0].children) == 1
+        and children[0].children[0].children[0].children[0].data == "variant_certain"
+    ):
+        return True
+    else:
+        return False
+
+
+@debug
+def _variants_certain_predicted_variant(children):
+    """
+    R1(R2(R3)):g.(10_15)
+    """
+    if (
+        children[0].data == children[1].data == "variants"
+        and _in(children[0], "variants_certain")
+        and _in(children[1], "variants_predicted")
+        and len(children[0].children[0].children[0].children[0].children[0].children) > 1
+    ):
+        return True
+    else:
+        return False
+
+
+@debug
+def _description_dna_protein(children):
+    """
+    R1:100insA
+    - we opt for "description_dna"
+    TODO: Leave it undefined and do the check based on
+          the reference type?
+    """
+    if (len(children) == 2 and children[0].data == children[1].data == "description"
+            and _in(children[0], "description_dna") and _in(children[1], "description_protein")):
+        return True
+    else:
+        return False
+
+
 class AmbigTransformer(Transformer):
     def _ambig(self, children):
-        if _is_uncertain_location(children):
+        if _is_uncertain_location_variants(children):
             # "R1:(1_2)": uncertain location instead of predicted variant
+            return children[0]
+        elif _is_uncertain_location_variant(children):
             return children[0]
         elif _is_insert_length(children):
             return children[0]
         elif _is_insert_location(children):
             return children[1]
-        elif children[0].data == children[1].data == "variant_certain":
-            if _in(children[0], "repeat") and _in(children[1], "substitution"):
-                if (
-                    children[1].children[1].data == "substitution"
-                    and children[1].children[1].children[0].data == "inserted"
-                    and children[1].children[1].children[0].children[0].data == "insert"
-                    and len(children[1].children[1].children[0].children[0].children)
-                    == 1
-                    and isinstance(
-                        children[1].children[1].children[0].children[0].children[0],
-                        Tree,
-                    )
-                    and children[1].children[1].children[0].children[0].children[0].data
-                    == "length"
-                ):
-                    # "PREF:p.Ala2[10]"
-                    return children[0]
-                else:
-                    # "PREF:p.Ser68Arg"
-                    return children[1]
-            elif (
-                _in(children[0], "substitution")
-                and len(children[1].children) == 1
-                and _in(children[1], "location")
-            ):
-                return children[1]
-        elif (
-            children[0].data == children[1].data == "variants"
-            and _in(children[0], "variants_certain")
-            and _in(children[1], "variants_predicted")
-        ):
-            # "NP_003997.1:p.(Trp24Cys)": on uncertain variant
+        elif _variant_certain_del_delins_repeat(children):
             return children[1]
-        elif children[0].data == "variant":
-            if children[1].children[1].data == "repeat":
+        elif _variants_certain_predicted_uncertain_location(children):
+            return children[0]
+        elif _variant_certain_insertion_repeat(children):
+            return children[0]
+        elif _variants_certain_predicted_variant(children):
+            return children[1]
+        elif _variant_certain_repeat_substitution(children):
+            return children[1]
+        elif _variant_certain_repeat_substitution_2(children):
+            return children[0]
+        elif _description_dna_protein(children):
+            return children[0]
+        elif _is_uncertain_location_variants_2(children):
+            return children[1]
+            # if _in(children[0], "repeat") and _in(children[1], "substitution"):
+            #     if (
+            #         children[1].children[1].data == "substitution"
+            #         and children[1].children[1].children[0].data == "inserted"
+            #         and children[1].children[1].children[0].children[0].data == "insert"
+            #         and len(children[1].children[1].children[0].children[0].children)
+            #         == 1
+            #         and isinstance(
+            #             children[1].children[1].children[0].children[0].children[0],
+            #             Tree,
+            #         )
+            #         and children[1].children[1].children[0].children[0].children[0].data
+            #         == "length"
+            #     ):
+            #         # "PREF:p.Ala2[10]"
+            #         return children[0]
+            #     else:
+            #         # "PREF:p.Ser68Arg"
+            #         return children[1]
+            # elif (
+            #     _in(children[0], "substitution")
+            #     and len(children[1].children) == 1
+            #     and _in(children[1], "location")
+            # ):
+            #     return children[1]
+            # elif _in(children[0], "insertion") and _in(children[1], "repeat"):
+            #     print("7")
+            #     return children[0]
+        # elif (
+        #     children[0].data == children[1].data == "variants"
+        #     and _in(children[0], "variants_certain")
+        #     and _in(children[1], "variants_predicted")
+        # ):
+            # "NP_003997.1:p.(Trp24Cys)": on uncertain variant
+            # return children[1]
+        # elif children[0].data == "variant":
+        #     if (
+        #         len(children[1].children) > 1
+        #         and children[1].children[1].data == "repeat"
+        #     ):
                 # variant start rule: "10_11insNM_000001.1:c.100_200"
-                return children[0]
-            elif (
-                children[1].children[1].data == "deletion_insertion"
-                and children[0].children[1].data == "deletion"
-            ):
+                # return children[0]
+            # elif (
+            #     len(children[1].children) > 1
+            #     and children[1].children[1].data == "deletion_insertion"
+            #     and children[0].children[1].data == "deletion"
+            # ):
                 # variant start rule: 10_11delinsR2:g.10_15
-                return children[1]
-        elif children[0].data == children[1].data == "description":
-            if _in(children[0], "description_dna") and _in(
-                children[1], "description_protein"
-            ):
+                # return children[1]
+        # elif children[0].data == children[1].data == "description":
+        #     if _in(children[0], "description_dna") and _in(
+        #         children[1], "description_protein"
+        #     ):
                 # "R1:100insA": we opt for "description_dna"
                 # TODO: Leave it undefined and do the check based on
                 #       the reference type?
-                return children[0]
-
+                # return children[0]
         return Tree("_ambig", children)
 
 
@@ -233,7 +431,7 @@ class FinalTransformer(Transformer):
         if children[0].data == "variant_certain":
             return Tree("variant", children[0].children)
         if children[0].data == "variant_predicted":
-            return Tree("variantspredicted", children[0].children)
+            return Tree("variants_predicted", children[0].children)
         return Tree("variants", children)
 
 
@@ -327,6 +525,24 @@ def parse(description, grammar_path=None, start_rule=None):
     :rtype: lark.Tree
     """
     parser = HgvsParser(grammar_path, start_rule)
+
+    # pydot__tree_to_png(parser.parse(description), "temp_original.png")
+    #
+    # pydot__tree_to_png(
+    #     FinalTransformer().transform(
+    #         AmbigTransformer().transform(
+    #             ProteinTransformer().transform(parser.parse(description))
+    #         )
+    #     ),
+    #     "temp.png",
+    # )
+    # pydot__tree_to_png(
+    #                 AmbigTransformer().transform(
+    #             ProteinTransformer().transform(parser.parse(description))
+    #
+    #     ),
+    #     "temp_after_ambig.png",
+    # )
     return FinalTransformer().transform(
         AmbigTransformer().transform(
             ProteinTransformer().transform(parser.parse(description))

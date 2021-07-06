@@ -13,7 +13,11 @@ variants_predicted: "([" variant (";" variant)* "])"
                   | "(" variant ")"
                   | "(=)"
 
-variant: location (conversion | deletion | deletion_insertion | duplication
+variant: variant_certain | variant_predicted
+
+variant_predicted: "(" variant_certain ")"
+
+variant_certain: location (conversion | deletion | deletion_insertion | duplication
                   | equal | insertion | inversion | substitution | repeat)?
 
 // -----
