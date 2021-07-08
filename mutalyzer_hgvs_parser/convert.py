@@ -33,7 +33,7 @@ def parse_tree_to_model(parse_tree, start_rule=None):
     :returns: Description dictionary model.
     :rtype: dict
     """
-    if start_rule is None:
+    if start_rule in [None, "description"]:
         return _description_to_model(parse_tree)
     if start_rule == "reference":
         return _reference_to_model(parse_tree)
@@ -74,15 +74,11 @@ def _description_to_model(parse_tree):
             elif isinstance(parse_tree, Tree):
                 if child.data == "reference":
                     model["reference"] = _reference_to_model(child)
+                elif child.data == "variants_predicted":
+                    model["variants"] = _variants_to_model(child)
+                    model["predicted"] = True
                 elif child.data == "variants":
-                    if (
-                        len(child.children) == 1
-                        and child.children[0].data == "variants_predicted"
-                    ):
-                        model["variants"] = _variants_to_model(child.children[0])
-                        model["predicted"] = True
-                    else:
-                        model["variants"] = _variants_to_model(child)
+                    model["variants"] = _variants_to_model(child)
     return model
 
 
@@ -129,7 +125,8 @@ def _variant_to_model(variant):
     :rtype: dict
     """
     if variant.data == "_ambig":
-        variant = _solve_variant_ambiguity(variant)
+        print("ambig _solve_variant_ambiguity(variant) other")
+        # _solve_variant_ambiguity(variant)
 
     output = {"location": _location_to_model(variant.children[0])}
     if variant.data == "p_variant_predicted":
@@ -166,18 +163,22 @@ def _solve_variant_ambiguity(variant):
     :rtype: lark.Tree
     """
     if variant.children[0].children[1].data == "repeat":
+        print("1")
         return variant.children[1]
     elif variant.children[1].children[1].data == "repeat":
+        print("2")
         return variant.children[0]
     elif (
         variant.children[0].children[1].data == "deletion_insertion"
         and variant.children[1].children[1].data == "deletion"
     ):
+        print("3")
         return variant.children[0]
     elif (
         variant.children[1].children[1].data == "deletion_insertion"
         and variant.children[0].children[1].data == "deletion"
     ):
+        print("4")
         return variant.children[1]
 
 
@@ -321,7 +322,8 @@ def _inserted_to_model(inserted):
     output = []
     for inserted_subtree in inserted.children:
         if inserted_subtree.data == "_ambig":
-            inserted_subtree = _solve_insert_ambiguity(inserted_subtree)
+            print("ambig")
+            # inserted_subtree = _solve_insert_ambiguity(inserted_subtree)
         output.extend(_insert_to_model(inserted_subtree))
     return output
 
@@ -406,7 +408,8 @@ def _insert_description_to_model(insert_description):
                 raise NestedDescriptions()
             variant = description_part.children[0]
             if variant.data == "_ambig":
-                variant = _solve_variant_ambiguity(variant)
+                print("ambig _solve_variant_ambiguity")
+                # _solve_variant_ambiguity(variant)
             if len(variant.children) != 1:
                 raise NestedDescriptions()
             else:

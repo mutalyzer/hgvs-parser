@@ -784,6 +784,17 @@ DESCRIPTIONS = {
             VARIANTS["10_20delinsGA"],
         ],
     },
+    "R1:g.10_11insA": {
+        "reference": REFERENCES["R1"],
+        "coordinate_system": "g",
+        "type": "description_dna",
+        "variants": [VARIANTS["10_11insA"]],
+    },
+    "R1:10": {
+        "reference": REFERENCES["R1"],
+        "type": "description_dna",
+        "variants": [{"location": LOCATIONS["10"]}],
+    },
 }
 
 

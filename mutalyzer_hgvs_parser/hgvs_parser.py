@@ -12,14 +12,6 @@ from lark.exceptions import UnexpectedCharacters, UnexpectedEOF
 from .exceptions import UnexpectedCharacter, UnexpectedEnd
 
 
-def _all(conditions):
-    for condition in conditions:
-        print(condition)
-        if not condition:
-            return False
-    return True
-
-
 def _in(tree, data):
     for sub_tree in tree.children:
         if sub_tree.data == data:
@@ -27,295 +19,249 @@ def _in(tree, data):
     return False
 
 
-def debug(f):
-    def wrapper(*args):
-        t = f(*args)
-        if t:
-            print(f.__name__)
-        return t
-
-    return wrapper
-
-
-@debug
-def _is_uncertain_location_variants(children):
-    """
-    """
-    if (
-        children[0].data == children[1].data == "variants"
-        and _in(children[0], "variants_certain")
-        and _in(children[1], "variants_predicted")
-        and len(children[0].children) == 1
-        and len(children[0].children[0].children) == 1
-        and _in(children[0].children[0].children[0], "location")
-    ):
-        return True
-    else:
-        return False
+def _data_equals(children, path, data):
+    parent = None
+    for i, p in enumerate(path):
+        if isinstance(children, list) and len(children) > p:
+            parent = children[p]
+            if isinstance(children[p], Tree):
+                children = children[p].children
+        else:
+            return False
+    return parent.data == data
 
 
-@debug
-def _is_uncertain_location_variants_2(children):
-    """
-    """
-    CONDITIONS = [
-        len(children) == 2,
-        children[0].data == children[1].data == "variants",
-        children[0].children[0].data == "variants_certain",
-        children[1].children[0].data == "variants_predicted",
-        children[0].children[0].children[0].data == "variant",
-        children[1].children[0].children[0].data == "variant"
-     ]
-    return _all(CONDITIONS)
+def _data_in(children, path, data):
+    for p in path:
+        if len(children) > p:
+            children = children[p]
+        else:
+            return False
+    for child in children:
+        if isinstance(child, Tree) and child.data == data:
+            return True
+    return False
 
 
-@debug
-def _is_uncertain_location_variant(children):
-    """
-    """
-    if (
-        children[0].data == children[1].data == "variant"
-        and _in(children[0], "variant_certain")
-        and _in(children[1], "variant_predicted")
-        and len(children[0].children) == 1
-        and _in(children[0].children[0], "location")
-    ):
-        return True
-    else:
-        return False
+def _get_child(children, path):
+    output = None
+    for p in path:
+        if not isinstance(children, list):
+            raise Exception("Children not a list.")
+        if len(children) > p:
+            output = children[p]
+            if isinstance(children[p], Tree):
+                children = children[p].children
+        else:
+            raise Exception("Index greater then the list size.")
+    return output
 
 
-@debug
-def _is_insert_length(children):
-    if (
-        children[0].data == children[1].data == "insert"
-        and _in(children[0], "length")
-        and _in(children[1], "location")
-    ):
-        return True
-    else:
-        return False
-
-
-@debug
-def _is_insert_location(children):
-    if (
-        children[0].data == children[1].data == "insert"
-        and _in(children[0], "location")
-        and _in(children[1], "length")
-    ):
-        return True
-    else:
-        return False
-
-
-@debug
-def _variant_certain_del_delins_repeat(children):
-    """
-    variant start rule: "10_11delinsR2:g.10_15"
-    deletion insertion
-    """
-    if (
-        len(children) == 3
-        and children[0].data == "variant_certain"
-        and children[1].data == "variant_certain"
-        and children[2].data == "variant_certain"
-        and _in(children[0], "deletion")
-        and _in(children[1], "deletion_insertion")
-        and _in(children[2], "repeat")
-    ):
-        return True
-    else:
-        return False
-
-
-@debug
-def _variant_certain_insertion_repeat(children):
-    """
-    variant start rule: "10_11delinsR2:g.10_15"
-    deletion insertion
-    """
-    if (
-        len(children) == 2
-        and children[0].data == "variant_certain"
-        and children[1].data == "variant_certain"
-        and _in(children[0], "insertion")
-        and _in(children[1], "repeat")
-    ):
-        return True
-    else:
-        return False
-
-@debug
-def _variant_certain_repeat_substitution(children):
-    """
-    """
-    return (
-        len(children) == 2
-        and children[0].data == children[1].data == "variant_certain"
-        and _in(children[0], "repeat")
-        and _in(children[1], "substitution")
-        and children[1].children[1].data == "substitution"
-        and children[1].children[1].children[0].data == "inserted"
-        and children[1].children[1].children[0].children[0].data == "insert"
-        and len(children[1].children[1].children[0].children[0].children) == 1
-        and isinstance(children[1].children[1].children[0].children[0].children[0], Tree)
-        and children[1].children[1].children[0].children[0].children[0].data == "length"
-    )
-
-
-@debug
-def _variant_certain_repeat_substitution_2(children):
-    """
-    """
-    return (
-        len(children) == 2
-        and children[0].data == "variant_certain"
-        and children[1].data == "variant_certain"
-        and _in(children[0], "repeat")
-        and _in(children[1], "substitution")
-        and children[1].children[1].data == "substitution"
-        and children[1].children[1].children[0].data == "inserted"
-        and children[1].children[1].children[0].children[0].data == "insert"
-        and len(children[1].children[1].children[0].children[0].children) == 1
-        and isinstance(children[1].children[1].children[0].children[0].children[0], Token)
-    )
-
-
-@debug
-def _variants_certain_predicted_uncertain_location(children):
-    """
-    R1(R2(R3)):g.(10_15)
-    """
-    if (
-        children[0].data == children[1].data == "variants"
-        and _in(children[0], "variants_certain")
-        and _in(children[1], "variants_predicted")
-        and children[0].children[0].children[0].data == "variant"
-        and len(children[0].children[0].children[0].children) == 1
-        and children[0].children[0].children[0].children[0].data == "variant_certain"
-    ):
-        return True
-    else:
-        return False
-
-
-@debug
-def _variants_certain_predicted_variant(children):
-    """
-    R1(R2(R3)):g.(10_15)
-    """
-    if (
-        children[0].data == children[1].data == "variants"
-        and _in(children[0], "variants_certain")
-        and _in(children[1], "variants_predicted")
-        and len(children[0].children[0].children[0].children[0].children[0].children) > 1
-    ):
-        return True
-    else:
-        return False
-
-
-@debug
-def _description_dna_protein(children):
-    """
-    R1:100insA
-    - we opt for "description_dna"
-    TODO: Leave it undefined and do the check based on
-          the reference type?
-    """
-    if (len(children) == 2 and children[0].data == children[1].data == "description"
-            and _in(children[0], "description_dna") and _in(children[1], "description_protein")):
-        return True
-    else:
-        return False
+AMBIGUITIES = [
+    {
+        "type": "insert_location | insert_length - length",
+        # 10 ("inserted" start rule)
+        "conditions": lambda children: (
+            len(children) == 2
+            and children[0].data == children[1].data == "insert"
+            and _data_equals(children, [0, 0], "location")
+            and _data_equals(children, [1, 0], "length")
+        ),
+        "selected": 1,
+    },
+    {
+        "type": "variant_certain_locatio_and_substitution | variant_certain_location",
+        # R1:10
+        # on the protein side
+        "conditions": lambda children: (
+            len(children) == 2
+            and children[0].data == children[1].data == "variant_certain"
+            and _data_equals(children, [0, 0], "location")
+            and len(_get_child(children, [0]).children) == 2
+            and _data_equals(children, [0, 1], "substitution")
+            and _data_equals(children, [1, 0], "location")
+        ),
+        "selected": 1,
+    },
+    {
+        "type": "variant_certain_repeat | variant_certain_substitution - repeat",
+        # PREF:p.Ala2[10]
+        "conditions": lambda children: (
+            len(children) == 2
+            and children[0].data == "variant_certain"
+            and children[1].data == "variant_certain"
+            and _data_equals(children, [0, 1], "repeat")
+            and _data_equals(children, [1, 1], "substitution")
+            and _data_equals(children, [1, 1, 0], "inserted")
+            and _data_equals(children, [1, 1, 0, 0], "insert")
+            and len(_get_child(children, [1, 1, 0, 0]).children) == 1
+            and isinstance(_get_child(children, [1, 1, 0, 0, 0]), Tree)
+            and _data_equals(children, [1, 1, 0, 0, 0], "length")
+        ),
+        "selected": 0,
+    },
+    {
+        "type": "variant_certain_repeat | variant_certain_substitution - substitution",
+        # PREF:p.Trp26Ter, LRG_199p1:p.Trp24Cys, PREF:p.Trp26*,
+        # PREF:p.[Ser44Arg;Trp46Arg]
+        "conditions": lambda children: (
+            len(children) == 2
+            and children[0].data == children[1].data == "variant_certain"
+            and _data_equals(children, [0, 1], "repeat")
+            and _data_equals(children, [1, 1], "substitution")
+            and _data_equals(children, [1, 1, 0], "inserted")
+            and _data_equals(children, [1, 1, 0, 0], "insert")
+            and len(_get_child(children, [1, 1, 0, 0]).children) == 1
+            and isinstance(_get_child(children, [1, 1, 0, 0, 0]), Token)
+        ),
+        "selected": 1,
+    },
+    {
+        "type": "insertion | repeat - insertion",
+        # 10_11insNM_000001.1:c.100_200 ("variant" start rule)
+        "conditions": lambda children: (
+            len(children) == 2
+            and children[0].data == children[1].data == "variant_certain"
+            and _data_equals(children, [0, 1], "insertion")
+            and _data_equals(children, [1, 1], "repeat")
+        ),
+        "selected": 0,
+    },
+    {
+        "type": "insertion | repeat | substitution - insertion",
+        # R1:[1del;10_11insR2:2del]
+        "conditions": lambda children: (
+            len(children) == 3
+            and children[0].data == children[1].data == "variant_certain"
+            and _data_equals(children, [0, 1], "insertion")
+            and _data_equals(children, [1, 1], "repeat")
+            and _data_equals(children, [2, 1], "substitution")
+        ),
+        "selected": 0,
+    },
+    {
+        "type": "deletion | deletion_insertion | repeat - deletion_insertion",
+        # 10_11insNM_000001.1:c.100_200 ("variant" start rule)
+        "conditions": lambda children: (
+            len(children) == 3
+            and children[0].data
+            == children[1].data
+            == children[2].data
+            == "variant_certain"
+            and _data_equals(children, [0, 1], "deletion")
+            and _data_equals(children, [1, 1], "deletion_insertion")
+            and _data_equals(children, [2, 1], "repeat")
+        ),
+        "selected": 1,
+    },
+    {
+        "type": "deletion | deletion_insertion | repeat | substitution - deletion_insertion",
+        # R1:1delinsR2:2del
+        "conditions": lambda children: (
+            len(children) == 4
+            and children[0].data == children[1].data == "variant_certain"
+            and children[2].data == children[3].data == "variant_certain"
+            and _data_equals(children, [0, 1], "deletion")
+            and _data_equals(children, [1, 1], "deletion_insertion")
+            and _data_equals(children, [2, 1], "repeat")
+            and _data_equals(children, [3, 1], "substitution")
+        ),
+        "selected": 1,
+    },
+    {
+        "type": "deletion | deletion_insertion | repeat | substitution - deletion_insertion",
+        # R1:[1del;10_11insR2:2del]
+        "conditions": lambda children: (
+            len(children) == 4
+            and children[0].data
+            == children[1].data
+            == children[2].data
+            == children[3].data
+            == "variant_certain"
+            and _data_equals(children, [0, 1], "deletion")
+            and _data_equals(children, [1, 1], "deletion_insertion")
+            and _data_equals(children, [2, 1], "repeat")
+            and _data_equals(children, [3, 1], "substitution")
+        ),
+        "selected": 1,
+    },
+    {
+        "type": "variant_certain | variant_predicted - variant_predicted",
+        # R1(R2(R3)):g.(10_15)
+        "conditions": lambda children: (
+            len(children) == 2
+            and children[0].data == children[1].data == "variant"
+            and _data_equals(children, [0, 0], "variant_certain")
+            and _data_equals(children, [1, 0], "variant_predicted")
+            and len(_get_child(children, [0, 0]).children) == 1
+            and _data_equals(children, [0, 0, 0], "location")
+        ),
+        "selected": 0,
+    },
+    {
+        "type": "variants_certain_variant_predicted | variants_predicted_variant_certain - variants_predicted",
+        # R1(R2(R3)):g.(10_15)
+        "conditions": lambda children: (
+            len(children) == 2
+            and children[0].data == children[1].data == "variants"
+            and _data_equals(children, [0, 0], "variants_certain")
+            and _data_equals(children, [1, 0], "variants_predicted")
+            and len(_get_child(children, [1, 0]).children) == 1
+            and _data_equals(children, [0, 0, 0], "variant")
+            and _data_equals(children, [1, 0, 0], "variant")
+            and _data_equals(children, [0, 0, 0, 0], "variant_certain")
+            and _data_equals(children, [1, 0, 0, 0], "variant_certain")
+        ),
+        "selected": 0,
+    },
+    {
+        "type": "variants_certain_variant_predicted | variants_predicted_variant_certain - variants_predicted",
+        # NP_003997.1:p.(Trp24Cys)
+        "conditions": lambda children: (
+            len(children) == 2
+            and children[0].data == children[1].data == "variants"
+            and _data_equals(children, [0, 0], "variants_certain")
+            and _data_equals(children, [1, 0], "variants_predicted")
+            and len(_get_child(children, [1, 0]).children) == 1
+            and _data_equals(children, [0, 0, 0], "variant")
+            and _data_equals(children, [1, 0, 0], "variant")
+            and _data_equals(children, [0, 0, 0, 0], "variant_predicted")
+            and _data_equals(children, [1, 0, 0, 0], "variant_certain")
+        ),
+        "selected": 1,
+    },
+    {
+        "type": "description_dna | description_protein - description_dna",
+        # R1:100insA
+        # - we opt for "description_dna"
+        # TODO: Leave it undefined and do the check based on
+        #     the reference type?
+        "conditions": lambda children: (
+            len(children) == 2
+            and children[0].data == children[1].data == "description"
+            and _data_equals(children, [0, 0], "description_dna")
+            and _data_equals(children, [1, 0], "description_protein")
+        ),
+        "selected": 0,
+    },
+]
 
 
 class AmbigTransformer(Transformer):
     def _ambig(self, children):
-        if _is_uncertain_location_variants(children):
-            # "R1:(1_2)": uncertain location instead of predicted variant
-            return children[0]
-        elif _is_uncertain_location_variant(children):
-            return children[0]
-        elif _is_insert_length(children):
-            return children[0]
-        elif _is_insert_location(children):
-            return children[1]
-        elif _variant_certain_del_delins_repeat(children):
-            return children[1]
-        elif _variants_certain_predicted_uncertain_location(children):
-            return children[0]
-        elif _variant_certain_insertion_repeat(children):
-            return children[0]
-        elif _variants_certain_predicted_variant(children):
-            return children[1]
-        elif _variant_certain_repeat_substitution(children):
-            return children[1]
-        elif _variant_certain_repeat_substitution_2(children):
-            return children[0]
-        elif _description_dna_protein(children):
-            return children[0]
-        elif _is_uncertain_location_variants_2(children):
-            return children[1]
-            # if _in(children[0], "repeat") and _in(children[1], "substitution"):
-            #     if (
-            #         children[1].children[1].data == "substitution"
-            #         and children[1].children[1].children[0].data == "inserted"
-            #         and children[1].children[1].children[0].children[0].data == "insert"
-            #         and len(children[1].children[1].children[0].children[0].children)
-            #         == 1
-            #         and isinstance(
-            #             children[1].children[1].children[0].children[0].children[0],
-            #             Tree,
-            #         )
-            #         and children[1].children[1].children[0].children[0].children[0].data
-            #         == "length"
-            #     ):
-            #         # "PREF:p.Ala2[10]"
-            #         return children[0]
-            #     else:
-            #         # "PREF:p.Ser68Arg"
-            #         return children[1]
-            # elif (
-            #     _in(children[0], "substitution")
-            #     and len(children[1].children) == 1
-            #     and _in(children[1], "location")
-            # ):
-            #     return children[1]
-            # elif _in(children[0], "insertion") and _in(children[1], "repeat"):
-            #     print("7")
-            #     return children[0]
-        # elif (
-        #     children[0].data == children[1].data == "variants"
-        #     and _in(children[0], "variants_certain")
-        #     and _in(children[1], "variants_predicted")
-        # ):
-            # "NP_003997.1:p.(Trp24Cys)": on uncertain variant
-            # return children[1]
-        # elif children[0].data == "variant":
-        #     if (
-        #         len(children[1].children) > 1
-        #         and children[1].children[1].data == "repeat"
-        #     ):
-                # variant start rule: "10_11insNM_000001.1:c.100_200"
-                # return children[0]
-            # elif (
-            #     len(children[1].children) > 1
-            #     and children[1].children[1].data == "deletion_insertion"
-            #     and children[0].children[1].data == "deletion"
-            # ):
-                # variant start rule: 10_11delinsR2:g.10_15
-                # return children[1]
-        # elif children[0].data == children[1].data == "description":
-        #     if _in(children[0], "description_dna") and _in(
-        #         children[1], "description_protein"
-        #     ):
-                # "R1:100insA": we opt for "description_dna"
-                # TODO: Leave it undefined and do the check based on
-                #       the reference type?
-                # return children[0]
-        return Tree("_ambig", children)
+        print("- ambiguity")
+        for ambig in AMBIGUITIES:
+            print(f"   {ambig['type']}")
+            if ambig["conditions"](children):
+                print("    resolved")
+                return children[ambig["selected"]]
+        print(children)
+        # pydot__tree_to_png(
+        #     Tree("_ambig", children),
+        #     "ambig.png",
+        # )
+        # exit()
+        raise Exception("Ambiguity not solved.")
 
 
 class ProteinTransformer(Transformer):
@@ -411,9 +357,6 @@ class ProteinTransformer(Transformer):
 
     def p_repeat_mixed(self, children):
         return Tree("repeat_mixed", children)
-
-    def p_repeat_number(self, children):
-        return Tree("length", children)
 
     def P_COORDINATE_SYSTEM(self, name):
         return Token("COORDINATE_SYSTEM", name.value)
@@ -537,9 +480,8 @@ def parse(description, grammar_path=None, start_rule=None):
     #     "temp.png",
     # )
     # pydot__tree_to_png(
-    #                 AmbigTransformer().transform(
-    #             ProteinTransformer().transform(parser.parse(description))
-    #
+    #     AmbigTransformer().transform(
+    #         ProteinTransformer().transform(parser.parse(description))
     #     ),
     #     "temp_after_ambig.png",
     # )
