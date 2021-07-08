@@ -124,10 +124,6 @@ def _variant_to_model(variant):
     :returns: Dictionary model.
     :rtype: dict
     """
-    if variant.data == "_ambig":
-        print("ambig _solve_variant_ambiguity(variant) other")
-        # _solve_variant_ambiguity(variant)
-
     output = {"location": _location_to_model(variant.children[0])}
     if variant.data == "p_variant_predicted":
         output["predicted"] = True
@@ -145,41 +141,6 @@ def _variant_to_model(variant):
             output["inserted"] = _inserted_to_model(variant.children[1])
 
     return output
-
-
-def _solve_variant_ambiguity(variant):
-    """
-    Deals with the following type of ambiguities:
-        - `REF1:100insREF2:100_200`
-          where the variant can be seen as a repeat in which `insREF2` is
-          wrongly interpreted as a reference, or as an insertion (correct).
-          This applies to other variant types also.
-        - `REF1:100delinsREF2:100_200`
-          where this variant can be seen as a deletion in which `insREF2` is
-          wrongly interpreted as a reference, or as a deletion insertion, case
-          in which `REF2` is the reference (correct).
-    :arg lark.Tree variant: Lark parse tree.
-    :returns: Valid tree path.
-    :rtype: lark.Tree
-    """
-    if variant.children[0].children[1].data == "repeat":
-        print("1")
-        return variant.children[1]
-    elif variant.children[1].children[1].data == "repeat":
-        print("2")
-        return variant.children[0]
-    elif (
-        variant.children[0].children[1].data == "deletion_insertion"
-        and variant.children[1].children[1].data == "deletion"
-    ):
-        print("3")
-        return variant.children[0]
-    elif (
-        variant.children[1].children[1].data == "deletion_insertion"
-        and variant.children[0].children[1].data == "deletion"
-    ):
-        print("4")
-        return variant.children[1]
 
 
 def _location_to_model(location):
@@ -321,9 +282,6 @@ def _inserted_to_model(inserted):
     """
     output = []
     for inserted_subtree in inserted.children:
-        if inserted_subtree.data == "_ambig":
-            print("ambig")
-            # inserted_subtree = _solve_insert_ambiguity(inserted_subtree)
         output.extend(_insert_to_model(inserted_subtree))
     return output
 
@@ -407,9 +365,6 @@ def _insert_description_to_model(insert_description):
             if len(description_part.children) != 1:
                 raise NestedDescriptions()
             variant = description_part.children[0]
-            if variant.data == "_ambig":
-                print("ambig _solve_variant_ambiguity")
-                # _solve_variant_ambiguity(variant)
             if len(variant.children) != 1:
                 raise NestedDescriptions()
             else:
@@ -419,45 +374,3 @@ def _insert_description_to_model(insert_description):
     if insert_description.data in ["description_dna", "description_protein"]:
         output["type"] = insert_description.data
     return output
-
-
-def _solve_insert_ambiguity(insert):
-    """
-    Deals with ambiguities in the `insert` description part
-    that arise between locations and lengths.
-
-    Example:
-    - REF:100>200 - 200 can be interpreted as a location or a length.
-
-    We interpret insert as length (size) for the following:
-    - NUMBER
-    - (NUMBER)
-    - (NUMBER_NUMBER)
-    Examples:
-    - 10, (10) something of length 10 is inserted;
-    - (10_20): something of a length between 10 and 20 is inserted.
-    - (?_20)
-    - (20_?)
-    - ?
-
-    We interpret insert as location for the following:
-    - point_point
-    - (point_point)_point
-    - point_(point_point)
-    Examples:
-    - 10_20
-    - 10_(20_30)
-    - (10_20)_30
-    - (10_20)_(30_40)
-    """
-    if len(insert.children) == 2:
-        if (
-            insert.children[0].children[0].data == "length"
-            and insert.children[1].children[0].data == "location"
-        ):
-            return insert.children[0]
-        elif (
-            insert.children[0].children[0].data == "location"
-            and insert.children[1].children[0].data == "length"
-        ):
-            return insert.children[1]

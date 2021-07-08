@@ -4,19 +4,10 @@ Module for parsing HGVS variant descriptions.
 
 import os
 
-from lark.tree import pydot__tree_to_png
-
 from lark import Lark, Token, Transformer, Tree
 from lark.exceptions import UnexpectedCharacters, UnexpectedEOF
 
 from .exceptions import UnexpectedCharacter, UnexpectedEnd
-
-
-def _in(tree, data):
-    for sub_tree in tree.children:
-        if sub_tree.data == data:
-            return True
-    return False
 
 
 def _data_equals(children, path, data):
@@ -29,18 +20,6 @@ def _data_equals(children, path, data):
         else:
             return False
     return parent.data == data
-
-
-def _data_in(children, path, data):
-    for p in path:
-        if len(children) > p:
-            children = children[p]
-        else:
-            return False
-    for child in children:
-        if isinstance(child, Tree) and child.data == data:
-            return True
-    return False
 
 
 def _get_child(children, path):
@@ -186,6 +165,17 @@ AMBIGUITIES = [
         "selected": 1,
     },
     {
+        "type": "inversion | repeat - inversion",
+        # R1(t1):c.-5-3inv
+        "conditions": lambda children: (
+            len(children) == 2
+            and children[0].data == children[1].data == "variant_certain"
+            and _data_equals(children, [0, 1], "inversion")
+            and _data_equals(children, [1, 1], "repeat")
+        ),
+        "selected": 0,
+    },
+    {
         "type": "variant_certain | variant_predicted - variant_predicted",
         # R1(R2(R3)):g.(10_15)
         "conditions": lambda children: (
@@ -255,12 +245,6 @@ class AmbigTransformer(Transformer):
             if ambig["conditions"](children):
                 print("    resolved")
                 return children[ambig["selected"]]
-        print(children)
-        # pydot__tree_to_png(
-        #     Tree("_ambig", children),
-        #     "ambig.png",
-        # )
-        # exit()
         raise Exception("Ambiguity not solved.")
 
 
@@ -469,22 +453,6 @@ def parse(description, grammar_path=None, start_rule=None):
     """
     parser = HgvsParser(grammar_path, start_rule)
 
-    # pydot__tree_to_png(parser.parse(description), "temp_original.png")
-    #
-    # pydot__tree_to_png(
-    #     FinalTransformer().transform(
-    #         AmbigTransformer().transform(
-    #             ProteinTransformer().transform(parser.parse(description))
-    #         )
-    #     ),
-    #     "temp.png",
-    # )
-    # pydot__tree_to_png(
-    #     AmbigTransformer().transform(
-    #         ProteinTransformer().transform(parser.parse(description))
-    #     ),
-    #     "temp_after_ambig.png",
-    # )
     return FinalTransformer().transform(
         AmbigTransformer().transform(
             ProteinTransformer().transform(parser.parse(description))

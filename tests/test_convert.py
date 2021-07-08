@@ -489,6 +489,16 @@ VARIANTS = {
         "source": "reference",
         "location": LOCATIONS["10_11"],
     },
+    "-10+20inv": {
+        "type": "inversion",
+        "source": "reference",
+        "location": LOCATIONS["-10+20"],
+    },
+    "-10-20inv": {
+        "type": "inversion",
+        "source": "reference",
+        "location": LOCATIONS["-10-20"],
+    },
     # Conversions
     "10_20con40_50": {
         "type": "conversion",
@@ -784,9 +794,8 @@ DESCRIPTIONS = {
             VARIANTS["10_20delinsGA"],
         ],
     },
-    "R1:g.10_11insA": {
+    "R1:10_11insA": {
         "reference": REFERENCES["R1"],
-        "coordinate_system": "g",
         "type": "description_dna",
         "variants": [VARIANTS["10_11insA"]],
     },
@@ -794,6 +803,16 @@ DESCRIPTIONS = {
         "reference": REFERENCES["R1"],
         "type": "description_dna",
         "variants": [{"location": LOCATIONS["10"]}],
+    },
+    "R1:-10+20inv": {
+        "reference": REFERENCES["R1"],
+        "type": "description_dna",
+        "variants": [VARIANTS["-10+20inv"]],
+    },
+    "R1:-10-20inv": {
+        "reference": REFERENCES["R1"],
+        "type": "description_dna",
+        "variants": [VARIANTS["-10-20inv"]],
     },
 }
 

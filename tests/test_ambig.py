@@ -1,9 +1,10 @@
 import pytest
+from lark.tree import Tree
 
 from mutalyzer_hgvs_parser.convert import to_model
 from mutalyzer_hgvs_parser.hgvs_parser import _get_child
-from lark.tree import Tree
-from .test_convert import INSERTED, DESCRIPTIONS, VARIANTS, LOCATIONS, REFERENCES
+
+from .test_convert import DESCRIPTIONS, INSERTED, LOCATIONS, REFERENCES, VARIANTS
 from .test_protein import HGVS_NOMENCLATURE
 
 
@@ -22,7 +23,7 @@ from .test_protein import HGVS_NOMENCLATURE
         # 1. insert_location | insert_length - length
         ("PREF:p.Ala2[10]", "description", HGVS_NOMENCLATURE["PREF:p.Ala2[10]"]),
         # 2. variants_certain_variant_predicted | variants_predicted_variant_certain - variants_predicted
-        # 1. variant_certain_repeat | variant_certain_substitution - substitution
+        # 1. variant_certain | variant_predicted - variant_predicted
         (
             "NP_003997.1:p.(Trp24Cys)",
             "description",
@@ -40,9 +41,12 @@ from .test_protein import HGVS_NOMENCLATURE
         # deletion | deltion_insertion | repeat - deletion_insertion
         ("10_11delinsR2:g.10_15", "variant", VARIANTS["10_11delinsR2:g.10_15"]),
         # description_dna | description_protein - description_dna
-        ("R1:g.10_11insA", "description", DESCRIPTIONS["R1:g.10_11insA"]),
-        # variant_certain_locatio_and_substitution | variant_certain_location
+        ("R1:10_11insA", "description", DESCRIPTIONS["R1:10_11insA"]),
+        # 2. description_dna | description_protein - description_dna
+        # 1. variant_certain_locatio_and_substitution | variant_certain_location
         ("R1:10", "description", DESCRIPTIONS["R1:10"]),
+        # inversion | repeat - inversion
+        ("R1:-10-20inv", "description", DESCRIPTIONS["R1:-10-20inv"]),
     ],
 )
 def test_ambiguities(description, start_rule, model):
