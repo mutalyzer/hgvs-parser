@@ -211,6 +211,10 @@ LOCATIONS = {
     },
 }
 
+@pytest.mark.parametrize("description, model", _get_tests(LOCATIONS))
+def test_location_to_model(description, model):
+    assert to_model(description, "location") == model
+
 
 LENGTHS = {
     "4": {"value": 4, "type": "point"},
@@ -235,9 +239,9 @@ LENGTHS = {
 }
 
 
-@pytest.mark.parametrize("description, model", _get_tests(LOCATIONS))
-def test_location_to_model(description, model):
-    assert to_model(description, "location") == model
+@pytest.mark.parametrize("description, model", _get_tests(LENGTHS))
+def test_length_to_model(description, model):
+    assert to_model(description, "length") == model
 
 
 INSERTED = {

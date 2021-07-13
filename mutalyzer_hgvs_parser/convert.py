@@ -8,8 +8,127 @@ from lark.lexer import Token
 from .exceptions import NestedDescriptions, UnsupportedStartRule
 from .hgvs_parser import parse
 
+from lark import Lark, Token, Transformer, Tree
 
-def to_model(description, start_rule=None):
+
+def _to_dict(d_list):
+    output = {}
+    for d in d_list:
+        if isinstance(d, dict):
+            output.update(d)
+        # else:
+        #     raise Exception("not dict")
+    return output
+
+
+class ConvertTransformer(Transformer):
+
+    def description(self, children):
+        return _to_dict(children)
+
+    def description_dna(self, children):
+        output = {"type": "description_dna"}
+        output.update(_to_dict(children))
+        return output
+
+    def reference(self, children):
+        output = {}
+        output.update(children[0])
+        if len(children) == 2:
+            output.update(children[0])
+            output["selector"] = children[1]["reference"]
+        return {"reference": output}
+
+    def ID(self, name):
+        return {"id": name.value}
+
+    def COORDINATE_SYSTEM(self, name):
+        return {"coordinate_system": name.value}
+
+    def variants(self, children):
+        return {"variants": children}
+
+    def variant(self, children):
+        return _to_dict(children)
+
+    def deletion(self, children):
+        output = {"type": "deletion"}
+        output.update(_to_dict(children))
+        return output
+
+    def location(self, children):
+        return {"location": _to_dict(children)}
+
+    def length(self, children):
+        length = children[0]
+        if isinstance(length, Token) and length.type == "NUMBER":
+            return {"length": {"type": "point", "value": int(length.value)}}
+        if isinstance(length, dict):
+            if length.get("type") == "range":
+                length["uncertain"] = True
+                if length["start"].get("uncertain") is None:
+                    length["start"]["value"] = length["start"]["position"]
+                    length["start"].pop("position")
+                if length["end"].get("uncertain") is None:
+                    length["end"]["value"] = length["end"]["position"]
+                    length["end"].pop("position")
+            return {"length": length}
+
+    def range(self, children):
+        return {"start": children[0], "end": children[1], "type": "range"}
+
+    def exact_range(self, children):
+        return {
+            "start": self.point([children[0]]),
+            "end": self.point([children[1]]),
+            "type": "range"
+        }
+
+    def uncertain_point(self, children):
+        return {"start": children[0], "end": children[1], "type": "range", "uncertain": True}
+
+    def point(self, children):
+        output = {"type": "point"}
+        for child in children:
+            if isinstance(child, dict):
+                output.update(child)
+            elif isinstance(child, Token) and child.type == "NUMBER":
+                output["position"] = int(child.value)
+        return output
+
+    def OFFSET(self, name):
+        output = {}
+        if "?" in name.value:
+            output["uncertain"] = True
+            if "+" in name.value:
+                output["downstream"] = True
+            elif "-" in name.value:
+                output["upstream"] = True
+        else:
+            output["value"] = int(name.value)
+        return {"offset": output}
+
+    def OUTSIDE_CDS(self, name):
+        output = {}
+        if name.value == "*":
+            output["outside_cds"] = "downstream"
+        elif name.value == "-":
+            output["outside_cds"] = "upstream"
+        return output
+
+    def UNKNOWN(self, name):
+        return {"uncertain": True}
+
+
+def to_model(description, start_rule="description"):
+    return ConvertTransformer().transform(parse(description, start_rule=start_rule))[start_rule]
+
+
+def parse_tree_to_model(parse_tree, start_rule="description"):
+    return ConvertTransformer().transform(parse_tree)[start_rule]
+
+
+def _to_model(description, start_rule=None):
     """
     Convert an  HGVS description, or parts of it, e.g., a location,
     a variants list, etc., if an appropriate alternative `start_rule`
@@ -24,7 +143,7 @@ def to_model(description, start_rule=None):
     return parse_tree_to_model(parse_tree, start_rule)
 
 
-def parse_tree_to_model(parse_tree, start_rule=None):
+def _parse_tree_to_model(parse_tree, start_rule=None):
     """
     Convert a parse tree to a nested dictionary model.
 
