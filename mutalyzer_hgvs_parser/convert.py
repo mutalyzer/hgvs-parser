@@ -25,7 +25,7 @@ class ConvertTransformer(Transformer):
 
     def description(self, children):
         output = _to_dict(children)
-        if output.get("variants_predicted"):
+        if output.get("variants_predicted") is not None:
             output["variants"] = output["variants_predicted"]
             output["predicted"] = True
             output.pop("variants_predicted")
@@ -33,6 +33,11 @@ class ConvertTransformer(Transformer):
 
     def description_dna(self, children):
         output = {"type": "description_dna"}
+        output.update(_to_dict(children))
+        return output
+
+    def description_protein(self, children):
+        output = {"type": "description_protein"}
         output.update(_to_dict(children))
         return output
 
@@ -55,7 +60,6 @@ class ConvertTransformer(Transformer):
 
     def variants_predicted(self, children):
         return {"variants_predicted": [child["variant"] for child in children]}
-
 
     def variant(self, children):
         return {"variant": _to_dict(children)}
@@ -84,7 +88,7 @@ class ConvertTransformer(Transformer):
     def duplication(self, children):
         output = {"type": "duplication", "source": "reference"}
         if children:
-            output["deleted"] = children[0]["inserted"]
+            output["inserted"] = children[0]["inserted"]
         return output
 
     def equal(self, children):
@@ -107,7 +111,6 @@ class ConvertTransformer(Transformer):
         output.update(_to_dict(children))
         return output
 
-
     def substitution(self, children):
         output = {"type": "substitution", "source": "reference"}
         if len(children) == 2:
@@ -116,6 +119,16 @@ class ConvertTransformer(Transformer):
             output["inserted"] = children[1]["inserted"]
         else:
             output.update(_to_dict(children))
+        return output
+
+    def extension(self, children):
+        output = {"type": "extension", "source": "reference"}
+        output.update(_to_dict(children))
+        return output
+
+    def frame_shift(self, children):
+        output = {"type": "frame_shift", "source": "reference"}
+        output.update(_to_dict(children))
         return output
 
     def location(self, children):
@@ -134,6 +147,8 @@ class ConvertTransformer(Transformer):
                 if length["end"].get("uncertain") is None:
                     length["end"]["value"] = length["end"]["position"]
                     length["end"].pop("position")
+            elif length.get("uncertain"):
+                length["type"] = "point"
             return {"length": length}
 
     def range(self, children):
@@ -227,6 +242,12 @@ class ConvertTransformer(Transformer):
 
     def SEQUENCE(self, name):
         return {"sequence": name.value}
+
+    def P_SEQUENCE(self, name):
+        return {"sequence": name.value}
+
+    def AA(self, name):
+        return {"amino_acid": name.value}
 
 
 def to_model(description, start_rule=None):

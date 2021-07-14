@@ -223,6 +223,7 @@ LENGTHS = {
     "10": {"value": 10, "type": "point"},
     "19": {"value": 19, "type": "point"},
     "20": {"type": "point", "value": 20},
+    "?": {"uncertain": True, "type": "point"},
     "(10)": {"value": 10, "type": "point"},
     "(10_20)": {
         "type": "range",
@@ -255,6 +256,10 @@ INSERTED = {
     "[A;10_20]": [
         {"sequence": "A", "source": "description"},
         {"source": "reference", "location": LOCATIONS["10_20"]},
+    ],
+    "[A;?]": [
+        {"sequence": "A", "source": "description"},
+        {"length": LENGTHS["?"]},
     ],
     "[A;10_20inv]": [
         {"sequence": "A", "source": "description"},
@@ -371,6 +376,17 @@ VARIANTS = {
         "type": "duplication",
         "source": "reference",
         "location": LOCATIONS["10"],
+    },
+    "10dupG": {
+        "type": "duplication",
+        "source": "reference",
+        "location": LOCATIONS["10"],
+        "inserted": [
+            {
+                "sequence": "G",
+                "source": "description"
+            }
+        ]
     },
     # Insertions
     "10_11insA": {
