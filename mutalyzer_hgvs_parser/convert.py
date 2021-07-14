@@ -24,7 +24,12 @@ def _to_dict(d_list):
 class ConvertTransformer(Transformer):
 
     def description(self, children):
-        return _to_dict(children)
+        output = _to_dict(children)
+        if output.get("variants_predicted"):
+            output["variants"] = output["variants_predicted"]
+            output["predicted"] = True
+            output.pop("variants_predicted")
+        return {"description": output}
 
     def description_dna(self, children):
         output = {"type": "description_dna"}
@@ -46,14 +51,71 @@ class ConvertTransformer(Transformer):
         return {"coordinate_system": name.value}
 
     def variants(self, children):
-        return {"variants": children}
+        return {"variants": [child["variant"] for child in children]}
+
+    def variants_predicted(self, children):
+        return {"variants_predicted": [child["variant"] for child in children]}
+
 
     def variant(self, children):
-        return _to_dict(children)
+        return {"variant": _to_dict(children)}
+
+    def conversion(self, children):
+        output = {"type": "conversion", "source": "reference"}
+        output.update(_to_dict(children))
+        return output
 
     def deletion(self, children):
-        output = {"type": "deletion"}
+        output = {"type": "deletion", "source": "reference"}
+        if children:
+            output["deleted"] = children[0]["inserted"]
+        return output
+
+    def deletion_insertion(self, children):
+        output = {"type": "deletion_insertion", "source": "reference"}
+        if len(children) == 1:
+            output["inserted"] = children[0]["inserted"]
+        if len(children) == 2:
+            output["deleted"] = children[0]["inserted"]
+            output["inserted"] = children[1]["inserted"]
+
+        return output
+
+    def duplication(self, children):
+        output = {"type": "duplication", "source": "reference"}
+        if children:
+            output["deleted"] = children[0]["inserted"]
+        return output
+
+    def equal(self, children):
+        output = {"type": "equal", "source": "reference"}
         output.update(_to_dict(children))
+        return output
+
+    def insertion(self, children):
+        output = {"type": "insertion", "source": "reference"}
+        output.update(_to_dict(children))
+        return output
+
+    def inversion(self, children):
+        output = {"type": "inversion", "source": "reference"}
+        output.update(_to_dict(children))
+        return output
+
+    def repeat(self, children):
+        output = {"type": "repeat", "source": "reference"}
+        output.update(_to_dict(children))
+        return output
+
+
+    def substitution(self, children):
+        output = {"type": "substitution", "source": "reference"}
+        if len(children) == 2:
+            children[0]["source"] = "description"
+            output["deleted"] = [children[0]]
+            output["inserted"] = children[1]["inserted"]
+        else:
+            output.update(_to_dict(children))
         return output
 
     def location(self, children):
@@ -119,12 +181,63 @@ class ConvertTransformer(Transformer):
     def UNKNOWN(self, name):
         return {"uncertain": True}
 
+    def inserted(self, children):
+        output = []
+        for child in children:
+            output.extend(child["insert"])
+        return {"inserted": output}
 
-def to_model(description, start_rule="description"):
+    def insert(self, children):
+        output = []
+        if len(children) > 1 and children[0].get("repeat_mixed"):
+            for child in children:
+                if child.get("repeat_mixed"):
+                    output.append(child["repeat_mixed"])
+        else:
+            child_output = _to_dict(children)
+            if child_output.get("sequence"):
+                child_output["source"] = "description"
+            elif child_output.get("location"):
+                child_output["source"] = "reference"
+            elif child_output.get("type"):
+                if len(child_output["variants"]) != 1:
+                    raise NestedDescriptions()
+                if len(child_output["variants"][0]) != 1:
+                    raise NestedDescriptions()
+                child_output["source"] = child_output["reference"]
+                child_output.update(child_output["variants"][0])
+                child_output.pop("reference")
+                child_output.pop("variants")
+            output.append(child_output)
+        return {"insert": output}
+
+    def repeat_number(self, children):
+        return {"repeat_number": self.length(children)["length"]}
+
+    def repeat_mixed(self, children):
+        output = _to_dict(children)
+        if output.get("sequence"):
+            output["source"] = "description"
+        elif output.get("location"):
+            output["source"] = "reference"
+        return {"repeat_mixed": output}
+
+    def INVERTED(self, name):
+        return {"inverted": True}
+
+    def SEQUENCE(self, name):
+        return {"sequence": name.value}
+
+
+def to_model(description, start_rule=None):
+    if start_rule is None:
+        start_rule = "description"
     return ConvertTransformer().transform(parse(description, start_rule=start_rule))[start_rule]
 
 
-def parse_tree_to_model(parse_tree, start_rule="description"):
+def parse_tree_to_model(parse_tree, start_rule=None):
+    if start_rule is None:
+        start_rule = "description"
     return ConvertTransformer().transform(parse_tree)[start_rule]
 
 
