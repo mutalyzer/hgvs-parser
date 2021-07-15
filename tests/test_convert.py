@@ -5,7 +5,7 @@ Tests for the lark tree to dictionary converter.
 import pytest
 
 from mutalyzer_hgvs_parser.convert import to_model
-from mutalyzer_hgvs_parser.exceptions import NestedDescriptions, UnsupportedStartRule
+from mutalyzer_hgvs_parser.exceptions import NestedDescriptions
 
 
 def _get_tests(tests):
@@ -211,6 +211,7 @@ LOCATIONS = {
     },
 }
 
+
 @pytest.mark.parametrize("description, model", _get_tests(LOCATIONS))
 def test_location_to_model(description, model):
     assert to_model(description, "location") == model
@@ -381,12 +382,7 @@ VARIANTS = {
         "type": "duplication",
         "source": "reference",
         "location": LOCATIONS["10"],
-        "inserted": [
-            {
-                "sequence": "G",
-                "source": "description"
-            }
-        ]
+        "inserted": [{"sequence": "G", "source": "description"}],
     },
     # Insertions
     "10_11insA": {
@@ -883,11 +879,6 @@ def _get_mix():
 @pytest.mark.parametrize("description, model", _get_tests(_get_mix()))
 def test_mix(description, model):
     assert to_model(description) == model
-
-
-def test_unsupported_start_rule():
-    with pytest.raises(UnsupportedStartRule):
-        to_model("10_20", "range")
 
 
 @pytest.mark.parametrize(

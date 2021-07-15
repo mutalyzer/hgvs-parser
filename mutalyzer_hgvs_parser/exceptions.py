@@ -110,11 +110,5 @@ TERMINALS = {
 }
 
 
-class UnsupportedStartRule(Exception):
-    def __init__(self, start_rule):
-        self.message = "Start rule '{}' not supported.".format(start_rule)
-        super().__init__(self.message)
-
-
 class NestedDescriptions(Exception):
     pass

@@ -26,7 +26,7 @@ def _to_model(description, start_rule):
     CLI wrapper for parsing, converting, and printing the model.
     """
     parse_tree = parse(description, start_rule=start_rule)
-    model = parse_tree_to_model(parse_tree, start_rule)
+    model = parse_tree_to_model(parse_tree)
     if isinstance(model, dict) or isinstance(model, list):
         print(json.dumps(model, indent=2))
     else:

@@ -8,33 +8,7 @@ from lark import Lark, Token, Transformer, Tree
 from lark.exceptions import UnexpectedCharacters, UnexpectedEOF
 
 from .exceptions import UnexpectedCharacter, UnexpectedEnd
-
-
-def _data_equals(children, path, data):
-    parent = None
-    for i, p in enumerate(path):
-        if isinstance(children, list) and len(children) > p:
-            parent = children[p]
-            if isinstance(children[p], Tree):
-                children = children[p].children
-        else:
-            return False
-    return parent.data == data
-
-
-def _get_child(children, path):
-    output = None
-    for p in path:
-        if not isinstance(children, list):
-            raise Exception("Children not a list.")
-        if len(children) > p:
-            output = children[p]
-            if isinstance(children[p], Tree):
-                children = children[p].children
-        else:
-            raise Exception("Index greater then the list size.")
-    return output
-
+from .util import data_equals, get_child
 
 AMBIGUITIES = [
     {
@@ -43,8 +17,8 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) == 2
             and children[0].data == children[1].data == "insert"
-            and _data_equals(children, [0, 0], "location")
-            and _data_equals(children, [1, 0], "length")
+            and data_equals(children, [0, 0], "location")
+            and data_equals(children, [1, 0], "length")
         ),
         "selected": 1,
     },
@@ -55,10 +29,10 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) == 2
             and children[0].data == children[1].data == "variant_certain"
-            and _data_equals(children, [0, 0], "location")
-            and len(_get_child(children, [0]).children) == 2
-            and _data_equals(children, [0, 1], "substitution")
-            and _data_equals(children, [1, 0], "location")
+            and data_equals(children, [0, 0], "location")
+            and len(get_child(children, [0]).children) == 2
+            and data_equals(children, [0, 1], "substitution")
+            and data_equals(children, [1, 0], "location")
         ),
         "selected": 1,
     },
@@ -69,13 +43,13 @@ AMBIGUITIES = [
             len(children) == 2
             and children[0].data == "variant_certain"
             and children[1].data == "variant_certain"
-            and _data_equals(children, [0, 1], "repeat")
-            and _data_equals(children, [1, 1], "substitution")
-            and _data_equals(children, [1, 1, 0], "inserted")
-            and _data_equals(children, [1, 1, 0, 0], "insert")
-            and len(_get_child(children, [1, 1, 0, 0]).children) == 1
-            and isinstance(_get_child(children, [1, 1, 0, 0, 0]), Tree)
-            and _data_equals(children, [1, 1, 0, 0, 0], "length")
+            and data_equals(children, [0, 1], "repeat")
+            and data_equals(children, [1, 1], "substitution")
+            and data_equals(children, [1, 1, 0], "inserted")
+            and data_equals(children, [1, 1, 0, 0], "insert")
+            and len(get_child(children, [1, 1, 0, 0]).children) == 1
+            and isinstance(get_child(children, [1, 1, 0, 0, 0]), Tree)
+            and data_equals(children, [1, 1, 0, 0, 0], "length")
         ),
         "selected": 0,
     },
@@ -86,12 +60,12 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) == 2
             and children[0].data == children[1].data == "variant_certain"
-            and _data_equals(children, [0, 1], "repeat")
-            and _data_equals(children, [1, 1], "substitution")
-            and _data_equals(children, [1, 1, 0], "inserted")
-            and _data_equals(children, [1, 1, 0, 0], "insert")
-            and len(_get_child(children, [1, 1, 0, 0]).children) == 1
-            and isinstance(_get_child(children, [1, 1, 0, 0, 0]), Token)
+            and data_equals(children, [0, 1], "repeat")
+            and data_equals(children, [1, 1], "substitution")
+            and data_equals(children, [1, 1, 0], "inserted")
+            and data_equals(children, [1, 1, 0, 0], "insert")
+            and len(get_child(children, [1, 1, 0, 0]).children) == 1
+            and isinstance(get_child(children, [1, 1, 0, 0, 0]), Token)
         ),
         "selected": 1,
     },
@@ -101,8 +75,8 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) == 2
             and children[0].data == children[1].data == "variant_certain"
-            and _data_equals(children, [0, 1], "insertion")
-            and _data_equals(children, [1, 1], "repeat")
+            and data_equals(children, [0, 1], "insertion")
+            and data_equals(children, [1, 1], "repeat")
         ),
         "selected": 0,
     },
@@ -112,9 +86,9 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) == 3
             and children[0].data == children[1].data == "variant_certain"
-            and _data_equals(children, [0, 1], "insertion")
-            and _data_equals(children, [1, 1], "repeat")
-            and _data_equals(children, [2, 1], "substitution")
+            and data_equals(children, [0, 1], "insertion")
+            and data_equals(children, [1, 1], "repeat")
+            and data_equals(children, [2, 1], "substitution")
         ),
         "selected": 0,
     },
@@ -127,9 +101,9 @@ AMBIGUITIES = [
             == children[1].data
             == children[2].data
             == "variant_certain"
-            and _data_equals(children, [0, 1], "deletion")
-            and _data_equals(children, [1, 1], "deletion_insertion")
-            and _data_equals(children, [2, 1], "repeat")
+            and data_equals(children, [0, 1], "deletion")
+            and data_equals(children, [1, 1], "deletion_insertion")
+            and data_equals(children, [2, 1], "repeat")
         ),
         "selected": 1,
     },
@@ -140,10 +114,10 @@ AMBIGUITIES = [
             len(children) == 4
             and children[0].data == children[1].data == "variant_certain"
             and children[2].data == children[3].data == "variant_certain"
-            and _data_equals(children, [0, 1], "deletion")
-            and _data_equals(children, [1, 1], "deletion_insertion")
-            and _data_equals(children, [2, 1], "repeat")
-            and _data_equals(children, [3, 1], "substitution")
+            and data_equals(children, [0, 1], "deletion")
+            and data_equals(children, [1, 1], "deletion_insertion")
+            and data_equals(children, [2, 1], "repeat")
+            and data_equals(children, [3, 1], "substitution")
         ),
         "selected": 1,
     },
@@ -157,10 +131,10 @@ AMBIGUITIES = [
             == children[2].data
             == children[3].data
             == "variant_certain"
-            and _data_equals(children, [0, 1], "deletion")
-            and _data_equals(children, [1, 1], "deletion_insertion")
-            and _data_equals(children, [2, 1], "repeat")
-            and _data_equals(children, [3, 1], "substitution")
+            and data_equals(children, [0, 1], "deletion")
+            and data_equals(children, [1, 1], "deletion_insertion")
+            and data_equals(children, [2, 1], "repeat")
+            and data_equals(children, [3, 1], "substitution")
         ),
         "selected": 1,
     },
@@ -170,8 +144,8 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) == 2
             and children[0].data == children[1].data == "variant_certain"
-            and _data_equals(children, [0, 1], "inversion")
-            and _data_equals(children, [1, 1], "repeat")
+            and data_equals(children, [0, 1], "inversion")
+            and data_equals(children, [1, 1], "repeat")
         ),
         "selected": 0,
     },
@@ -181,10 +155,10 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) == 2
             and children[0].data == children[1].data == "variant"
-            and _data_equals(children, [0, 0], "variant_certain")
-            and _data_equals(children, [1, 0], "variant_predicted")
-            and len(_get_child(children, [0, 0]).children) == 1
-            and _data_equals(children, [0, 0, 0], "location")
+            and data_equals(children, [0, 0], "variant_certain")
+            and data_equals(children, [1, 0], "variant_predicted")
+            and len(get_child(children, [0, 0]).children) == 1
+            and data_equals(children, [0, 0, 0], "location")
         ),
         "selected": 0,
     },
@@ -194,13 +168,13 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) == 2
             and children[0].data == children[1].data == "variants"
-            and _data_equals(children, [0, 0], "variants_certain")
-            and _data_equals(children, [1, 0], "variants_predicted")
-            and len(_get_child(children, [1, 0]).children) == 1
-            and _data_equals(children, [0, 0, 0], "variant")
-            and _data_equals(children, [1, 0, 0], "variant")
-            and _data_equals(children, [0, 0, 0, 0], "variant_certain")
-            and _data_equals(children, [1, 0, 0, 0], "variant_certain")
+            and data_equals(children, [0, 0], "variants_certain")
+            and data_equals(children, [1, 0], "variants_predicted")
+            and len(get_child(children, [1, 0]).children) == 1
+            and data_equals(children, [0, 0, 0], "variant")
+            and data_equals(children, [1, 0, 0], "variant")
+            and data_equals(children, [0, 0, 0, 0], "variant_certain")
+            and data_equals(children, [1, 0, 0, 0], "variant_certain")
         ),
         "selected": 0,
     },
@@ -210,13 +184,13 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) == 2
             and children[0].data == children[1].data == "variants"
-            and _data_equals(children, [0, 0], "variants_certain")
-            and _data_equals(children, [1, 0], "variants_predicted")
-            and len(_get_child(children, [1, 0]).children) == 1
-            and _data_equals(children, [0, 0, 0], "variant")
-            and _data_equals(children, [1, 0, 0], "variant")
-            and _data_equals(children, [0, 0, 0, 0], "variant_predicted")
-            and _data_equals(children, [1, 0, 0, 0], "variant_certain")
+            and data_equals(children, [0, 0], "variants_certain")
+            and data_equals(children, [1, 0], "variants_predicted")
+            and len(get_child(children, [1, 0]).children) == 1
+            and data_equals(children, [0, 0, 0], "variant")
+            and data_equals(children, [1, 0, 0], "variant")
+            and data_equals(children, [0, 0, 0, 0], "variant_predicted")
+            and data_equals(children, [1, 0, 0, 0], "variant_certain")
         ),
         "selected": 1,
     },
@@ -229,8 +203,8 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) == 2
             and children[0].data == children[1].data == "description"
-            and _data_equals(children, [0, 0], "description_dna")
-            and _data_equals(children, [1, 0], "description_protein")
+            and data_equals(children, [0, 0], "description_dna")
+            and data_equals(children, [1, 0], "description_protein")
         ),
         "selected": 0,
     },
@@ -362,7 +336,7 @@ class FinalTransformer(Transformer):
         return Tree("variants", children)
 
 
-def read_files(file_name):
+def _read_grammar_file(file_name):
     grammar_path = os.path.join(os.path.dirname(__file__), f"ebnf/{file_name}")
     with open(grammar_path) as grammar_file:
         return grammar_file.read()
@@ -389,11 +363,11 @@ class HgvsParser:
             with open(self._grammar_path) as grammar_file:
                 grammar = grammar_file.read()
         else:
-            grammar = read_files("top.g")
-            grammar += read_files("dna.g")
-            grammar += read_files("protein.g")
-            grammar += read_files("reference.g")
-            grammar += read_files("common.g")
+            grammar = _read_grammar_file("top.g")
+            grammar += _read_grammar_file("dna.g")
+            grammar += _read_grammar_file("protein.g")
+            grammar += _read_grammar_file("reference.g")
+            grammar += _read_grammar_file("common.g")
 
         start_rule = self._start_rule if self._start_rule else "description"
 
