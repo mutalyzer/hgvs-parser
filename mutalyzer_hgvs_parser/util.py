@@ -35,3 +35,13 @@ def get_child(children, path):
         else:
             raise Exception("Index greater then the list size.")
     return output
+
+
+def get_only_value(children):
+    """
+    It happens quite often to
+    """
+    if len(children) == 1:
+        return children[0][list(children[0])[0]]
+    else:
+        raise Exception("Not only one key dictionary.")

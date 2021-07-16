@@ -1,5 +1,6 @@
 """
-Module for converting lark parse trees to their equivalent dictionary models.
+Module for converting HGVS descriptions and lark parse trees
+to their equivalent dictionary models.
 """
 
 from lark import Token, Transformer
@@ -7,27 +8,55 @@ from lark.exceptions import VisitError
 
 from .exceptions import NestedDescriptions
 from .hgvs_parser import parse
-from .util import to_dict
+from .util import get_only_value, to_dict
+
+
+def to_model(description, start_rule=None):
+    """
+    Convert an  HGVS description, or parts of it, e.g., a location,
+    a variants list, etc., if an appropriate alternative `start_rule`
+    is provided, to a nested dictionary model.
+
+    :arg str description: HGVS description.
+    :arg str start_rule: Alternative start rule.
+    :returns: Description dictionary model.
+    :rtype: dict
+    """
+    parse_tree = parse(description, start_rule=start_rule)
+    return parse_tree_to_model(parse_tree)
+
+
+def parse_tree_to_model(parse_tree):
+    """
+    Convert a parse tree to a nested dictionary model.
+
+    :arg lark.Tree parse_tree: HGVS description.
+    :returns: Description dictionary model.
+    :rtype: dict
+    """
+    try:
+        model = Converter().transform(parse_tree)
+    except VisitError as e:
+        raise e.orig_exc
+
+    return model[list(model)[0]]
 
 
 class Converter(Transformer):
     def description(self, children):
-        output = to_dict(children)
-        if output.get("variants_predicted") is not None:
-            output["variants"] = output["variants_predicted"]
-            output["predicted"] = True
-            output.pop("variants_predicted")
-        return {"description": output}
+        return {"description": get_only_value(children)}
 
     def description_dna(self, children):
         output = {"type": "description_dna"}
         output.update(to_dict(children))
-        return output
+        _predicted(output)
+        return {"description_dna": output}
 
     def description_protein(self, children):
         output = {"type": "description_protein"}
         output.update(to_dict(children))
-        return output
+        _predicted(output)
+        return {"description_protein": output}
 
     def reference(self, children):
         output = {}
@@ -120,42 +149,7 @@ class Converter(Transformer):
         return output
 
     def location(self, children):
-        return {"location": to_dict(children)}
-
-    def length(self, children):
-        length = children[0]
-        if isinstance(length, Token) and length.type == "NUMBER":
-            return {"length": {"type": "point", "value": int(length.value)}}
-        if isinstance(length, dict):
-            if length.get("type") == "range":
-                length["uncertain"] = True
-                if length["start"].get("uncertain") is None:
-                    length["start"]["value"] = length["start"]["position"]
-                    length["start"].pop("position")
-                if length["end"].get("uncertain") is None:
-                    length["end"]["value"] = length["end"]["position"]
-                    length["end"].pop("position")
-            elif length.get("uncertain"):
-                length["type"] = "point"
-            return {"length": length}
-
-    def range(self, children):
-        return {"start": children[0], "end": children[1], "type": "range"}
-
-    def exact_range(self, children):
-        return {
-            "start": self.point([children[0]]),
-            "end": self.point([children[1]]),
-            "type": "range",
-        }
-
-    def uncertain_point(self, children):
-        return {
-            "start": children[0],
-            "end": children[1],
-            "type": "range",
-            "uncertain": True,
-        }
+        return {"location": get_only_value(children)}
 
     def point(self, children):
         output = {"type": "point"}
@@ -164,7 +158,33 @@ class Converter(Transformer):
                 output.update(child)
             elif isinstance(child, Token) and child.type == "NUMBER":
                 output["position"] = int(child.value)
-        return output
+        return {"point": output}
+
+    def uncertain_point(self, children):
+        return {
+            "uncertain_point": {
+                "start": get_only_value([children[0]]),
+                "end": get_only_value([children[1]]),
+                "type": "range",
+                "uncertain": True,
+            }
+        }
+
+    def range(self, children):
+        return {
+            "range": {
+                "start": get_only_value([children[0]]),
+                "end": get_only_value([children[1]]),
+                "type": "range",
+            }
+        }
+
+    def exact_range(self, children):
+        return {
+            "start": get_only_value([self.point([children[0]])]),
+            "end": get_only_value([self.point([children[1]])]),
+            "type": "range",
+        }
 
     def OFFSET(self, name):
         output = {}
@@ -196,28 +216,15 @@ class Converter(Transformer):
         return {"inserted": output}
 
     def insert(self, children):
-        output = []
         if len(children) > 1 and children[0].get("repeat_mixed"):
-            for child in children:
-                if child.get("repeat_mixed"):
-                    output.append(child["repeat_mixed"])
-        else:
-            child_output = to_dict(children)
-            if child_output.get("sequence"):
-                child_output["source"] = "description"
-            elif child_output.get("location"):
-                child_output["source"] = "reference"
-            elif child_output.get("type"):
-                if len(child_output["variants"]) != 1:
-                    raise NestedDescriptions()
-                if len(child_output["variants"][0]) != 1:
-                    raise NestedDescriptions()
-                child_output["source"] = child_output["reference"]
-                child_output.update(child_output["variants"][0])
-                child_output.pop("reference")
-                child_output.pop("variants")
-            output.append(child_output)
-        return {"insert": output}
+            return _insert_repeat_mixed(children)
+        new_children = []
+        for child in children:
+            if child.get("description_dna") or child.get("description_protein"):
+                new_children.append(get_only_value([child]))
+            else:
+                new_children.append(child)
+        return _insert(new_children)
 
     def repeat_number(self, children):
         return {"repeat_number": self.length(children)["length"]}
@@ -233,6 +240,23 @@ class Converter(Transformer):
     def INVERTED(self, name):
         return {"inverted": True}
 
+    def length(self, children):
+        length = children[0]
+        if isinstance(length, Token) and length.type == "NUMBER":
+            return {"length": {"type": "point", "value": int(length.value)}}
+        if isinstance(length, dict):
+            if length.get("type") == "range":
+                length["uncertain"] = True
+                if length["start"].get("uncertain") is None:
+                    length["start"]["value"] = length["start"]["position"]
+                    length["start"].pop("position")
+                if length["end"].get("uncertain") is None:
+                    length["end"]["value"] = length["end"]["position"]
+                    length["end"].pop("position")
+            elif length.get("uncertain"):
+                length["type"] = "point"
+            return {"length": length}
+
     def SEQUENCE(self, name):
         return {"sequence": name.value}
 
@@ -243,15 +267,43 @@ class Converter(Transformer):
         return {"amino_acid": name.value}
 
 
-def to_model(description, start_rule=None):
-    parse_tree = parse(description, start_rule=start_rule)
-    return parse_tree_to_model(parse_tree)
+def _predicted(model):
+    """
+
+    :param model:
+    """
+    if model.get("variants_predicted") is not None:
+        model["variants"] = model["variants_predicted"]
+        model["predicted"] = True
+        model.pop("variants_predicted")
 
 
-def parse_tree_to_model(parse_tree):
-    try:
-        model = Converter().transform(parse_tree)
-    except VisitError as e:
-        raise e.orig_exc
+def _insert_repeat_mixed(children):
+    """
+    A repeat mixed ("AA[5]TTT[7]") is a list.
+    """
+    output = []
+    for child in children:
+        if child.get("repeat_mixed"):
+            output.append(child["repeat_mixed"])
+        else:
+            raise Exception("Not repeat mixed.")
+    return {"insert": output}
 
-    return model[list(model)[0]]
+
+def _insert(children):
+    output = to_dict(children)
+    if output.get("sequence"):
+        output["source"] = "description"
+    elif output.get("location"):
+        output["source"] = "reference"
+    elif output.get("type"):
+        if len(output["variants"]) != 1:
+            raise NestedDescriptions()
+        if len(output["variants"][0]) != 1:
+            raise NestedDescriptions()
+        output["source"] = output["reference"]
+        output.update(output["variants"][0])
+        output.pop("reference")
+        output.pop("variants")
+    return {"insert": [output]}
