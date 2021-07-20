@@ -1,1 +1,7 @@
+include mutalyzer_hgvs_parser/ebnf/common.g
+include mutalyzer_hgvs_parser/ebnf/description.g
+include mutalyzer_hgvs_parser/ebnf/dna.g
 include mutalyzer_hgvs_parser/ebnf/hgvs_mutalyzer_3.g
+include mutalyzer_hgvs_parser/ebnf/protein.g
+include mutalyzer_hgvs_parser/ebnf/reference.g
+include mutalyzer_hgvs_parser/ebnf/top.g

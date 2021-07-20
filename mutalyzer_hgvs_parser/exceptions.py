@@ -37,7 +37,7 @@ class UnexpectedEnd(Exception):
     def __init__(self, exception, description):
         self.pos_in_stream = len(description)
         self.description = description
-        lark_terminals = [terminal.name for terminal in exception.expected]
+        lark_terminals = [terminal for terminal in exception.expected]
         self.expecting = _get_expecting(lark_terminals)
 
         message = "Unexpected character end of input"
@@ -108,12 +108,6 @@ TERMINALS = {
     "UCASE_LETTER": "upper case letter",
     "UNKNOWN": "?",
 }
-
-
-class UnsupportedStartRule(Exception):
-    def __init__(self, start_rule):
-        self.message = "Start rule '{}' not supported.".format(start_rule)
-        super().__init__(self.message)
 
 
 class NestedDescriptions(Exception):

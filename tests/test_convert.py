@@ -5,7 +5,7 @@ Tests for the lark tree to dictionary converter.
 import pytest
 
 from mutalyzer_hgvs_parser.convert import to_model
-from mutalyzer_hgvs_parser.exceptions import NestedDescriptions, UnsupportedStartRule
+from mutalyzer_hgvs_parser.exceptions import NestedDescriptions
 
 
 def _get_tests(tests):
@@ -212,6 +212,11 @@ LOCATIONS = {
 }
 
 
+@pytest.mark.parametrize("description, model", _get_tests(LOCATIONS))
+def test_location_to_model(description, model):
+    assert to_model(description, "location") == model
+
+
 LENGTHS = {
     "4": {"value": 4, "type": "point"},
     "5": {"value": 5, "type": "point"},
@@ -219,6 +224,7 @@ LENGTHS = {
     "10": {"value": 10, "type": "point"},
     "19": {"value": 19, "type": "point"},
     "20": {"type": "point", "value": 20},
+    "?": {"uncertain": True, "type": "point"},
     "(10)": {"value": 10, "type": "point"},
     "(10_20)": {
         "type": "range",
@@ -235,9 +241,9 @@ LENGTHS = {
 }
 
 
-@pytest.mark.parametrize("description, model", _get_tests(LOCATIONS))
-def test_location_to_model(description, model):
-    assert to_model(description, "location") == model
+@pytest.mark.parametrize("description, model", _get_tests(LENGTHS))
+def test_length_to_model(description, model):
+    assert to_model(description, "length") == model
 
 
 INSERTED = {
@@ -252,6 +258,10 @@ INSERTED = {
         {"sequence": "A", "source": "description"},
         {"source": "reference", "location": LOCATIONS["10_20"]},
     ],
+    "[A;?]": [
+        {"sequence": "A", "source": "description"},
+        {"length": LENGTHS["?"]},
+    ],
     "[A;10_20inv]": [
         {"sequence": "A", "source": "description"},
         {"source": "reference", "location": LOCATIONS["10_20"], "inverted": True},
@@ -259,6 +269,7 @@ INSERTED = {
     "R2:g.10_15": [
         {
             "source": {"id": "R2"},
+            "type": "description_dna",
             "coordinate_system": "g",
             "location": LOCATIONS["10_15"],
         }
@@ -266,6 +277,7 @@ INSERTED = {
     "NG_000001.1(NM_000002.3):c.100": [
         {
             "source": REFERENCES["NG_000001.1(NM_000002.3)"],
+            "type": "description_dna",
             "coordinate_system": "c",
             "location": LOCATIONS["100"],
         }
@@ -273,6 +285,7 @@ INSERTED = {
     "NG_000001.1(NM_000002.3):c.(?_-20)_(30+1_30-1)": [
         {
             "source": REFERENCES["NG_000001.1(NM_000002.3)"],
+            "type": "description_dna",
             "coordinate_system": "c",
             "location": LOCATIONS["(?_-20)_(30+1_30-1)"],
         }
@@ -280,6 +293,7 @@ INSERTED = {
     "NG_000001.1(NM_000002.3):c.(170_?)_420+60[19]": [
         {
             "source": REFERENCES["NG_000001.1(NM_000002.3)"],
+            "type": "description_dna",
             "coordinate_system": "c",
             "location": LOCATIONS["(170_?)_420+60"],
             "repeat_number": LENGTHS["19"],
@@ -288,6 +302,7 @@ INSERTED = {
     "[R2:g.200_300;40_50]": [
         {
             "source": {"id": "R2"},
+            "type": "description_dna",
             "coordinate_system": "g",
             "location": LOCATIONS["200_300"],
         },
@@ -298,6 +313,7 @@ INSERTED = {
         {"source": "reference", "location": LOCATIONS["10_20"], "inverted": True},
         {
             "source": {"id": "NM_000001.1"},
+            "type": "description_dna",
             "coordinate_system": "c",
             "location": LOCATIONS["200_300"],
         },
@@ -315,6 +331,7 @@ def test_inserted_to_model(description, model):
 VARIANTS = {
     "1": {"location": LOCATIONS["1"]},
     "10_15": {"location": LOCATIONS["10_15"]},
+    "(10_15)": {"location": LOCATIONS["(10_15)"]},
     # Substitutions
     "10C>A": {
         "type": "substitution",
@@ -360,6 +377,12 @@ VARIANTS = {
         "type": "duplication",
         "source": "reference",
         "location": LOCATIONS["10"],
+    },
+    "10dupG": {
+        "type": "duplication",
+        "source": "reference",
+        "location": LOCATIONS["10"],
+        "inserted": [{"sequence": "G", "source": "description"}],
     },
     # Insertions
     "10_11insA": {
@@ -448,6 +471,7 @@ VARIANTS = {
         "inserted": [
             {
                 "source": {"id": "NM_000001.1"},
+                "type": "description_dna",
                 "coordinate_system": "c",
                 "location": {
                     "type": "range",
@@ -469,6 +493,7 @@ VARIANTS = {
         "inserted": [
             {
                 "source": {"id": "NG_000001.1", "selector": {"id": "NM_000002.3"}},
+                "type": "description_dna",
                 "coordinate_system": "c",
                 "location": {"type": "point", "position": 100},
             }
@@ -479,6 +504,16 @@ VARIANTS = {
         "type": "inversion",
         "source": "reference",
         "location": LOCATIONS["10_11"],
+    },
+    "-10+20inv": {
+        "type": "inversion",
+        "source": "reference",
+        "location": LOCATIONS["-10+20"],
+    },
+    "-10-20inv": {
+        "type": "inversion",
+        "source": "reference",
+        "location": LOCATIONS["-10-20"],
     },
     # Conversions
     "10_20con40_50": {
@@ -735,16 +770,65 @@ DESCRIPTIONS = {
     "R1(R2(R3)):g.[10del;10_11delinsR2:g.10_15]": {
         "reference": REFERENCES["R1(R2(R3))"],
         "coordinate_system": "g",
+        "type": "description_dna",
         "variants": [VARIANTS["10del"], VARIANTS["10_11delinsR2:g.10_15"]],
+    },
+    "R1(R2(R3)):g.([10del;10_11delinsR2:g.10_15])": {
+        "reference": REFERENCES["R1(R2(R3))"],
+        "coordinate_system": "g",
+        "type": "description_dna",
+        "variants": [VARIANTS["10del"], VARIANTS["10_11delinsR2:g.10_15"]],
+        "predicted": True,
+    },
+    "R1(R2(R3)):g.(10_11delinsR2:g.10_15)": {
+        "reference": REFERENCES["R1(R2(R3))"],
+        "coordinate_system": "g",
+        "type": "description_dna",
+        "variants": [VARIANTS["10_11delinsR2:g.10_15"]],
+        "predicted": True,
+    },
+    "R1(R2(R3)):g.(10_15)": {
+        "reference": REFERENCES["R1(R2(R3))"],
+        "coordinate_system": "g",
+        "type": "description_dna",
+        "variants": [VARIANTS["(10_15)"]],
+    },
+    "R1(R2(R3)):g.((10_15))": {
+        "reference": REFERENCES["R1(R2(R3))"],
+        "coordinate_system": "g",
+        "type": "description_dna",
+        "variants": [VARIANTS["(10_15)"]],
+        "predicted": True,
     },
     "R1:g.[10=;10_11ins[T;10_20inv;NM_000001.1:c.200_300];10_20delinsGA]": {
         "reference": REFERENCES["R1"],
         "coordinate_system": "g",
+        "type": "description_dna",
         "variants": [
             VARIANTS["10="],
             VARIANTS["10_11ins[T;10_20inv;NM_000001.1:c.200_300]"],
             VARIANTS["10_20delinsGA"],
         ],
+    },
+    "R1:10_11insA": {
+        "reference": REFERENCES["R1"],
+        "type": "description_dna",
+        "variants": [VARIANTS["10_11insA"]],
+    },
+    "R1:10": {
+        "reference": REFERENCES["R1"],
+        "type": "description_dna",
+        "variants": [{"location": LOCATIONS["10"]}],
+    },
+    "R1:-10+20inv": {
+        "reference": REFERENCES["R1"],
+        "type": "description_dna",
+        "variants": [VARIANTS["-10+20inv"]],
+    },
+    "R1:-10-20inv": {
+        "reference": REFERENCES["R1"],
+        "type": "description_dna",
+        "variants": [VARIANTS["-10-20inv"]],
     },
 }
 
@@ -765,6 +849,7 @@ def compose_description_model(reference, location, operation, insert):
     description = "{}:{}{}{}".format(reference, location, operation, insert)
     model = {
         "reference": REFERENCES[reference],
+        "type": "description_dna",
         "variants": [
             {
                 "type": OPERATIONS_MIX[operation],
@@ -794,11 +879,6 @@ def _get_mix():
 @pytest.mark.parametrize("description, model", _get_tests(_get_mix()))
 def test_mix(description, model):
     assert to_model(description) == model
-
-
-def test_unsupported_start_rule():
-    with pytest.raises(UnsupportedStartRule):
-        to_model("10_20", "range")
 
 
 @pytest.mark.parametrize(

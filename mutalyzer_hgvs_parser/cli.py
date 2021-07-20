@@ -8,7 +8,7 @@ import json
 from lark.tree import pydot__tree_to_png
 
 from . import usage, version
-from .convert import _parse_tree_to_model
+from .convert import parse_tree_to_model
 from .hgvs_parser import parse
 
 
@@ -26,8 +26,11 @@ def _to_model(description, start_rule):
     CLI wrapper for parsing, converting, and printing the model.
     """
     parse_tree = parse(description, start_rule=start_rule)
-    model = _parse_tree_to_model(parse_tree, start_rule)
-    print(json.dumps(model, indent=2))
+    model = parse_tree_to_model(parse_tree)
+    if isinstance(model, dict) or isinstance(model, list):
+        print(json.dumps(model, indent=2))
+    else:
+        print(model)
     return parse_tree
 
 
