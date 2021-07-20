@@ -213,11 +213,8 @@ AMBIGUITIES = [
 
 class AmbigTransformer(Transformer):
     def _ambig(self, children):
-        print("- ambiguity")
         for ambig in AMBIGUITIES:
-            print(f"   {ambig['type']}")
             if ambig["conditions"](children):
-                print("    resolved")
                 return children[ambig["selected"]]
         raise Exception("Ambiguity not solved.")
 
