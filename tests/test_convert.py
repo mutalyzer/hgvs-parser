@@ -525,6 +525,18 @@ VARIANTS = {
         "location": LOCATIONS["10_20"],
         "inserted": [{"source": "reference", "location": LOCATIONS["40_50"]}],
     },
+    "10_20conR2:40_50": {
+        "type": "conversion",
+        "source": "reference",
+        "location": LOCATIONS["10_20"],
+        "inserted": [
+            {
+                "source": {"id": "R2"},
+                "type": "description_dna",
+                "location": LOCATIONS["40_50"],
+            }
+        ],
+    },
     # Deletion insertions
     "10delinsGA": {
         "type": "deletion_insertion",
@@ -832,6 +844,17 @@ DESCRIPTIONS = {
         "reference": REFERENCES["R1"],
         "type": "description_dna",
         "variants": [VARIANTS["-10-20inv"]],
+    },
+    "R1:10_20conR2:40_50": {
+        "reference": REFERENCES["R1"],
+        "type": "description_dna",
+        "variants": [VARIANTS["10_20conR2:40_50"]],
+    },
+    "R1:g.10_20conR2:40_50": {
+        "reference": REFERENCES["R1"],
+        "type": "description_dna",
+        "coordinate_system": "g",
+        "variants": [VARIANTS["10_20conR2:40_50"]],
     },
 }
 

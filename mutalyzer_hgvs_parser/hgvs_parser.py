@@ -70,6 +70,20 @@ AMBIGUITIES = [
         "selected": 1,
     },
     {
+        "type": "variant_certain_repeat | variant_certain_substitution - substitution",
+        # for protein variants: 10R2:10_20
+        "conditions": lambda children: (
+            len(children) == 2
+            and children[0].data == children[1].data == "variant_certain"
+            and data_equals(children, [0, 1], "repeat")
+            and data_equals(children, [1, 1], "substitution")
+            and data_equals(children, [1, 1, 0], "inserted")
+            and data_equals(children, [1, 1, 0, 0], "insert")
+            and data_equals(children, [1, 1, 0, 0, 0], "description_protein")
+        ),
+        "selected": 1,
+    },
+    {
         "type": "insertion | repeat - insertion",
         # 10_11insNM_000001.1:c.100_200 ("variant" start rule)
         "conditions": lambda children: (
@@ -145,6 +159,17 @@ AMBIGUITIES = [
             len(children) == 2
             and children[0].data == children[1].data == "variant_certain"
             and data_equals(children, [0, 1], "inversion")
+            and data_equals(children, [1, 1], "repeat")
+        ),
+        "selected": 0,
+    },
+    {
+        "type": "conversion | repeat - conversion",
+        # R1:g.10_20conR2:40_50
+        "conditions": lambda children: (
+            len(children) == 2
+            and children[0].data == children[1].data == "variant_certain"
+            and data_equals(children, [0, 1], "conversion")
             and data_equals(children, [1, 1], "repeat")
         ),
         "selected": 0,
@@ -230,6 +255,8 @@ class AmbigTransformer(Transformer):
         for ambig in AMBIGUITIES:
             if ambig["conditions"](children):
                 return children[ambig["selected"]]
+        # from lark.tree import pydot__tree_to_png
+        # pydot__tree_to_png(Tree("ambig", children), "ambig.png")
         raise Exception("Ambiguity not solved.")
 
 
