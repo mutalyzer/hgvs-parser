@@ -150,6 +150,20 @@ AMBIGUITIES = [
         "selected": 0,
     },
     {
+        "type": "repeat | location - location",
+        # REF:g.123?
+        # REF:g.??
+        "conditions": lambda children: (
+            len(children) == 2
+            and children[0].data == "variant_certain"
+            and children[1].data == "variant_certain"
+            and data_equals(children, [0, 1], "repeat")
+            and data_equals(children, [1, 0], "location")
+            and len(get_child(children, [1]).children) == 1
+        ),
+        "selected": 1,
+    },
+    {
         "type": "variant_certain | variant_predicted - variant_predicted",
         # R1(R2(R3)):g.(10_15)
         "conditions": lambda children: (

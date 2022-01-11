@@ -37,6 +37,7 @@ LOCATIONS = {
     "10+20": {"type": "point", "position": 10, "offset": {"value": +20}},
     "?": {"type": "point", "uncertain": True},
     "??": {"type": "point", "uncertain": True, "offset": {"uncertain": True}},
+    "100?": {"type": "point", "position": 100, "offset": {"uncertain": True}},
     "?+?": {
         "type": "point",
         "uncertain": True,
@@ -330,6 +331,8 @@ def test_inserted_to_model(description, model):
 
 VARIANTS = {
     "1": {"location": LOCATIONS["1"]},
+    "??": {"location": LOCATIONS["??"]},
+    "100?": {"location": LOCATIONS["100?"]},
     "10_15": {"location": LOCATIONS["10_15"]},
     "(10_15)": {"location": LOCATIONS["(10_15)"]},
     # Substitutions

@@ -47,6 +47,9 @@ from .test_protein import HGVS_NOMENCLATURE
         ("R1:10", "description", DESCRIPTIONS["R1:10"]),
         # inversion | repeat - inversion
         ("R1:-10-20inv", "description", DESCRIPTIONS["R1:-10-20inv"]),
+        # repeat | location - location
+        ("100?", "variant", VARIANTS["100?"]),
+        ("??", "variant", VARIANTS["??"]),
     ],
 )
 def test_ambiguities(description, start_rule, model):
