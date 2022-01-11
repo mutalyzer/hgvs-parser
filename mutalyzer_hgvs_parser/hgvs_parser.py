@@ -23,7 +23,7 @@ AMBIGUITIES = [
         "selected": 1,
     },
     {
-        "type": "variant_certain_locatio_and_substitution | variant_certain_location",
+        "type": "variant_certain_location_and_substitution | variant_certain_location",
         # R1:10
         # on the protein side
         "conditions": lambda children: (
