@@ -9,7 +9,7 @@ from lark.tree import pydot__tree_to_png
 
 from . import usage, version
 from .convert import parse_tree_to_model
-from .hgvs_parser import parse
+from .hgvs_parser import parse, HgvsParser
 
 
 def _parse(description, grammar_path, start_rule):
@@ -32,6 +32,11 @@ def _to_model(description, start_rule):
     else:
         print(model)
     return parse_tree
+
+
+def _parse_raw(description, grammar_path, start_rule):
+    parser = HgvsParser(grammar_path, start_rule)
+    return parser.parse(description)
 
 
 def _arg_parser():
@@ -58,6 +63,10 @@ def _arg_parser():
         "-g", help="alternative input grammar file path (do not use with -c)"
     )
 
+    alt.add_argument(
+        "-p", action="store_true", help="raw parse tree (no ambiguity solving)"
+    )
+
     parser.add_argument(
         "-i", help="save the parse tree as a PNG image (pydot required!)"
     )
@@ -70,6 +79,9 @@ def _arg_parser():
 def _cli(args):
     if args.c:
         parse_tree = _to_model(args.description, args.r)
+    elif args.p:
+        parse_tree = _parse_raw(args.description, args.g, args.r)
+        print(parse_tree)
     else:
         parse_tree = _parse(args.description, args.g, args.r)
 
