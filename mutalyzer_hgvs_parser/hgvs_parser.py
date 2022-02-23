@@ -366,12 +366,14 @@ class FinalTransformer(Transformer):
             return Tree("variants_predicted", children[0].children)
         return Tree("variants", children)
 
+    def variant_predicted(self, children):
+        return Tree("variant_predicted", children[0].children)
+
     def variant(self, children):
         if children[0].data == "variant_certain":
             return Tree("variant", children[0].children)
-        if children[0].data == "variant_predicted":
-            return Tree("variants_predicted", children[0].children)
-        return Tree("variants", children)
+        elif children[0].data == "variant_predicted":
+            return Tree("variant_predicted", children[0].children)
 
 
 def _read_grammar_file(file_name):

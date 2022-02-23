@@ -394,6 +394,13 @@ VARIANTS = {
         "location": LOCATIONS["10_11"],
         "inserted": INSERTED["A"],
     },
+    "(10_11insA)": {
+        "type": "insertion",
+        "source": "reference",
+        "location": LOCATIONS["10_11"],
+        "inserted": INSERTED["A"],
+        "predicted": True,
+    },
     "10_11ins[A]": {
         "type": "insertion",
         "source": "reference",
@@ -855,6 +862,12 @@ DESCRIPTIONS = {
         "type": "description_dna",
         "coordinate_system": "g",
         "variants": [VARIANTS["10_20conR2:40_50"]],
+    },
+    "R1:g.[10_20conR2:40_50;(10_11insA)]": {
+        "reference": REFERENCES["R1"],
+        "type": "description_dna",
+        "coordinate_system": "g",
+        "variants": [VARIANTS["10_20conR2:40_50"], VARIANTS["(10_11insA)"]],
     },
 }
 

@@ -78,6 +78,14 @@ class Converter(Transformer):
     def variants_predicted(self, children):
         return {"variants_predicted": [child["variant"] for child in children]}
 
+    def variant_certain(self, children):
+        return {"variant_certain": to_dict(children)}
+
+    def variant_predicted(self, children):
+        output = {"variant": to_dict(children)}
+        output["variant"]["predicted"] = True
+        return output
+
     def variant(self, children):
         return {"variant": to_dict(children)}
 
