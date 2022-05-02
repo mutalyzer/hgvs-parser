@@ -382,6 +382,21 @@ def _read_grammar_file(file_name):
         return grammar_file.read()
 
 
+def _replace_annon_terminals(grammar):
+    updated_grammar = grammar
+    terminals = {
+        "PREDICTED_EQUAL": "(=)",
+        "LPAR_LSQB": "([",
+        "LSQB_LPAR": "[(",
+        "RSQB_RPAR": "])",
+        "RPAR_RSQB": ")]",
+    }
+    for name in terminals:
+        updated_grammar = updated_grammar.replace('"terminals[name]"', name)
+        updated_grammar += f'\n\n{name}: "{terminals[name]}"'
+    return updated_grammar
+
+
 class HgvsParser:
     """
     HGVS parser object.
@@ -408,6 +423,7 @@ class HgvsParser:
             grammar += _read_grammar_file("protein.g")
             grammar += _read_grammar_file("reference.g")
             grammar += _read_grammar_file("common.g")
+            grammar = _replace_annon_terminals(grammar)
 
         start_rule = self._start_rule if self._start_rule else "description"
 

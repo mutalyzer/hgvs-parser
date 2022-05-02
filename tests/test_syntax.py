@@ -4,6 +4,7 @@ Syntax tests for the lark based HGVS parser - taken from the HGVS website.
 
 import pytest
 
+from mutalyzer_hgvs_parser.exceptions import UnexpectedCharacter, UnexpectedEnd
 from mutalyzer_hgvs_parser.hgvs_parser import HgvsParser
 
 
@@ -251,3 +252,40 @@ def test_incorrect_syntax(parser, description):
     """
     with pytest.raises(Exception):
         HgvsParser().parse(description)
+
+
+def test_unexpected_end():
+    try:
+        HgvsParser().parse("REF:g.1de")
+    except UnexpectedEnd as e:
+        s = e.serialize()
+        assert s["pos_in_stream"] == 8
+        assert s["unexpected_character"] == "e"
+        assert s["description"] == "REF:g.1de"
+        assert set(s["expecting"]) == {
+            "a reference / selector ID",
+            "':' between the reference part and the coordinate system",
+            "'(' for an uncertainty start or before a selector ID",
+        }
+
+
+def test_unexpected_character():
+    try:
+        HgvsParser().parse("REF_1:g.pter_100delins[REF_2:g.]")
+    except UnexpectedCharacter as e:
+        s = e.serialize()
+        assert s["pos_in_stream"] == 31
+        assert s["unexpected_character"] == "]"
+        assert s["description"] == "REF_1:g.pter_100delins[REF_2:g.]"
+        assert set(s["expecting"]) == {
+            "'=' to indicate no changes",
+            "a number (to indicate a location or a length)",
+            "'(['",
+            "?",
+            "'[('",
+            "'[' for multiple variants, insertions, or repeats",
+            "'(' for an uncertainty start or before a selector ID",
+            "'*' or '-' for an outside CDS location",
+            "'pter' or 'qter'",
+            "'(=)' for predicted no changes",
+        }

@@ -1,3 +1,6 @@
+from lark.load_grammar import _TERMINAL_NAMES
+
+
 class UnexpectedCharacter(Exception):
     def __init__(self, exception, description):
         self.line = exception.line
@@ -35,7 +38,7 @@ class UnexpectedCharacter(Exception):
 
 class UnexpectedEnd(Exception):
     def __init__(self, exception, description):
-        self.pos_in_stream = len(description)
+        self.pos_in_stream = len(description) - 1
         self.description = description
         lark_terminals = [terminal for terminal in exception.expected]
         self.expecting = _get_expecting(lark_terminals)
@@ -107,6 +110,12 @@ TERMINALS = {
     "LCASE_LETTER": "lower case letter",
     "UCASE_LETTER": "upper case letter",
     "UNKNOWN": "?",
+    "CHROMOSOME_POINT": "'pter' or 'qter'",
+    "PREDICTED_EQUAL": "'(=)' for predicted no changes",
+    "LPAR_LSQB": "'(['",
+    "LSQB_LPAR": "'[('",
+    "RSQB_RPAR": "'])'",
+    "RPAR_RSQB": "')]'",
 }
 
 
