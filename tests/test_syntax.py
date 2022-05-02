@@ -156,6 +156,18 @@ def parser():
         # White spaces
         " NC_000023.10 : g . 33038255 C > A ",
         "LRG_199 t1 :c.( 4071+1_4072 -1)_ ( 5154 +1_5155-1)[ 3]",
+        # pter and qter
+        "NC_000002.12:g.pterdel",
+        "NC_000002.12:g.qterdel",
+        "NC_000002.12:g.pter_qterdel",
+        "NC_000002.12:g.pter_100del",
+        "NC_000002.12:g.100_qterdel",
+        "NC_000002.12:g.pter_8247756delinspter_qter",
+        "NC_000002.12:g.pter_8247756delins[NC_000011.10:g.pter_15825272]",
+        "NC_000002.12:g.1_qterdelins[NC_000011.10:g.pter_qter]",
+        "NC_000002.12:g.pter_qterdelins[NC_000011.10:g.pter_qter]",
+        "NC_000002.12:g.pterdelins[NC_000011.10:g.pter_qter]",
+        "NC_000002.12:g.qterdelins[NC_000011.10:g.pter_qter]",
     ],
 )
 def test_correct_syntax(parser, description):

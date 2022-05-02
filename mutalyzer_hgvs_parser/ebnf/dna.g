@@ -24,11 +24,13 @@ variant_certain: location (conversion | deletion | deletion_insertion | duplicat
 
 location: point | uncertain_point | range
 
-point: OUTSIDE_CDS? (NUMBER | UNKNOWN) OFFSET?
+point: (OUTSIDE_CDS? (NUMBER | UNKNOWN) OFFSET?) | CHROMOSOME_POINT
 
 OUTSIDE_CDS: "*" | "-"
 
 OFFSET: ("+" | "-")? (NUMBER | UNKNOWN)
+
+CHROMOSOME_POINT: "pter" | "qter"
 
 uncertain_point: "(" point "_" point ")"
 

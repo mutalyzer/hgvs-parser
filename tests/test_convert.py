@@ -210,6 +210,29 @@ LOCATIONS = {
         },
         "end": {"type": "point", "position": 420, "offset": {"value": 60}},
     },
+    "pter": {
+        "type": "point",
+        "position": "pter",
+    },
+    "qter": {
+        "type": "point",
+        "position": "qter",
+    },
+    "pter_qter": {
+        "type": "range",
+        "start": {"type": "point", "position": "pter"},
+        "end": {"type": "point", "position": "qter"},
+    },
+    "pter_100": {
+        "type": "range",
+        "start": {"type": "point", "position": "pter"},
+        "end": {"type": "point", "position": 100},
+    },
+    "100_qter": {
+        "type": "range",
+        "start": {"type": "point", "position": 100},
+        "end": {"type": "point", "position": "qter"},
+    },
 }
 
 
@@ -319,6 +342,23 @@ INSERTED = {
             "location": LOCATIONS["200_300"],
         },
     ],
+    "qter": [
+        {"source": "reference", "location": LOCATIONS["qter"]},
+    ],
+    "pter": [
+        {"source": "reference", "location": LOCATIONS["pter"]},
+    ],
+    "pter_qter": [
+        {"source": "reference", "location": LOCATIONS["pter_qter"]},
+    ],
+    "[pter_qter;10_20inv]": [
+        {"source": "reference", "location": LOCATIONS["pter_qter"]},
+        {"source": "reference", "location": LOCATIONS["10_20"], "inverted": True},
+    ],
+    "[pter_qterinv;10_20]": [
+        {"source": "reference", "location": LOCATIONS["pter_qter"], "inverted": True},
+        {"source": "reference", "location": LOCATIONS["10_20"]},
+    ],
 }
 
 DELETED = {}
@@ -374,6 +414,11 @@ VARIANTS = {
         "source": "reference",
         "location": LOCATIONS["10_15"],
         "deleted": [{"length": {"value": 6, "type": "point"}}],
+    },
+    "pterdel": {
+        "type": "deletion",
+        "source": "reference",
+        "location": LOCATIONS["pter"],
     },
     # Duplications
     "10dup": {

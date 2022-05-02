@@ -166,6 +166,8 @@ class Converter(Transformer):
                 output.update(child)
             elif isinstance(child, Token) and child.type == "NUMBER":
                 output["position"] = int(child.value)
+            elif isinstance(child, Token) and child.type == "CHROMOSOME_POINT":
+                output["position"] = child.value
         return {"point": output}
 
     def uncertain_point(self, children):
