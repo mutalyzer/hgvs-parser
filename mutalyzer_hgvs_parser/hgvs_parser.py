@@ -247,6 +247,54 @@ AMBIGUITIES = [
         ),
         "selected": 0,
     },
+    {
+        "type": "variant_certain-location_repeat|repeat - variant_certain-location",
+        # NM_000492.4:c.1210-34_1210-6
+        "conditions": lambda children: (
+                len(children) == 3
+                and children[0].data == children[1].data == children[2].data == "variant_certain"
+                and data_equals(children, [0, 0], "location")
+                and data_equals(children, [0, 1], "repeat")
+                and data_equals(children, [1, 0], "location")
+                and data_equals(children, [1, 1], "repeat")
+                and data_equals(children, [2, 0], "location")
+                and len(get_child(children, [2, 0]).children) == 1
+        ),
+        "selected": 2,
+    },
+    {
+        "type": "variant_certain-location_repeat|location_inversion - inversion",
+        # NC_000015.9(NM_001012338.3):c.396-6644_1397-29766inv
+        "conditions": lambda children: (
+                len(children) == 3
+                and children[0].data == children[1].data == children[2].data == "variant_certain"
+                and len(get_child(children, [0]).children) == 2
+                and data_equals(children, [0, 0], "location")
+                and data_equals(children, [0, 1], "inversion")
+                and len(get_child(children, [1]).children) == 2
+                and data_equals(children, [1, 0], "location")
+                and data_equals(children, [1, 1], "repeat")
+                and len(get_child(children, [2]).children) == 2
+                and data_equals(children, [2, 0], "location")
+                and data_equals(children, [2, 1], "repeat")
+        ),
+        "selected": 0,
+    },
+    {
+        "type": "variant_certain_duplication | variant_certain_repeat - duplication",
+        # R1:c.10-5_10-2dupR2:10
+        "conditions": lambda children: (
+                len(children) == 2
+                and children[0].data == children[1].data == "variant_certain"
+                and len(get_child(children, [0]).children) == 2
+                and data_equals(children, [0, 0], "location")
+                and data_equals(children, [0, 1], "duplication")
+                and len(get_child(children, [1]).children) == 2
+                and data_equals(children, [1, 0], "location")
+                and data_equals(children, [1, 1], "repeat")
+        ),
+        "selected": 0,
+    },
 ]
 
 

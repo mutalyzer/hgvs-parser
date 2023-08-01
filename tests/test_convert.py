@@ -74,6 +74,19 @@ LOCATIONS = {
         "outside_cds": "downstream",
         "offset": {"value": -20},
     },
+    "10-5_10-2": {
+        "type": "range",
+        "start": {
+            "type": "point",
+            "position": 10,
+            "offset": {"value": -5},
+        },
+        "end": {
+            "type": "point",
+            "position": 10,
+            "offset": {"value": -2},
+        },
+    },
     "10_15": {
         "type": "range",
         "start": {"type": "point", "position": 10},
@@ -375,6 +388,7 @@ VARIANTS = {
     "100?": {"location": LOCATIONS["100?"]},
     "10_15": {"location": LOCATIONS["10_15"]},
     "(10_15)": {"location": LOCATIONS["(10_15)"]},
+    "10-5_10-2": {"location": LOCATIONS["10-5_10-2"]},
     # Substitutions
     "10C>A": {
         "type": "substitution",
@@ -569,6 +583,11 @@ VARIANTS = {
         "type": "inversion",
         "source": "reference",
         "location": LOCATIONS["-10-20"],
+    },
+    "10-5_10-2inv": {
+        "type": "inversion",
+        "source": "reference",
+        "location": LOCATIONS["10-5_10-2"]
     },
     # Conversions
     "10_20con40_50": {
@@ -913,6 +932,32 @@ DESCRIPTIONS = {
         "type": "description_dna",
         "coordinate_system": "g",
         "variants": [VARIANTS["10_20conR2:40_50"], VARIANTS["(10_11insA)"]],
+    },
+    "R1:c.10-5_10-2": {
+        "reference": REFERENCES["R1"],
+        "type": "description_dna",
+        "coordinate_system": "c",
+        "variants": [VARIANTS["10-5_10-2"]],
+    },
+    "R1:c.10-5_10-2dupR2:10": {
+        "reference": REFERENCES["R1"],
+        "type": "description_dna",
+        "coordinate_system": "c",
+        "variants": [{
+            "location": LOCATIONS["10-5_10-2"],
+            "type": "duplication",
+            "source": "reference",
+            "inserted": [
+                {
+                    "type": "description_dna",
+                    "source": {"id": "R2"},
+                    "location": {
+                        "type": "point",
+                        "position": 10
+                    }
+                }
+            ]
+        }],
     },
 }
 
