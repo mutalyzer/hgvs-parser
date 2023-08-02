@@ -959,6 +959,53 @@ DESCRIPTIONS = {
             ]
         }],
     },
+    "R1:c.10-5_10-2delinsTCTR2.2:c.10": {
+        "reference": REFERENCES["R1"],
+        "type": "description_dna",
+        "coordinate_system": "c",
+        "variants": [{
+            "location": LOCATIONS["10-5_10-2"],
+            "type": "deletion_insertion",
+            "source": "reference",
+            "inserted": [
+                {
+                    "type": "description_dna",
+                    "source": {"id": "TCTR2.2"},
+                    "coordinate_system": "c",
+                    "location": {
+                        "type": "point",
+                        "position": 10
+                    }
+                }
+            ]
+        }],
+    },
+    # TODO: revisit this in the repeats context.
+    "R1:c.10-20[5]": {
+        "reference": REFERENCES["R1"],
+        "type": "description_dna",
+        "coordinate_system": "c",
+        "variants": [{
+            "location": LOCATIONS["10-20"],
+            "type": "repeat",
+            "source": "reference",
+            "inserted": [{"length": LENGTHS["5"]}
+            ]
+        }],
+    },
+    "R1:c.10-5_10-2[5]": {
+        "reference": REFERENCES["R1"],
+        "type": "description_dna",
+        "coordinate_system": "c",
+        "variants": [{
+            "location": LOCATIONS["10-5_10-2"],
+            "type": "repeat",
+            "source": "reference",
+            "inserted": [{"length": LENGTHS["5"]}
+                         ]
+        }],
+    },
+
 }
 
 
@@ -1012,7 +1059,14 @@ def test_mix(description, model):
 
 @pytest.mark.parametrize(
     "description",
-    ["R1:1delinsR2:2del", "R1:1del[R2:2del]", "R1:[1del;10_11insR2:2del]"],
+    [
+        "R1:1delinsR2:2del",
+        "R1:1del[R2:2del]",
+        "R1:[1del;10_11insR2:2del]",
+        "R1:c.10-5_10-2delR2:10del",
+        "R1:c.10-5_10-2dupR2:10del",
+        "R1:c.10-5_10-2delinsTCTR2.2:c.10insT",
+    ],
 )
 def test_nested_descriptions(description):
     with pytest.raises(NestedDescriptions):
