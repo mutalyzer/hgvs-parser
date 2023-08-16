@@ -1005,7 +1005,40 @@ DESCRIPTIONS = {
                          ]
         }],
     },
-
+    "R1:p.10AE[5]": {
+        "reference": REFERENCES["R1"],
+        "type": "description_protein",
+        "coordinate_system": "p",
+        "variants": [{
+            "location": LOCATIONS["10"],
+            "type": "repeat",
+            "source": "reference",
+            "inserted": [
+                {
+                    "sequence": "AE",
+                    "repeat_number": LENGTHS["5"],
+                    "source": "description"
+                }
+            ]
+        }],
+    },
+    "R1:p.10AlaArg[5]": {
+        "reference": REFERENCES["R1"],
+        "type": "description_protein",
+        "coordinate_system": "p",
+        "variants": [{
+            "location": LOCATIONS["10"],
+            "type": "repeat",
+            "source": "reference",
+            "inserted": [
+                {
+                    "sequence": "AlaArg",
+                    "repeat_number": LENGTHS["5"],
+                    "source": "description"
+                }
+            ]
+        }],
+    },
 }
 
 

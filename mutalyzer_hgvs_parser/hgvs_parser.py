@@ -54,7 +54,24 @@ AMBIGUITIES = [
         "selected": 0,
     },
     {
-        "type": "variant_certain_repeat | variant_certain_substitution - substitution",
+        "type": "variant_certain_repeat | variant_certain_substitution - repeat 2",
+        # PREF:p.254AE[3]
+        "conditions": lambda children: (
+            len(children) == 2
+            and children[0].data == "variant_certain"
+            and children[1].data == "variant_certain"
+            and data_equals(children, [0, 1], "repeat")
+            and data_equals(children, [1, 1], "substitution")
+            and data_equals(children, [1, 1, 0], "inserted")
+            and data_equals(children, [1, 1, 0, 0], "insert")
+            and len(get_child(children, [0, 1, 0, 0]).children) == 2
+            and isinstance(get_child(children, [0, 1, 0, 0]), Tree)
+            and data_equals(children, [1, 1, 0, 0, 1], "repeat_number")
+        ),
+        "selected": 0,
+    },
+    {
+        "type": "variant_certain_repeat | variant_certain_substitution - substitution 1",
         # PREF:p.Trp26Ter, LRG_199p1:p.Trp24Cys, PREF:p.Trp26*,
         # PREF:p.[Ser44Arg;Trp46Arg]
         "conditions": lambda children: (
@@ -70,7 +87,7 @@ AMBIGUITIES = [
         "selected": 1,
     },
     {
-        "type": "variant_certain_repeat | variant_certain_substitution - substitution",
+        "type": "variant_certain_repeat | variant_certain_substitution - substitution 2",
         # for protein variants: 10R2:10_20
         "conditions": lambda children: (
             len(children) == 2
@@ -459,6 +476,8 @@ AMBIGUITIES = [
 class AmbigTransformer(Transformer):
     def _ambig(self, children):
         for ambig in AMBIGUITIES:
+            # from lark.tree import pydot__tree_to_png
+            # pydot__tree_to_png(Tree("ambig", children), "ambig.png")
             if ambig["conditions"](children):
                 return children[ambig["selected"]]
         from lark.tree import pydot__tree_to_png
