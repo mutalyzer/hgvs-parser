@@ -476,12 +476,12 @@ AMBIGUITIES = [
 class AmbigTransformer(Transformer):
     def _ambig(self, children):
         for ambig in AMBIGUITIES:
-            # from lark.tree import pydot__tree_to_png
-            # pydot__tree_to_png(Tree("ambig", children), "ambig.png")
             if ambig["conditions"](children):
+                # from lark.tree import pydot__tree_to_png
+                # pydot__tree_to_png(Tree("ambig", children), "ambig_2.png")
                 return children[ambig["selected"]]
-        from lark.tree import pydot__tree_to_png
-        pydot__tree_to_png(Tree("ambig", children), "ambig.png")
+        # from lark.tree import pydot__tree_to_png
+        # pydot__tree_to_png(Tree("ambig", children), "ambig.png")
         raise Exception("Ambiguity not solved.")
 
 
