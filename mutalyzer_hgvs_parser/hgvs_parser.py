@@ -3,6 +3,7 @@ Module for parsing HGVS variant descriptions.
 """
 
 import os
+import functools
 
 from lark import Lark, Token, Transformer, Tree
 from lark.exceptions import UnexpectedCharacters, UnexpectedEOF
@@ -693,6 +694,9 @@ class HgvsParser:
                 "  Propagate positions: %s" % self._parser.options.propagate_positions
             )
 
+@functools.lru_cache
+def get_parser(grammar_path=None, start_rule=None):
+    return HgvsParser(grammar_path, start_rule)
 
 def parse(description, grammar_path=None, start_rule=None):
     """
@@ -706,7 +710,7 @@ def parse(description, grammar_path=None, start_rule=None):
     :returns: Parse tree.
     :rtype: lark.Tree
     """
-    parser = HgvsParser(grammar_path, start_rule)
+    parser = get_parser(grammar_path, start_rule)
 
     return FinalTransformer().transform(
         AmbigTransformer().transform(
