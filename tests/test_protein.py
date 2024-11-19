@@ -831,10 +831,10 @@ HGVS_NOMENCLATURE = {
                 "source": "reference",
                 "inserted": [
                     {"sequence": "Gln", "source": "description"},
+                    {"sequence": "Ter", "source": "description"},
                     {
                         "location": {
                             "type": "point",
-                            "amino_acid": "Ter",
                             "position": 17,
                         },
                         "source": "reference",
@@ -854,10 +854,10 @@ HGVS_NOMENCLATURE = {
                 "source": "reference",
                 "inserted": [
                     {"sequence": "Gln", "source": "description"},
+                    {"sequence": "*", "source": "description"},
                     {
                         "location": {
                             "type": "point",
-                            "amino_acid": "*",
                             "position": 17,
                         },
                         "source": "reference",
@@ -901,8 +901,46 @@ HGVS_NOMENCLATURE = {
         ],
     },
     # -
-    "PREF:p.Ter327Argext*?": {},
-    "PREF:p.*327Argext*?": {},
+    "PREF:p.Ter327Argext*?": {
+        "type": "description_protein",
+        "reference": {"id": "PREF"},
+        "coordinate_system": "p",
+        "variants": [
+            {
+                "location": {"type": "point", "amino_acid": "Ter", "position": 327},
+                "type": "extension",
+                "source": "reference",
+                "inserted": [
+                    {"sequence": "Arg", "source": "description"},
+                    {"sequence": "*", "source": "description"},
+                    {
+                        "location": {"type": "point", "uncertain": True},
+                        "source": "reference",
+                    },
+                ],
+            }
+        ],
+    },
+    "PREF:p.*327Argext*?": {
+        "type": "description_protein",
+        "reference": {"id": "PREF"},
+        "coordinate_system": "p",
+        "variants": [
+            {
+                "location": {"type": "point", "amino_acid": "*", "position": 327},
+                "type": "extension",
+                "source": "reference",
+                "inserted": [
+                    {"sequence": "Arg", "source": "description"},
+                    {"sequence": "*", "source": "description"},
+                    {
+                        "location": {"type": "point", "uncertain": True},
+                        "source": "reference",
+                    },
+                ],
+            }
+        ],
+    },
 }
 
 OTHER = {

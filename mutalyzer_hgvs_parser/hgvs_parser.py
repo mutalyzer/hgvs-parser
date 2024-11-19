@@ -540,12 +540,16 @@ class ProteinTransformer(Transformer):
         return Tree("inserted", [Tree("insert", location)])
 
     def extension_c(self, children):
-        inserted = [Tree("insert", [Token("P_SEQUENCE", children[0]).value])]
-        if isinstance(children[1], Token):
-            inserted.append(Tree("insert", [Token("P_SEQUENCE", children[1].value)]))
+        new_children = []
+        for child in children:
+            if isinstance(child, Token):
+                new_children.append(Tree("insert", [Token("P_SEQUENCE", child.value)]))
+            else:
+                new_children.append(Tree("insert", [child]))
+        if new_children:
+            return Tree("extension", [Tree("inserted", new_children)])
         else:
-            inserted.append(Tree("insert", [Tree("location", [children[1]])]))
-        return Tree("inserted", inserted)
+            return Tree("extension", [])
 
     def frame_shift(self, children):
         new_children = []

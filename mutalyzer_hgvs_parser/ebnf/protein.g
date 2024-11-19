@@ -43,7 +43,7 @@ extension: extension_n | extension_c
 
 extension_n:  "ext" "-" NUMBER
 
-extension_c:  P_SEQUENCE "ext" (P_SEQUENCE | p_point)
+extension_c:  P_SEQUENCE "ext" P_SEQUENCE p_location?
 
 frame_shift: "fs" | AA "fs" ("*" | "Ter") p_location
 
