@@ -5,13 +5,13 @@ Syntax tests for the lark based HGVS parser - taken from the HGVS website.
 import pytest
 
 from mutalyzer_hgvs_parser.exceptions import UnexpectedCharacter, UnexpectedEnd
-from mutalyzer_hgvs_parser.hgvs_parser import HgvsParser
+from mutalyzer_hgvs_parser.hgvs_parser import get_parser
 
 
 @pytest.fixture
 def parser():
     def parse(description):
-        parse_tree = HgvsParser().parse(description)
+        parse_tree = get_parser().parse(description)
         if parse_tree is None:
             pytest.fail("failed to parse: `%s`" % description)
 
@@ -251,12 +251,12 @@ def test_incorrect_syntax(parser, description):
     The parser should fail for these descriptions.
     """
     with pytest.raises(Exception):
-        HgvsParser().parse(description)
+        get_parser().parse(description)
 
 
 def test_unexpected_end():
     try:
-        HgvsParser().parse("REF:g.1de")
+        get_parser().parse("REF:g.1de")
     except UnexpectedEnd as e:
         s = e.serialize()
         assert s["pos_in_stream"] == 8
@@ -271,7 +271,7 @@ def test_unexpected_end():
 
 def test_unexpected_character():
     try:
-        HgvsParser().parse("REF_1:g.pter_100delins[REF_2:g.]")
+        get_parser().parse("REF_1:g.pter_100delins[REF_2:g.]")
     except UnexpectedCharacter as e:
         s = e.serialize()
         assert s["pos_in_stream"] == 31

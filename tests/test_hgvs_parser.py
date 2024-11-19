@@ -5,12 +5,12 @@ Mutalyzer tests.
 
 import pytest
 
-from mutalyzer_hgvs_parser.hgvs_parser import HgvsParser
+from mutalyzer_hgvs_parser.hgvs_parser import get_parser
 
 
 @pytest.fixture
 def grammar():
-    return HgvsParser()
+    return get_parser()
 
 
 @pytest.fixture
