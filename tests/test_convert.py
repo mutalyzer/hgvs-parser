@@ -1099,6 +1099,7 @@ def test_mix(description, model):
         "R1:c.10-5_10-2delR2:10del",
         "R1:c.10-5_10-2dupR2:10del",
         "R1:c.10-5_10-2delinsTCTR2.2:c.10insT",
+        "REF_1:10del REF_2:20insA REF_3:30insT"
     ],
 )
 def test_nested_descriptions(description):

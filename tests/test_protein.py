@@ -941,6 +941,27 @@ HGVS_NOMENCLATURE = {
             }
         ],
     },
+    "STR:D5S818": {
+        "type": "description_protein",
+        "reference": {"id": "STR"},
+        "variants": [
+            {
+                "location": {"type": "point", "amino_acid": "D", "position": 5},
+                "type": "substitution",
+                "source": "reference",
+                "inserted": [
+                    {
+                        "location": {
+                            "type": "point",
+                            "amino_acid": "S",
+                            "position": 818,
+                        },
+                        "source": "reference",
+                    }
+                ],
+            }
+        ],
+    },
 }
 
 OTHER = {

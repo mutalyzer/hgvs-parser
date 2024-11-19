@@ -269,14 +269,14 @@ AMBIGUITIES = [
         "type": "variant_certain-location_repeat|repeat - variant_certain-location",
         # NM_000492.4:c.1210-34_1210-6
         "conditions": lambda children: (
-                len(children) == 3
-                and children[0].data == children[1].data == children[2].data == "variant_certain"
-                and data_equals(children, [0, 0], "location")
-                and data_equals(children, [0, 1], "repeat")
-                and data_equals(children, [1, 0], "location")
-                and data_equals(children, [1, 1], "repeat")
-                and len(get_child(children, [2]).children) == 1
-                and data_equals(children, [2, 0], "location")
+            len(children) == 3
+            and children[0].data == children[1].data == children[2].data == "variant_certain"
+            and data_equals(children, [0, 0], "location")
+            and data_equals(children, [0, 1], "repeat")
+            and data_equals(children, [1, 0], "location")
+            and data_equals(children, [1, 1], "repeat")
+            and len(get_child(children, [2]).children) == 1
+            and data_equals(children, [2, 0], "location")
         ),
         "selected": 2,
     },
@@ -284,17 +284,17 @@ AMBIGUITIES = [
         "type": "variant_certain-location_repeat|location_inversion - inversion",
         # NC_000015.9(NM_001012338.3):c.396-6644_1397-29766inv
         "conditions": lambda children: (
-                len(children) == 3
-                and children[0].data == children[1].data == children[2].data == "variant_certain"
-                and len(get_child(children, [0]).children) == 2
-                and data_equals(children, [0, 0], "location")
-                and data_equals(children, [0, 1], "inversion")
-                and len(get_child(children, [1]).children) == 2
-                and data_equals(children, [1, 0], "location")
-                and data_equals(children, [1, 1], "repeat")
-                and len(get_child(children, [2]).children) == 2
-                and data_equals(children, [2, 0], "location")
-                and data_equals(children, [2, 1], "repeat")
+            len(children) == 3
+            and children[0].data == children[1].data == children[2].data == "variant_certain"
+            and len(get_child(children, [0]).children) == 2
+            and data_equals(children, [0, 0], "location")
+            and data_equals(children, [0, 1], "inversion")
+            and len(get_child(children, [1]).children) == 2
+            and data_equals(children, [1, 0], "location")
+            and data_equals(children, [1, 1], "repeat")
+            and len(get_child(children, [2]).children) == 2
+            and data_equals(children, [2, 0], "location")
+            and data_equals(children, [2, 1], "repeat")
         ),
         "selected": 0,
     },
@@ -302,14 +302,14 @@ AMBIGUITIES = [
         "type": "variant_certain_duplication | variant_certain_repeat - duplication",
         # R1:c.10-5_10-2dupR2:10
         "conditions": lambda children: (
-                len(children) == 2
-                and children[0].data == children[1].data == "variant_certain"
-                and len(get_child(children, [0]).children) == 2
-                and data_equals(children, [0, 0], "location")
-                and data_equals(children, [0, 1], "duplication")
-                and len(get_child(children, [1]).children) == 2
-                and data_equals(children, [1, 0], "location")
-                and data_equals(children, [1, 1], "repeat")
+            len(children) == 2
+            and children[0].data == children[1].data == "variant_certain"
+            and len(get_child(children, [0]).children) == 2
+            and data_equals(children, [0, 0], "location")
+            and data_equals(children, [0, 1], "duplication")
+            and len(get_child(children, [1]).children) == 2
+            and data_equals(children, [1, 0], "location")
+            and data_equals(children, [1, 1], "repeat")
         ),
         "selected": 0,
     },
@@ -317,18 +317,16 @@ AMBIGUITIES = [
         "type": "variant_certain_deletion | variant_certain_repeat - deletion",
         # R1:c.10-5_10-2delR2:10del
         "conditions": lambda children: (
-                len(children) == 2
-                and children[0].data == children[1].data == "variant_certain"
-                and len(get_child(children, [0]).children) == 2
-                and data_equals(children, [0, 0], "location")
-                and data_equals(children, [0, 1], "deletion")
-                and len(get_child(children, [1]).children) == 2
-                and data_equals(children, [1, 0], "location")
-                and data_equals(children, [1, 1], "repeat")
-
-                and len(get_child(children, [0, 1]).children) == 1
-                and data_equals(children, [0, 1, 0], "inserted")
-
+            len(children) == 2
+            and children[0].data == children[1].data == "variant_certain"
+            and len(get_child(children, [0]).children) == 2
+            and data_equals(children, [0, 0], "location")
+            and data_equals(children, [0, 1], "deletion")
+            and len(get_child(children, [1]).children) == 2
+            and data_equals(children, [1, 0], "location")
+            and data_equals(children, [1, 1], "repeat")
+            and len(get_child(children, [0, 1]).children) == 1
+            and data_equals(children, [0, 1, 0], "inserted")
         ),
         "selected": 0,
     },
@@ -336,140 +334,174 @@ AMBIGUITIES = [
         "type": "variant_certain_delins | variant_certain_delins - one insert",
         # R1:c.10-5_10-2delinsTCTR2.2:c.10insT
         "conditions": lambda children: (
-                len(children) == 2
-                and children[0].data == children[1].data == "deletion_insertion"
-                and len(get_child(children, [1]).children) == 1
-                and data_equals(children, [0, 0], "inserted")
+            len(children) == 2
+            and children[0].data == children[1].data == "deletion_insertion"
+            and len(get_child(children, [1]).children) == 1
+            and data_equals(children, [0, 0], "inserted")
         ),
-        "selected": 1
+        "selected": 1,
     },
     # TODO: revisit the next ones in the repeats context.
     {
         "type": "variant_certain_repeat | variant_certain_repeat_length - length 0",
         # R1:c.10-2[5]
         "conditions": lambda children: (
-                len(children) == 2
-                and children[0].data == children[1].data == "variant_certain"
-                and len(get_child(children, [0]).children) == 2
-                and data_equals(children, [0, 0], "location")
-                and data_equals(children, [0, 1], "repeat")
-
-                and len(get_child(children, [1]).children) == 2
-                and data_equals(children, [1, 0], "location")
-                and data_equals(children, [1, 1], "repeat")
-
-                and len(get_child(children, [0, 1]).children) == 1
-                and data_equals(children, [0, 1, 0], "inserted")
-                and len(get_child(children, [0, 1, 0]).children) == 1
-                and data_equals(children, [0, 1, 0, 0], "insert")
-                and len(get_child(children, [0, 1, 0, 0]).children) == 1
-                and data_equals(children, [0, 1, 0, 0, 0], "length")
+            len(children) == 2
+            and children[0].data == children[1].data == "variant_certain"
+            and len(get_child(children, [0]).children) == 2
+            and data_equals(children, [0, 0], "location")
+            and data_equals(children, [0, 1], "repeat")
+            and len(get_child(children, [1]).children) == 2
+            and data_equals(children, [1, 0], "location")
+            and data_equals(children, [1, 1], "repeat")
+            and len(get_child(children, [0, 1]).children) == 1
+            and data_equals(children, [0, 1, 0], "inserted")
+            and len(get_child(children, [0, 1, 0]).children) == 1
+            and data_equals(children, [0, 1, 0, 0], "insert")
+            and len(get_child(children, [0, 1, 0, 0]).children) == 1
+            and data_equals(children, [0, 1, 0, 0, 0], "length")
         ),
-        "selected": 0
+        "selected": 0,
     },
     {
         "type": "variant_certain_repeat | variant_certain_repeat_length - length 1",
         # R1:c.10-2[5]
         "conditions": lambda children: (
-                len(children) == 2
-                and children[0].data == children[1].data == "variant_certain"
-                and len(get_child(children, [0]).children) == 2
-                and data_equals(children, [0, 0], "location")
-                and data_equals(children, [0, 1], "repeat")
-
-                and len(get_child(children, [1]).children) == 2
-                and data_equals(children, [1, 0], "location")
-                and data_equals(children, [1, 1], "repeat")
-
-                and len(get_child(children, [1, 1]).children) == 1
-                and data_equals(children, [1, 1, 0], "inserted")
-                and len(get_child(children, [1, 1, 0]).children) == 1
-                and data_equals(children, [1, 1, 0, 0], "insert")
-                and len(get_child(children, [1, 1, 0, 0]).children) == 1
-                and data_equals(children, [1, 1, 0, 0, 0], "length")
+            len(children) == 2
+            and children[0].data == children[1].data == "variant_certain"
+            and len(get_child(children, [0]).children) == 2
+            and data_equals(children, [0, 0], "location")
+            and data_equals(children, [0, 1], "repeat")
+            and len(get_child(children, [1]).children) == 2
+            and data_equals(children, [1, 0], "location")
+            and data_equals(children, [1, 1], "repeat")
+            and len(get_child(children, [1, 1]).children) == 1
+            and data_equals(children, [1, 1, 0], "inserted")
+            and len(get_child(children, [1, 1, 0]).children) == 1
+            and data_equals(children, [1, 1, 0, 0], "insert")
+            and len(get_child(children, [1, 1, 0, 0]).children) == 1
+            and data_equals(children, [1, 1, 0, 0, 0], "length")
         ),
-        "selected": 1
+        "selected": 1,
     },
     {
         "type": "variant_certain_repeat | variant_certain_repeat_range_length - length 0",
         # R1:c.10-2_10-4[5]
         "conditions": lambda children: (
-                len(children) == 3
-                and children[0].data == children[1].data == "variant_certain"
-                and len(get_child(children, [0]).children) == 2
-                and data_equals(children, [0, 0], "location")
-                and data_equals(children, [0, 1], "repeat")
-
-                and len(get_child(children, [1]).children) == 2
-                and data_equals(children, [1, 0], "location")
-                and data_equals(children, [1, 1], "repeat")
-
-                and len(get_child(children, [2]).children) == 2
-                and data_equals(children, [2, 0], "location")
-                and data_equals(children, [2, 1], "repeat")
-
-                and len(get_child(children, [0, 1]).children) == 1
-                and data_equals(children, [0, 1, 0], "inserted")
-                and len(get_child(children, [0, 1, 0]).children) == 1
-                and data_equals(children, [0, 1, 0, 0], "insert")
-                and len(get_child(children, [0, 1, 0, 0]).children) == 1
-                and data_equals(children, [0, 1, 0, 0, 0], "length")
+            len(children) == 3
+            and children[0].data == children[1].data == "variant_certain"
+            and len(get_child(children, [0]).children) == 2
+            and data_equals(children, [0, 0], "location")
+            and data_equals(children, [0, 1], "repeat")
+            and len(get_child(children, [1]).children) == 2
+            and data_equals(children, [1, 0], "location")
+            and data_equals(children, [1, 1], "repeat")
+            and len(get_child(children, [2]).children) == 2
+            and data_equals(children, [2, 0], "location")
+            and data_equals(children, [2, 1], "repeat")
+            and len(get_child(children, [0, 1]).children) == 1
+            and data_equals(children, [0, 1, 0], "inserted")
+            and len(get_child(children, [0, 1, 0]).children) == 1
+            and data_equals(children, [0, 1, 0, 0], "insert")
+            and len(get_child(children, [0, 1, 0, 0]).children) == 1
+            and data_equals(children, [0, 1, 0, 0, 0], "length")
         ),
-        "selected": 0
+        "selected": 0,
     },
     {
         "type": "variant_certain_repeat | variant_certain_repeat_range_length - length 1",
         # R1:c.10-2_10-4[5]
         "conditions": lambda children: (
-                len(children) == 3
-                and children[0].data == children[1].data == "variant_certain"
-                and len(get_child(children, [0]).children) == 2
-                and data_equals(children, [0, 0], "location")
-                and data_equals(children, [0, 1], "repeat")
-
-                and len(get_child(children, [1]).children) == 2
-                and data_equals(children, [1, 0], "location")
-                and data_equals(children, [1, 1], "repeat")
-
-                and len(get_child(children, [2]).children) == 2
-                and data_equals(children, [2, 0], "location")
-                and data_equals(children, [2, 1], "repeat")
-
-                and len(get_child(children, [1, 1]).children) == 1
-                and data_equals(children, [1, 1, 0], "inserted")
-                and len(get_child(children, [1, 1, 0]).children) == 1
-                and data_equals(children, [1, 1, 0, 0], "insert")
-                and len(get_child(children, [1, 1, 0, 0]).children) == 1
-                and data_equals(children, [1, 1, 0, 0, 0], "length")
+            len(children) == 3
+            and children[0].data == children[1].data == "variant_certain"
+            and len(get_child(children, [0]).children) == 2
+            and data_equals(children, [0, 0], "location")
+            and data_equals(children, [0, 1], "repeat")
+            and len(get_child(children, [1]).children) == 2
+            and data_equals(children, [1, 0], "location")
+            and data_equals(children, [1, 1], "repeat")
+            and len(get_child(children, [2]).children) == 2
+            and data_equals(children, [2, 0], "location")
+            and data_equals(children, [2, 1], "repeat")
+            and len(get_child(children, [1, 1]).children) == 1
+            and data_equals(children, [1, 1, 0], "inserted")
+            and len(get_child(children, [1, 1, 0]).children) == 1
+            and data_equals(children, [1, 1, 0, 0], "insert")
+            and len(get_child(children, [1, 1, 0, 0]).children) == 1
+            and data_equals(children, [1, 1, 0, 0, 0], "length")
         ),
-        "selected": 1
+        "selected": 1,
     },
     {
         "type": "variant_certain_repeat | variant_certain_repeat_range_length - length 2",
         # R1:c.10-2_10-4[5]
         "conditions": lambda children: (
-                len(children) == 3
-                and children[0].data == children[1].data == "variant_certain"
-                and len(get_child(children, [0]).children) == 2
-                and data_equals(children, [0, 0], "location")
-                and data_equals(children, [0, 1], "repeat")
-
-                and len(get_child(children, [1]).children) == 2
-                and data_equals(children, [1, 0], "location")
-                and data_equals(children, [1, 1], "repeat")
-
-                and len(get_child(children, [2]).children) == 2
-                and data_equals(children, [2, 0], "location")
-                and data_equals(children, [2, 1], "repeat")
-
-                and len(get_child(children, [2, 1]).children) == 1
-                and data_equals(children, [2, 1, 0], "inserted")
-                and len(get_child(children, [2, 1, 0]).children) == 1
-                and data_equals(children, [2, 1, 0, 0], "insert")
-                and len(get_child(children, [2, 1, 0, 0]).children) == 1
-                and data_equals(children, [2, 1, 0, 0, 0], "length")
+            len(children) == 3
+            and children[0].data == children[1].data == "variant_certain"
+            and len(get_child(children, [0]).children) == 2
+            and data_equals(children, [0, 0], "location")
+            and data_equals(children, [0, 1], "repeat")
+            and len(get_child(children, [1]).children) == 2
+            and data_equals(children, [1, 0], "location")
+            and data_equals(children, [1, 1], "repeat")
+            and len(get_child(children, [2]).children) == 2
+            and data_equals(children, [2, 0], "location")
+            and data_equals(children, [2, 1], "repeat")
+            and len(get_child(children, [2, 1]).children) == 1
+            and data_equals(children, [2, 1, 0], "inserted")
+            and len(get_child(children, [2, 1, 0]).children) == 1
+            and data_equals(children, [2, 1, 0, 0], "insert")
+            and len(get_child(children, [2, 1, 0, 0]).children) == 1
+            and data_equals(children, [2, 1, 0, 0, 0], "length")
         ),
-        "selected": 2
+        "selected": 2,
+    },
+    {
+        "type": "variant_certain_repeat | variant_certain_substitution - 2",
+        # for protein descriptions
+        # STR:D5S818
+        "conditions": lambda children: (
+            len(children) == 2
+            and children[0].data == children[1].data == "variant_certain"
+            and len(get_child(children, [0]).children) == 2
+            and data_equals(children, [0, 0], "location")
+            and isinstance(get_child(children, [0, 0, 0]), Tree)
+            and data_equals(children, [0, 0, 0], "point")
+            and len(get_child(children, [0, 0, 0]).children) == 2
+            and isinstance(get_child(children, [0, 0, 0, 0]), Token)
+            and isinstance(get_child(children, [0, 0, 0, 1]), Token)
+            and data_equals(children, [0, 1], "repeat")
+            and len(get_child(children, [1]).children) == 2
+            and data_equals(children, [1, 0], "location")
+            and isinstance(get_child(children, [1, 0, 0]), Tree)
+            and data_equals(children, [1, 0, 0], "point")
+            and len(get_child(children, [1, 0, 0]).children) == 2
+            and isinstance(get_child(children, [1, 0, 0, 0]), Token)
+            and isinstance(get_child(children, [1, 0, 0, 1]), Token)
+            and data_equals(children, [1, 1], "substitution")
+        ),
+        "selected": 1,
+    },
+    {
+        "type": "deletion_insertion | deletion_insertion | ... nested - 0",
+        # REF_1:10del REF_2:20insA REF_3:30insT
+        "conditions": lambda children: (
+            len(children) >= 2
+            and children[0].data == children[1].data == "deletion_insertion"
+            and len(get_child(children, [0]).children) == 2
+            and len(get_child(children, [1]).children) == 2
+            and isinstance(get_child(children, [1, 0]), Tree)
+            and len(get_child(children, [1, 0]).children) == 1
+            and isinstance(get_child(children, [1, 1]), Tree)
+            and len(get_child(children, [1, 1]).children) == 1
+            and data_equals(children, [1, 0, 0], "insert")
+            and len(get_child(children, [1, 0, 0]).children) == 1
+            and (
+                data_equals(children, [1, 0, 0, 0], "description_dna")
+                or data_equals(children, [1, 0, 0, 0], "description_protein")
+            )
+        ),
+        "selected": 1,
     },
 ]
 
@@ -698,9 +730,11 @@ class HgvsParser:
                 "  Propagate positions: %s" % self._parser.options.propagate_positions
             )
 
+
 @functools.lru_cache
 def get_parser(grammar_path=None, start_rule=None):
     return HgvsParser(grammar_path, start_rule)
+
 
 def parse(description, grammar_path=None, start_rule=None):
     """
