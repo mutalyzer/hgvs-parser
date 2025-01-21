@@ -587,7 +587,7 @@ VARIANTS = {
     "10-5_10-2inv": {
         "type": "inversion",
         "source": "reference",
-        "location": LOCATIONS["10-5_10-2"]
+        "location": LOCATIONS["10-5_10-2"],
     },
     # Conversions
     "10_20con40_50": {
@@ -943,101 +943,226 @@ DESCRIPTIONS = {
         "reference": REFERENCES["R1"],
         "type": "description_dna",
         "coordinate_system": "c",
-        "variants": [{
-            "location": LOCATIONS["10-5_10-2"],
-            "type": "duplication",
-            "source": "reference",
-            "inserted": [
-                {
-                    "type": "description_dna",
-                    "source": {"id": "R2"},
-                    "location": {
-                        "type": "point",
-                        "position": 10
+        "variants": [
+            {
+                "location": LOCATIONS["10-5_10-2"],
+                "type": "duplication",
+                "source": "reference",
+                "inserted": [
+                    {
+                        "type": "description_dna",
+                        "source": {"id": "R2"},
+                        "location": {"type": "point", "position": 10},
                     }
-                }
-            ]
-        }],
+                ],
+            }
+        ],
     },
     "R1:c.10-5_10-2delinsTCTR2.2:c.10": {
         "reference": REFERENCES["R1"],
         "type": "description_dna",
         "coordinate_system": "c",
-        "variants": [{
-            "location": LOCATIONS["10-5_10-2"],
-            "type": "deletion_insertion",
-            "source": "reference",
-            "inserted": [
-                {
-                    "type": "description_dna",
-                    "source": {"id": "TCTR2.2"},
-                    "coordinate_system": "c",
-                    "location": {
-                        "type": "point",
-                        "position": 10
+        "variants": [
+            {
+                "location": LOCATIONS["10-5_10-2"],
+                "type": "deletion_insertion",
+                "source": "reference",
+                "inserted": [
+                    {
+                        "type": "description_dna",
+                        "source": {"id": "TCTR2.2"},
+                        "coordinate_system": "c",
+                        "location": {"type": "point", "position": 10},
                     }
-                }
-            ]
-        }],
+                ],
+            }
+        ],
     },
     # TODO: revisit this in the repeats context.
     "R1:c.10-20[5]": {
         "reference": REFERENCES["R1"],
         "type": "description_dna",
         "coordinate_system": "c",
-        "variants": [{
-            "location": LOCATIONS["10-20"],
-            "type": "repeat",
-            "source": "reference",
-            "inserted": [{"length": LENGTHS["5"]}
-            ]
-        }],
+        "variants": [
+            {
+                "location": LOCATIONS["10-20"],
+                "type": "repeat",
+                "source": "reference",
+                "inserted": [{"length": LENGTHS["5"]}],
+            }
+        ],
     },
     "R1:c.10-5_10-2[5]": {
         "reference": REFERENCES["R1"],
         "type": "description_dna",
         "coordinate_system": "c",
-        "variants": [{
-            "location": LOCATIONS["10-5_10-2"],
-            "type": "repeat",
-            "source": "reference",
-            "inserted": [{"length": LENGTHS["5"]}
-                         ]
-        }],
+        "variants": [
+            {
+                "location": LOCATIONS["10-5_10-2"],
+                "type": "repeat",
+                "source": "reference",
+                "inserted": [{"length": LENGTHS["5"]}],
+            }
+        ],
     },
     "R1:p.10AE[5]": {
         "reference": REFERENCES["R1"],
         "type": "description_protein",
         "coordinate_system": "p",
-        "variants": [{
-            "location": LOCATIONS["10"],
-            "type": "repeat",
-            "source": "reference",
-            "inserted": [
-                {
-                    "sequence": "AE",
-                    "repeat_number": LENGTHS["5"],
-                    "source": "description"
-                }
-            ]
-        }],
+        "variants": [
+            {
+                "location": LOCATIONS["10"],
+                "type": "repeat",
+                "source": "reference",
+                "inserted": [
+                    {
+                        "sequence": "AE",
+                        "repeat_number": LENGTHS["5"],
+                        "source": "description",
+                    }
+                ],
+            }
+        ],
     },
     "R1:p.10AlaArg[5]": {
         "reference": REFERENCES["R1"],
         "type": "description_protein",
         "coordinate_system": "p",
-        "variants": [{
-            "location": LOCATIONS["10"],
-            "type": "repeat",
-            "source": "reference",
-            "inserted": [
-                {
-                    "sequence": "AlaArg",
-                    "repeat_number": LENGTHS["5"],
-                    "source": "description"
-                }
-            ]
-        }],
+        "variants": [
+            {
+                "location": LOCATIONS["10"],
+                "type": "repeat",
+                "source": "reference",
+                "inserted": [
+                    {
+                        "sequence": "AlaArg",
+                        "repeat_number": LENGTHS["5"],
+                        "source": "description",
+                    }
+                ],
+            }
+        ],
+    },
+    "LRG_763t1:52_153CAG[21]CAA[1]CAG[1]CCG[1]CCA[1]CCG[7]CCT[2]": {
+        "type": "description_dna",
+        "reference": {"id": "LRG_763t1"},
+        "variants": [
+            {
+                "location": {
+                    "start": {"type": "point", "position": 52},
+                    "end": {"type": "point", "position": 153},
+                    "type": "range",
+                },
+                "type": "repeat",
+                "source": "reference",
+                "inserted": [
+                    {
+                        "sequence": "CAG",
+                        "repeat_number": {"type": "point", "value": 21},
+                        "source": "description",
+                    },
+                    {
+                        "sequence": "CAA",
+                        "repeat_number": {"type": "point", "value": 1},
+                        "source": "description",
+                    },
+                    {
+                        "sequence": "CAG",
+                        "repeat_number": {"type": "point", "value": 1},
+                        "source": "description",
+                    },
+                    {
+                        "sequence": "CCG",
+                        "repeat_number": {"type": "point", "value": 1},
+                        "source": "description",
+                    },
+                    {
+                        "sequence": "CCA",
+                        "repeat_number": {"type": "point", "value": 1},
+                        "source": "description",
+                    },
+                    {
+                        "sequence": "CCG",
+                        "repeat_number": {"type": "point", "value": 7},
+                        "source": "description",
+                    },
+                    {
+                        "sequence": "CCT",
+                        "repeat_number": {"type": "point", "value": 2},
+                        "source": "description",
+                    },
+                ],
+            }
+        ],
+    },
+    "R1:p.Ala1207_Asp1208Thr1207_Asn1208": {
+        "type": "description_protein",
+        "reference": {"id": "R1"},
+        "coordinate_system": "p",
+        "variants": [
+            {
+                "location": {
+                    "start": {"type": "point", "amino_acid": "Ala", "position": 1207},
+                    "end": {"type": "point", "amino_acid": "Asp", "position": 1208},
+                    "type": "range",
+                },
+                "type": "substitution",
+                "source": "reference",
+                "inserted": [
+                    {
+                        "location": {
+                            "start": {
+                                "type": "point",
+                                "amino_acid": "Thr",
+                                "position": 1207,
+                            },
+                            "end": {
+                                "type": "point",
+                                "amino_acid": "Asn",
+                                "position": 1208,
+                            },
+                            "type": "range",
+                        },
+                        "source": "reference",
+                    }
+                ],
+            }
+        ],
+    },
+    "R1:p.Ala1207_Asp1208Thr1207_Asn1208[10]": {
+        "type": "description_protein",
+        "reference": {"id": "R1"},
+        "coordinate_system": "p",
+        "variants": [
+            {
+                "location": {
+                    "start": {"type": "point", "amino_acid": "Ala", "position": 1207},
+                    "end": {"type": "point", "amino_acid": "Asp", "position": 1208},
+                    "type": "range",
+                },
+                "type": "repeat",
+                "source": "reference",
+                "inserted": [
+                    {
+                        "location": {
+                            "start": {
+                                "type": "point",
+                                "amino_acid": "Thr",
+                                "position": 1207,
+                            },
+                            "end": {
+                                "type": "point",
+                                "amino_acid": "Asn",
+                                "position": 1208,
+                            },
+                            "type": "range",
+                        },
+                        "repeat_number": {"type": "point", "value": 10},
+                        "source": "reference",
+                    }
+                ],
+            }
+        ],
     },
 }
 
@@ -1099,7 +1224,7 @@ def test_mix(description, model):
         "R1:c.10-5_10-2delR2:10del",
         "R1:c.10-5_10-2dupR2:10del",
         "R1:c.10-5_10-2delinsTCTR2.2:c.10insT",
-        "REF_1:10del REF_2:20insA REF_3:30insT"
+        "REF_1:10del REF_2:20insA REF_3:30insT",
     ],
 )
 def test_nested_descriptions(description):

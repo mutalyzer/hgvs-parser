@@ -2,14 +2,14 @@
 Module for parsing HGVS variant descriptions.
 """
 
-import os
 import functools
+import os
 
 from lark import Lark, Token, Transformer, Tree
 from lark.exceptions import UnexpectedCharacters, UnexpectedEOF
 
 from .exceptions import UnexpectedCharacter, UnexpectedEnd
-from .util import data_equals, get_child
+from .util import all_tree_children_equal, data_equals, get_child
 
 AMBIGUITIES = [
     {
@@ -270,7 +270,10 @@ AMBIGUITIES = [
         # NM_000492.4:c.1210-34_1210-6
         "conditions": lambda children: (
             len(children) == 3
-            and children[0].data == children[1].data == children[2].data == "variant_certain"
+            and children[0].data
+            == children[1].data
+            == children[2].data
+            == "variant_certain"
             and data_equals(children, [0, 0], "location")
             and data_equals(children, [0, 1], "repeat")
             and data_equals(children, [1, 0], "location")
@@ -285,7 +288,10 @@ AMBIGUITIES = [
         # NC_000015.9(NM_001012338.3):c.396-6644_1397-29766inv
         "conditions": lambda children: (
             len(children) == 3
-            and children[0].data == children[1].data == children[2].data == "variant_certain"
+            and children[0].data
+            == children[1].data
+            == children[2].data
+            == "variant_certain"
             and len(get_child(children, [0]).children) == 2
             and data_equals(children, [0, 0], "location")
             and data_equals(children, [0, 1], "inversion")
@@ -503,18 +509,125 @@ AMBIGUITIES = [
         ),
         "selected": 1,
     },
+    {
+        "type": "inserted | inserted ",
+        # in the inserted rule
+        # NG_000001.1(NM_000002.3):c.(170_?)_420+60[19]
+        "conditions": lambda children: (
+            len(children) == 2
+            and children[0].data == children[1].data == "inserted"
+            and len(get_child(children, [0]).children) == 1
+            and data_equals(children, [0, 0], "insert")
+            and len(get_child(children, [0, 0]).children) == 1
+            and data_equals(children, [0, 0, 0], "description_dna")
+            and len(get_child(children, [1]).children) == 1
+            and data_equals(children, [1, 0], "insert")
+            and len(get_child(children, [1, 0]).children) == 2
+            and data_equals(children, [1, 0, 0], "description_dna")
+            and data_equals(children, [1, 0, 1], "repeat_number")
+        ),
+        "selected": 1,
+    },
+    {
+        "type": "inserted insert repeat_mixed - 0 ",
+        # in the variant rule
+        # 123_191delins[CAG[19];CAA[4]]
+        "conditions": lambda children: (
+            all_tree_children_equal(children, "inserted")
+            and all_tree_children_equal(children[0].children, "insert")
+        ),
+        "selected": 0,
+    },
+    {
+        "type": "variant_certain repeat | variant_certain substitution - 0 ",
+        # for proteins
+        # R1:p.Ala1207_Asp1208Thr1207_Asn1208
+        "conditions": lambda children: (
+            len(children) == 2
+            and children[0].data == children[1].data == "variant_certain"
+            and len(get_child(children, [0]).children) == 2
+            and data_equals(children, [0, 0], "location")
+            and data_equals(children, [0, 1], "repeat")
+            and len(get_child(children, [0, 1]).children) == 1
+            and data_equals(children, [0, 1, 0], "inserted")
+            and len(get_child(children, [0, 1, 0]).children) == 1
+            and data_equals(children, [0, 1, 0, 0], "insert")
+            and len(get_child(children, [0, 1, 0, 0]).children) == 1
+            and data_equals(children, [0, 1, 0, 0, 0], "repeat_mixed")
+            and len(get_child(children, [0, 1, 0, 0, 0]).children) == 2
+            and data_equals(children, [0, 1, 0, 0, 0, 1], "repeat_number")
+            and len(get_child(children, [1]).children) == 2
+            and data_equals(children, [1, 0], "location")
+            and data_equals(children, [1, 1], "substitution")
+        ),
+        "selected": 0,
+    },
+    {
+        "type": "variant_certain repeat | variant_certain substitution - 1 ",
+        # for proteins
+        # R1:p.Ala1207_Asp1208Thr1207_Asn1208[10]
+        "conditions": lambda children: (
+            len(children) == 2
+            and children[0].data == children[1].data == "variant_certain"
+            and len(get_child(children, [0]).children) == 2
+            and data_equals(children, [0, 0], "location")
+            and data_equals(children, [0, 1], "repeat")
+            and len(get_child(children, [0, 1]).children) == 1
+            and data_equals(children, [0, 1, 0], "inserted")
+            and len(get_child(children, [0, 1, 0]).children) == 1
+            and data_equals(children, [0, 1, 0, 0], "insert")
+            and len(get_child(children, [0, 1, 0, 0]).children) == 1
+            and data_equals(children, [0, 1, 0, 0, 0], "location")
+            and len(get_child(children, [1]).children) == 2
+            and data_equals(children, [1, 0], "location")
+            and data_equals(children, [1, 1], "substitution")
+        ),
+        "selected": 1,
+    },
+    {
+        "type": "variant_certain repeat | variant_certain substitution - 1 ",
+        # for proteins
+        # R1:54_149Ala[23]Ter[1]
+        "conditions": lambda children: (
+            len(children) == 2
+            and children[0].data == children[1].data == "variant_certain"
+            and len(get_child(children, [0]).children) == 2
+            and data_equals(children, [0, 0], "location")
+            and data_equals(children, [0, 1], "repeat")
+            and len(get_child(children, [1]).children) == 2
+            and data_equals(children, [1, 0], "location")
+            and data_equals(children, [1, 1], "substitution")
+            and get_child(children, [0, 1, 0]) == get_child(children, [1, 1, 0])
+        ),
+        "selected": 0,
+    },
+    {
+        "type": "repeat | repeat - 0 ",
+        # NG_007524:28578-181-182
+        "conditions": lambda children: (
+            len(children) == 2
+            and children[0].data == children[1].data == "variant_certain"
+            and len(get_child(children, [0]).children) == 2
+            and data_equals(children, [0, 0], "location")
+            and data_equals(children, [0, 1], "repeat")
+            and len(get_child(children, [1]).children) == 2
+            and data_equals(children, [1, 0], "location")
+            and data_equals(children, [1, 1], "repeat")
+        ),
+        "selected": 0,
+    },
 ]
 
 
 class AmbigTransformer(Transformer):
     def _ambig(self, children):
+        # from lark.tree import pydot__tree_to_png
+        # pydot__tree_to_png(Tree("ambig", children), "ambig.png")
         for ambig in AMBIGUITIES:
             if ambig["conditions"](children):
                 # from lark.tree import pydot__tree_to_png
                 # pydot__tree_to_png(Tree("ambig", children), "ambig_2.png")
                 return children[ambig["selected"]]
-        # from lark.tree import pydot__tree_to_png
-        # pydot__tree_to_png(Tree("ambig", children), "ambig.png")
         raise Exception("Ambiguity not solved.")
 
 
@@ -749,6 +862,9 @@ def parse(description, grammar_path=None, start_rule=None):
     :rtype: lark.Tree
     """
     parser = get_parser(grammar_path, start_rule)
+
+    # from lark.tree import pydot__tree_to_png
+    # pydot__tree_to_png(parser.parse(description), "tree.png")
 
     return FinalTransformer().transform(
         AmbigTransformer().transform(

@@ -226,7 +226,7 @@ class Converter(Transformer):
         return {"inserted": output}
 
     def insert(self, children):
-        if len(children) > 1 and children[0].get("repeat_mixed"):
+        if children[0].get("repeat_mixed"):
             return _insert_repeat_mixed(children)
         new_children = []
         for child in children:

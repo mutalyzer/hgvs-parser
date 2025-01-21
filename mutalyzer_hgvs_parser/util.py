@@ -38,10 +38,17 @@ def get_child(children, path):
 
 
 def get_only_value(children):
-    """
-    It happens quite often to
-    """
     if len(children) == 1:
         return children[0][list(children[0])[0]]
     else:
         raise Exception("Not only one key dictionary.")
+
+
+def all_tree_children_equal(children, child_type):
+    for child in children:
+        if not isinstance(child, Tree):
+            return False
+        else:
+            if child.data != child_type:
+                return False
+    return True
