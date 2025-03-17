@@ -1164,6 +1164,68 @@ DESCRIPTIONS = {
             }
         ],
     },
+    "NC_000016.9:g.pter_2140661delins[NC_000001.10:g.188411550_pterinv]": {
+        "type": "description_dna",
+        "reference": {"id": "NC_000016.9"},
+        "coordinate_system": "g",
+        "variants": [
+            {
+                "location": {
+                    "start": {"type": "point", "position": "pter"},
+                    "end": {"type": "point", "position": 2140661},
+                    "type": "range",
+                },
+                "type": "deletion_insertion",
+                "source": "reference",
+                "inserted": [
+                    {
+                        "type": "description_dna",
+                        "coordinate_system": "g",
+                        "source": {"id": "NC_000001.10"},
+                        "location": {
+                            "start": {"type": "point", "position": 188411550},
+                            "end": {"type": "point", "position": "pter"},
+                            "type": "range",
+                            "inverted": True,
+                        },
+                    }
+                ],
+            }
+        ],
+    },
+    "R1:c.10-5_10-2delins[R2:10;R1:10_20inv]": {
+        "type": "description_dna",
+        "reference": {"id": "R1"},
+        "coordinate_system": "c",
+        "variants": [
+            {
+                "location": {
+                    "start": {"type": "point", "position": 10, "offset": {"value": -5}},
+                    "end": {"type": "point", "position": 10, "offset": {"value": -2}},
+                    "type": "range",
+                },
+                "type": "deletion_insertion",
+                "source": "reference",
+                "inserted": [
+                    {
+                        "type": "description_dna",
+                        "source": {"id": "R2"},
+                        "location": {"type": "point", "position": 10},
+                    },
+                    {
+                        "type": "description_dna",
+                        "source": {"id": "R1"},
+                        "location": {
+                            "start": {"type": "point", "position": 10},
+                            "end": {"type": "point", "position": 20},
+                            "type": "range",
+                            "inverted": True,
+                        },
+                    },
+                ],
+            }
+        ],
+    },
 }
 
 
@@ -1225,6 +1287,7 @@ def test_mix(description, model):
         "R1:c.10-5_10-2dupR2:10del",
         "R1:c.10-5_10-2delinsTCTR2.2:c.10insT",
         "REF_1:10del REF_2:20insA REF_3:30insT",
+        "R1:c.10-5_10-2delins[R2:10;R1:10_20del]",
     ],
 )
 def test_nested_descriptions(description):

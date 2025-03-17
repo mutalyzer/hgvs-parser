@@ -170,6 +170,7 @@ def parser():
         "NC_000002.12:g.pter_qterdelins[NC_000011.10:g.pter_qter]",
         "NC_000002.12:g.pterdelins[NC_000011.10:g.pter_qter]",
         "NC_000002.12:g.qterdelins[NC_000011.10:g.pter_qter]",
+        "NC_000016.9:g.pter_2140661delins[NC_000001.10:g.188411550_pterinv]"
     ],
 )
 def test_correct_syntax(parser, description):

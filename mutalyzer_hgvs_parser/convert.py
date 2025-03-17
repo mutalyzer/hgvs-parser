@@ -308,12 +308,21 @@ def _insert(children):
     elif output.get("location"):
         output["source"] = "reference"
     elif output.get("type"):
-        if len(output["variants"]) != 1:
+        variants = output.get("variants", [])
+        if len(output["variants"]) > 1:
             raise NestedDescriptions()
-        if len(output["variants"][0]) != 1:
-            raise NestedDescriptions()
-        output["source"] = output["reference"]
-        output.update(output["variants"][0])
-        output.pop("reference")
-        output.pop("variants")
+        elif len(variants) == 1:
+            if variants[0].get("type") is None:
+                output["source"] = output["reference"]
+                output.update(output["variants"][0])
+                output.pop("reference")
+                output.pop("variants")
+            elif variants[0].get("type") is "inversion":
+                output["source"] = output["reference"]
+                output["location"] = variants[0]["location"]
+                output["location"]["inverted"] = True
+                output.pop("variants")
+                output.pop("reference")
+            else:
+                raise NestedDescriptions()
     return {"insert": [output]}

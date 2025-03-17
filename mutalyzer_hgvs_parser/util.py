@@ -13,14 +13,17 @@ def to_dict(d_list):
 
 def data_equals(children, path, data):
     parent = None
-    for i, p in enumerate(path):
-        if isinstance(children, list) and len(children) > p:
+    for p in path:
+        if isinstance(children, list) and p < len(children):
             parent = children[p]
-            if isinstance(children[p], Tree):
-                children = children[p].children
+            if isinstance(parent, Tree):
+                children = parent.children
+            else:
+                return False
         else:
             return False
-    return parent.data == data
+
+    return isinstance(parent, Tree) and parent.data == data
 
 
 def get_child(children, path):
