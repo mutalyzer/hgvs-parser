@@ -616,6 +616,61 @@ AMBIGUITIES = [
         ),
         "selected": 0,
     },
+    {
+        "type": "insert description_dna repeat_number | insert description_dna - 0 ",
+        # inserted
+        # NG_000001.1(NM_000002.3):c.(170_?)_420+60[19]
+        "conditions": lambda children: (
+                len(children) == 2
+                and children[0].data == children[1].data == "insert"
+                and len(get_child(children, [0]).children) == 2
+                and data_equals(children, [0, 0], "description_dna")
+                and data_equals(children, [0, 1], "repeat_number")
+                and len(get_child(children, [1]).children) == 1
+                and data_equals(children, [1, 0], "description_dna")
+        ),
+        "selected": 0,
+    },
+    {
+        "type": "insert location repeat_number | insert repeat_mixed - 0 ",
+        # test_variant_to_model 123_191[CAG[19];CAA[4];10_15[6]
+        "conditions": lambda children: (
+                len(children) == 2
+                and children[0].data == children[1].data == "insert"
+                and len(get_child(children, [0]).children) in [2, 3]
+                and data_equals(children, [0, 1], "repeat_number")
+                and len(get_child(children, [1]).children) == 1
+                and data_equals(children, [1, 0], "repeat_mixed")
+        ),
+        "selected": 0,
+    },
+    {
+        "type": "insert location repeat_number | insert repeat_mixed - 0 ",
+        # test_variant_to_model 123_191[CAG[19];CAA[4];10_15[6]
+        "conditions": lambda children: (
+                len(children) == 2
+                and children[0].data == children[1].data == "insert"
+                and len(get_child(children, [0]).children) == 2
+                and data_equals(children, [0, 0], "location")
+                and data_equals(children, [0, 1], "repeat_number")
+                and len(get_child(children, [1]).children) == 1
+                and data_equals(children, [1, 0], "repeat_mixed")
+        ),
+        "selected": 0,
+    },
+    {
+        "type": "insert description_dna inv | insert description_dna - 1 ",
+        "conditions": lambda children: (
+                len(children) == 2
+                and children[0].data == children[1].data == "insert"
+                and len(get_child(children, [0]).children) == 2
+                and data_equals(children, [0, 0], "description_dna")
+                and isinstance(get_child(children, [0, 1]), Token)
+                and len(get_child(children, [1]).children) == 1
+                and data_equals(children, [1, 0], "description_dna")
+        ),
+        "selected": 1,
+    },
 ]
 
 
