@@ -8,7 +8,7 @@ version = "0.4.0"
 description = "Mutalyzer HGVS variant description parser."
 readme = {file = "README.rst", content-type = "text/x-rst"}
 authors = [{name = "Mihai Lefter", email = "M.Lefter@lumc.nl"}]
-license = "MIT"
+license = {text = "MIT"}
 keywords = ["Mutalyzer", "HGVS", "description", "parser", "genomic"]
 classifiers = [
     "Intended Audience :: Science/Research",
