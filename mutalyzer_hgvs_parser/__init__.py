@@ -10,7 +10,8 @@ __all__ = ["parse", "to_model"]
 
 def _get_metadata(name: str) -> str:
     meta = metadata(__package__)
-    return meta.get(name) or ""
+    values = meta.get_all(name)
+    return values[0] if values else ""
 
 
 def _get_homepage() -> str:
