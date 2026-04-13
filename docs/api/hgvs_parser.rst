@@ -1,5 +1,5 @@
-Hgvs parser
-===========================================
+HGVS Parser
+===========
 
 .. automodule:: mutalyzer_hgvs_parser.hgvs_parser
    :members:

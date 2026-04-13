@@ -2,16 +2,26 @@
 Module for parsing HGVS variant descriptions.
 """
 
+from __future__ import annotations
+
 import functools
 import os
+from typing import Callable, TypedDict
 
 from lark import Lark, Token, Transformer, Tree
 from lark.exceptions import UnexpectedCharacters, UnexpectedEOF
 
 from .exceptions import UnexpectedCharacter, UnexpectedEnd
-from .util import all_tree_children_equal, data_equals, get_child
+from .util import all_tree_children_equal, data_equals, get_child, get_tree_child
 
-AMBIGUITIES = [
+
+class _Ambiguity(TypedDict):
+    type: str
+    conditions: Callable[[list], bool]
+    selected: int
+
+
+AMBIGUITIES: list[_Ambiguity] = [
     {
         "type": "insert_location | insert_length - length",
         # 10 ("inserted" start rule)
@@ -31,7 +41,7 @@ AMBIGUITIES = [
             len(children) == 2
             and children[0].data == children[1].data == "variant_certain"
             and data_equals(children, [0, 0], "location")
-            and len(get_child(children, [0]).children) == 2
+            and len(get_tree_child(children, [0]).children) == 2
             and data_equals(children, [0, 1], "substitution")
             and data_equals(children, [1, 0], "location")
         ),
@@ -48,7 +58,7 @@ AMBIGUITIES = [
             and data_equals(children, [1, 1], "substitution")
             and data_equals(children, [1, 1, 0], "inserted")
             and data_equals(children, [1, 1, 0, 0], "insert")
-            and len(get_child(children, [1, 1, 0, 0]).children) == 1
+            and len(get_tree_child(children, [1, 1, 0, 0]).children) == 1
             and isinstance(get_child(children, [1, 1, 0, 0, 0]), Tree)
             and data_equals(children, [1, 1, 0, 0, 0], "length")
         ),
@@ -65,7 +75,7 @@ AMBIGUITIES = [
             and data_equals(children, [1, 1], "substitution")
             and data_equals(children, [1, 1, 0], "inserted")
             and data_equals(children, [1, 1, 0, 0], "insert")
-            and len(get_child(children, [0, 1, 0, 0]).children) == 2
+            and len(get_tree_child(children, [0, 1, 0, 0]).children) == 2
             and isinstance(get_child(children, [0, 1, 0, 0]), Tree)
             and data_equals(children, [1, 1, 0, 0, 1], "repeat_number")
         ),
@@ -82,7 +92,7 @@ AMBIGUITIES = [
             and data_equals(children, [1, 1], "substitution")
             and data_equals(children, [1, 1, 0], "inserted")
             and data_equals(children, [1, 1, 0, 0], "insert")
-            and len(get_child(children, [1, 1, 0, 0]).children) == 1
+            and len(get_tree_child(children, [1, 1, 0, 0]).children) == 1
             and isinstance(get_child(children, [1, 1, 0, 0, 0]), Token)
         ),
         "selected": 1,
@@ -202,7 +212,7 @@ AMBIGUITIES = [
             and children[1].data == "variant_certain"
             and data_equals(children, [0, 1], "repeat")
             and data_equals(children, [1, 0], "location")
-            and len(get_child(children, [1]).children) == 1
+            and len(get_tree_child(children, [1]).children) == 1
         ),
         "selected": 1,
     },
@@ -214,7 +224,7 @@ AMBIGUITIES = [
             and children[0].data == children[1].data == "variant"
             and data_equals(children, [0, 0], "variant_certain")
             and data_equals(children, [1, 0], "variant_predicted")
-            and len(get_child(children, [0, 0]).children) == 1
+            and len(get_tree_child(children, [0, 0]).children) == 1
             and data_equals(children, [0, 0, 0], "location")
         ),
         "selected": 0,
@@ -227,7 +237,7 @@ AMBIGUITIES = [
             and children[0].data == children[1].data == "variants"
             and data_equals(children, [0, 0], "variants_certain")
             and data_equals(children, [1, 0], "variants_predicted")
-            and len(get_child(children, [1, 0]).children) == 1
+            and len(get_tree_child(children, [1, 0]).children) == 1
             and data_equals(children, [0, 0, 0], "variant")
             and data_equals(children, [1, 0, 0], "variant")
             and data_equals(children, [0, 0, 0, 0], "variant_certain")
@@ -243,7 +253,7 @@ AMBIGUITIES = [
             and children[0].data == children[1].data == "variants"
             and data_equals(children, [0, 0], "variants_certain")
             and data_equals(children, [1, 0], "variants_predicted")
-            and len(get_child(children, [1, 0]).children) == 1
+            and len(get_tree_child(children, [1, 0]).children) == 1
             and data_equals(children, [0, 0, 0], "variant")
             and data_equals(children, [1, 0, 0], "variant")
             and data_equals(children, [0, 0, 0, 0], "variant_predicted")
@@ -278,7 +288,7 @@ AMBIGUITIES = [
             and data_equals(children, [0, 1], "repeat")
             and data_equals(children, [1, 0], "location")
             and data_equals(children, [1, 1], "repeat")
-            and len(get_child(children, [2]).children) == 1
+            and len(get_tree_child(children, [2]).children) == 1
             and data_equals(children, [2, 0], "location")
         ),
         "selected": 2,
@@ -292,13 +302,13 @@ AMBIGUITIES = [
             == children[1].data
             == children[2].data
             == "variant_certain"
-            and len(get_child(children, [0]).children) == 2
+            and len(get_tree_child(children, [0]).children) == 2
             and data_equals(children, [0, 0], "location")
             and data_equals(children, [0, 1], "inversion")
-            and len(get_child(children, [1]).children) == 2
+            and len(get_tree_child(children, [1]).children) == 2
             and data_equals(children, [1, 0], "location")
             and data_equals(children, [1, 1], "repeat")
-            and len(get_child(children, [2]).children) == 2
+            and len(get_tree_child(children, [2]).children) == 2
             and data_equals(children, [2, 0], "location")
             and data_equals(children, [2, 1], "repeat")
         ),
@@ -310,10 +320,10 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) == 2
             and children[0].data == children[1].data == "variant_certain"
-            and len(get_child(children, [0]).children) == 2
+            and len(get_tree_child(children, [0]).children) == 2
             and data_equals(children, [0, 0], "location")
             and data_equals(children, [0, 1], "duplication")
-            and len(get_child(children, [1]).children) == 2
+            and len(get_tree_child(children, [1]).children) == 2
             and data_equals(children, [1, 0], "location")
             and data_equals(children, [1, 1], "repeat")
         ),
@@ -325,13 +335,13 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) == 2
             and children[0].data == children[1].data == "variant_certain"
-            and len(get_child(children, [0]).children) == 2
+            and len(get_tree_child(children, [0]).children) == 2
             and data_equals(children, [0, 0], "location")
             and data_equals(children, [0, 1], "deletion")
-            and len(get_child(children, [1]).children) == 2
+            and len(get_tree_child(children, [1]).children) == 2
             and data_equals(children, [1, 0], "location")
             and data_equals(children, [1, 1], "repeat")
-            and len(get_child(children, [0, 1]).children) == 1
+            and len(get_tree_child(children, [0, 1]).children) == 1
             and data_equals(children, [0, 1, 0], "inserted")
         ),
         "selected": 0,
@@ -342,7 +352,7 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) == 2
             and children[0].data == children[1].data == "deletion_insertion"
-            and len(get_child(children, [1]).children) == 1
+            and len(get_tree_child(children, [1]).children) == 1
             and data_equals(children, [0, 0], "inserted")
         ),
         "selected": 1,
@@ -354,17 +364,17 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) == 2
             and children[0].data == children[1].data == "variant_certain"
-            and len(get_child(children, [0]).children) == 2
+            and len(get_tree_child(children, [0]).children) == 2
             and data_equals(children, [0, 0], "location")
             and data_equals(children, [0, 1], "repeat")
-            and len(get_child(children, [1]).children) == 2
+            and len(get_tree_child(children, [1]).children) == 2
             and data_equals(children, [1, 0], "location")
             and data_equals(children, [1, 1], "repeat")
-            and len(get_child(children, [0, 1]).children) == 1
+            and len(get_tree_child(children, [0, 1]).children) == 1
             and data_equals(children, [0, 1, 0], "inserted")
-            and len(get_child(children, [0, 1, 0]).children) == 1
+            and len(get_tree_child(children, [0, 1, 0]).children) == 1
             and data_equals(children, [0, 1, 0, 0], "insert")
-            and len(get_child(children, [0, 1, 0, 0]).children) == 1
+            and len(get_tree_child(children, [0, 1, 0, 0]).children) == 1
             and data_equals(children, [0, 1, 0, 0, 0], "length")
         ),
         "selected": 0,
@@ -375,17 +385,17 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) == 2
             and children[0].data == children[1].data == "variant_certain"
-            and len(get_child(children, [0]).children) == 2
+            and len(get_tree_child(children, [0]).children) == 2
             and data_equals(children, [0, 0], "location")
             and data_equals(children, [0, 1], "repeat")
-            and len(get_child(children, [1]).children) == 2
+            and len(get_tree_child(children, [1]).children) == 2
             and data_equals(children, [1, 0], "location")
             and data_equals(children, [1, 1], "repeat")
-            and len(get_child(children, [1, 1]).children) == 1
+            and len(get_tree_child(children, [1, 1]).children) == 1
             and data_equals(children, [1, 1, 0], "inserted")
-            and len(get_child(children, [1, 1, 0]).children) == 1
+            and len(get_tree_child(children, [1, 1, 0]).children) == 1
             and data_equals(children, [1, 1, 0, 0], "insert")
-            and len(get_child(children, [1, 1, 0, 0]).children) == 1
+            and len(get_tree_child(children, [1, 1, 0, 0]).children) == 1
             and data_equals(children, [1, 1, 0, 0, 0], "length")
         ),
         "selected": 1,
@@ -396,20 +406,20 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) == 3
             and children[0].data == children[1].data == "variant_certain"
-            and len(get_child(children, [0]).children) == 2
+            and len(get_tree_child(children, [0]).children) == 2
             and data_equals(children, [0, 0], "location")
             and data_equals(children, [0, 1], "repeat")
-            and len(get_child(children, [1]).children) == 2
+            and len(get_tree_child(children, [1]).children) == 2
             and data_equals(children, [1, 0], "location")
             and data_equals(children, [1, 1], "repeat")
-            and len(get_child(children, [2]).children) == 2
+            and len(get_tree_child(children, [2]).children) == 2
             and data_equals(children, [2, 0], "location")
             and data_equals(children, [2, 1], "repeat")
-            and len(get_child(children, [0, 1]).children) == 1
+            and len(get_tree_child(children, [0, 1]).children) == 1
             and data_equals(children, [0, 1, 0], "inserted")
-            and len(get_child(children, [0, 1, 0]).children) == 1
+            and len(get_tree_child(children, [0, 1, 0]).children) == 1
             and data_equals(children, [0, 1, 0, 0], "insert")
-            and len(get_child(children, [0, 1, 0, 0]).children) == 1
+            and len(get_tree_child(children, [0, 1, 0, 0]).children) == 1
             and data_equals(children, [0, 1, 0, 0, 0], "length")
         ),
         "selected": 0,
@@ -420,20 +430,20 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) == 3
             and children[0].data == children[1].data == "variant_certain"
-            and len(get_child(children, [0]).children) == 2
+            and len(get_tree_child(children, [0]).children) == 2
             and data_equals(children, [0, 0], "location")
             and data_equals(children, [0, 1], "repeat")
-            and len(get_child(children, [1]).children) == 2
+            and len(get_tree_child(children, [1]).children) == 2
             and data_equals(children, [1, 0], "location")
             and data_equals(children, [1, 1], "repeat")
-            and len(get_child(children, [2]).children) == 2
+            and len(get_tree_child(children, [2]).children) == 2
             and data_equals(children, [2, 0], "location")
             and data_equals(children, [2, 1], "repeat")
-            and len(get_child(children, [1, 1]).children) == 1
+            and len(get_tree_child(children, [1, 1]).children) == 1
             and data_equals(children, [1, 1, 0], "inserted")
-            and len(get_child(children, [1, 1, 0]).children) == 1
+            and len(get_tree_child(children, [1, 1, 0]).children) == 1
             and data_equals(children, [1, 1, 0, 0], "insert")
-            and len(get_child(children, [1, 1, 0, 0]).children) == 1
+            and len(get_tree_child(children, [1, 1, 0, 0]).children) == 1
             and data_equals(children, [1, 1, 0, 0, 0], "length")
         ),
         "selected": 1,
@@ -444,20 +454,20 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) == 3
             and children[0].data == children[1].data == "variant_certain"
-            and len(get_child(children, [0]).children) == 2
+            and len(get_tree_child(children, [0]).children) == 2
             and data_equals(children, [0, 0], "location")
             and data_equals(children, [0, 1], "repeat")
-            and len(get_child(children, [1]).children) == 2
+            and len(get_tree_child(children, [1]).children) == 2
             and data_equals(children, [1, 0], "location")
             and data_equals(children, [1, 1], "repeat")
-            and len(get_child(children, [2]).children) == 2
+            and len(get_tree_child(children, [2]).children) == 2
             and data_equals(children, [2, 0], "location")
             and data_equals(children, [2, 1], "repeat")
-            and len(get_child(children, [2, 1]).children) == 1
+            and len(get_tree_child(children, [2, 1]).children) == 1
             and data_equals(children, [2, 1, 0], "inserted")
-            and len(get_child(children, [2, 1, 0]).children) == 1
+            and len(get_tree_child(children, [2, 1, 0]).children) == 1
             and data_equals(children, [2, 1, 0, 0], "insert")
-            and len(get_child(children, [2, 1, 0, 0]).children) == 1
+            and len(get_tree_child(children, [2, 1, 0, 0]).children) == 1
             and data_equals(children, [2, 1, 0, 0, 0], "length")
         ),
         "selected": 2,
@@ -469,19 +479,19 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) == 2
             and children[0].data == children[1].data == "variant_certain"
-            and len(get_child(children, [0]).children) == 2
+            and len(get_tree_child(children, [0]).children) == 2
             and data_equals(children, [0, 0], "location")
             and isinstance(get_child(children, [0, 0, 0]), Tree)
             and data_equals(children, [0, 0, 0], "point")
-            and len(get_child(children, [0, 0, 0]).children) == 2
+            and len(get_tree_child(children, [0, 0, 0]).children) == 2
             and isinstance(get_child(children, [0, 0, 0, 0]), Token)
             and isinstance(get_child(children, [0, 0, 0, 1]), Token)
             and data_equals(children, [0, 1], "repeat")
-            and len(get_child(children, [1]).children) == 2
+            and len(get_tree_child(children, [1]).children) == 2
             and data_equals(children, [1, 0], "location")
             and isinstance(get_child(children, [1, 0, 0]), Tree)
             and data_equals(children, [1, 0, 0], "point")
-            and len(get_child(children, [1, 0, 0]).children) == 2
+            and len(get_tree_child(children, [1, 0, 0]).children) == 2
             and isinstance(get_child(children, [1, 0, 0, 0]), Token)
             and isinstance(get_child(children, [1, 0, 0, 1]), Token)
             and data_equals(children, [1, 1], "substitution")
@@ -494,14 +504,14 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) >= 2
             and children[0].data == children[1].data == "deletion_insertion"
-            and len(get_child(children, [0]).children) == 2
-            and len(get_child(children, [1]).children) == 2
+            and len(get_tree_child(children, [0]).children) == 2
+            and len(get_tree_child(children, [1]).children) == 2
             and isinstance(get_child(children, [1, 0]), Tree)
-            and len(get_child(children, [1, 0]).children) == 1
+            and len(get_tree_child(children, [1, 0]).children) == 1
             and isinstance(get_child(children, [1, 1]), Tree)
-            and len(get_child(children, [1, 1]).children) == 1
+            and len(get_tree_child(children, [1, 1]).children) == 1
             and data_equals(children, [1, 0, 0], "insert")
-            and len(get_child(children, [1, 0, 0]).children) == 1
+            and len(get_tree_child(children, [1, 0, 0]).children) == 1
             and (
                 data_equals(children, [1, 0, 0, 0], "description_dna")
                 or data_equals(children, [1, 0, 0, 0], "description_protein")
@@ -516,13 +526,13 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) == 2
             and children[0].data == children[1].data == "inserted"
-            and len(get_child(children, [0]).children) == 1
+            and len(get_tree_child(children, [0]).children) == 1
             and data_equals(children, [0, 0], "insert")
-            and len(get_child(children, [0, 0]).children) == 1
+            and len(get_tree_child(children, [0, 0]).children) == 1
             and data_equals(children, [0, 0, 0], "description_dna")
-            and len(get_child(children, [1]).children) == 1
+            and len(get_tree_child(children, [1]).children) == 1
             and data_equals(children, [1, 0], "insert")
-            and len(get_child(children, [1, 0]).children) == 2
+            and len(get_tree_child(children, [1, 0]).children) == 2
             and data_equals(children, [1, 0, 0], "description_dna")
             and data_equals(children, [1, 0, 1], "repeat_number")
         ),
@@ -545,18 +555,18 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) == 2
             and children[0].data == children[1].data == "variant_certain"
-            and len(get_child(children, [0]).children) == 2
+            and len(get_tree_child(children, [0]).children) == 2
             and data_equals(children, [0, 0], "location")
             and data_equals(children, [0, 1], "repeat")
-            and len(get_child(children, [0, 1]).children) == 1
+            and len(get_tree_child(children, [0, 1]).children) == 1
             and data_equals(children, [0, 1, 0], "inserted")
-            and len(get_child(children, [0, 1, 0]).children) == 1
+            and len(get_tree_child(children, [0, 1, 0]).children) == 1
             and data_equals(children, [0, 1, 0, 0], "insert")
-            and len(get_child(children, [0, 1, 0, 0]).children) == 1
+            and len(get_tree_child(children, [0, 1, 0, 0]).children) == 1
             and data_equals(children, [0, 1, 0, 0, 0], "repeat_mixed")
-            and len(get_child(children, [0, 1, 0, 0, 0]).children) == 2
+            and len(get_tree_child(children, [0, 1, 0, 0, 0]).children) == 2
             and data_equals(children, [0, 1, 0, 0, 0, 1], "repeat_number")
-            and len(get_child(children, [1]).children) == 2
+            and len(get_tree_child(children, [1]).children) == 2
             and data_equals(children, [1, 0], "location")
             and data_equals(children, [1, 1], "substitution")
         ),
@@ -569,16 +579,16 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) == 2
             and children[0].data == children[1].data == "variant_certain"
-            and len(get_child(children, [0]).children) == 2
+            and len(get_tree_child(children, [0]).children) == 2
             and data_equals(children, [0, 0], "location")
             and data_equals(children, [0, 1], "repeat")
-            and len(get_child(children, [0, 1]).children) == 1
+            and len(get_tree_child(children, [0, 1]).children) == 1
             and data_equals(children, [0, 1, 0], "inserted")
-            and len(get_child(children, [0, 1, 0]).children) == 1
+            and len(get_tree_child(children, [0, 1, 0]).children) == 1
             and data_equals(children, [0, 1, 0, 0], "insert")
-            and len(get_child(children, [0, 1, 0, 0]).children) == 1
+            and len(get_tree_child(children, [0, 1, 0, 0]).children) == 1
             and data_equals(children, [0, 1, 0, 0, 0], "location")
-            and len(get_child(children, [1]).children) == 2
+            and len(get_tree_child(children, [1]).children) == 2
             and data_equals(children, [1, 0], "location")
             and data_equals(children, [1, 1], "substitution")
         ),
@@ -591,10 +601,10 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) == 2
             and children[0].data == children[1].data == "variant_certain"
-            and len(get_child(children, [0]).children) == 2
+            and len(get_tree_child(children, [0]).children) == 2
             and data_equals(children, [0, 0], "location")
             and data_equals(children, [0, 1], "repeat")
-            and len(get_child(children, [1]).children) == 2
+            and len(get_tree_child(children, [1]).children) == 2
             and data_equals(children, [1, 0], "location")
             and data_equals(children, [1, 1], "substitution")
             and get_child(children, [0, 1, 0]) == get_child(children, [1, 1, 0])
@@ -607,10 +617,10 @@ AMBIGUITIES = [
         "conditions": lambda children: (
             len(children) == 2
             and children[0].data == children[1].data == "variant_certain"
-            and len(get_child(children, [0]).children) == 2
+            and len(get_tree_child(children, [0]).children) == 2
             and data_equals(children, [0, 0], "location")
             and data_equals(children, [0, 1], "repeat")
-            and len(get_child(children, [1]).children) == 2
+            and len(get_tree_child(children, [1]).children) == 2
             and data_equals(children, [1, 0], "location")
             and data_equals(children, [1, 1], "repeat")
         ),
@@ -623,10 +633,10 @@ AMBIGUITIES = [
         "conditions": lambda children: (
                 len(children) == 2
                 and children[0].data == children[1].data == "insert"
-                and len(get_child(children, [0]).children) == 2
+                and len(get_tree_child(children, [0]).children) == 2
                 and data_equals(children, [0, 0], "description_dna")
                 and data_equals(children, [0, 1], "repeat_number")
-                and len(get_child(children, [1]).children) == 1
+                and len(get_tree_child(children, [1]).children) == 1
                 and data_equals(children, [1, 0], "description_dna")
         ),
         "selected": 0,
@@ -637,9 +647,9 @@ AMBIGUITIES = [
         "conditions": lambda children: (
                 len(children) == 2
                 and children[0].data == children[1].data == "insert"
-                and len(get_child(children, [0]).children) in [2, 3]
+                and len(get_tree_child(children, [0]).children) in [2, 3]
                 and data_equals(children, [0, 1], "repeat_number")
-                and len(get_child(children, [1]).children) == 1
+                and len(get_tree_child(children, [1]).children) == 1
                 and data_equals(children, [1, 0], "repeat_mixed")
         ),
         "selected": 0,
@@ -650,10 +660,10 @@ AMBIGUITIES = [
         "conditions": lambda children: (
                 len(children) == 2
                 and children[0].data == children[1].data == "insert"
-                and len(get_child(children, [0]).children) == 2
+                and len(get_tree_child(children, [0]).children) == 2
                 and data_equals(children, [0, 0], "location")
                 and data_equals(children, [0, 1], "repeat_number")
-                and len(get_child(children, [1]).children) == 1
+                and len(get_tree_child(children, [1]).children) == 1
                 and data_equals(children, [1, 0], "repeat_mixed")
         ),
         "selected": 0,
@@ -663,10 +673,10 @@ AMBIGUITIES = [
         "conditions": lambda children: (
                 len(children) == 2
                 and children[0].data == children[1].data == "insert"
-                and len(get_child(children, [0]).children) == 2
+                and len(get_tree_child(children, [0]).children) == 2
                 and data_equals(children, [0, 0], "description_dna")
                 and isinstance(get_child(children, [0, 1]), Token)
-                and len(get_child(children, [1]).children) == 1
+                and len(get_tree_child(children, [1]).children) == 1
                 and data_equals(children, [1, 0], "description_dna")
         ),
         "selected": 1,
@@ -675,7 +685,7 @@ AMBIGUITIES = [
 
 
 class AmbigTransformer(Transformer):
-    def _ambig(self, children):
+    def _ambig(self, children: list) -> Tree:
         # from lark.tree import pydot__tree_to_png
         # pydot__tree_to_png(Tree("ambig", children), "ambig.png")
         for ambig in AMBIGUITIES:
@@ -687,59 +697,59 @@ class AmbigTransformer(Transformer):
 
 
 class ProteinTransformer(Transformer):
-    def p_variants(self, children):
+    def p_variants(self, children: list) -> Tree:
         return Tree("variants", children)
 
-    def p_variants_certain(self, children):
+    def p_variants_certain(self, children: list) -> Tree:
         return Tree("variants_certain", children)
 
-    def p_variants_predicted(self, children):
+    def p_variants_predicted(self, children: list) -> Tree:
         return Tree("variants_predicted", children)
 
-    def p_variant(self, children):
+    def p_variant(self, children: list) -> Tree:
         return Tree("variant", children)
 
-    def p_variant_certain(self, children):
+    def p_variant_certain(self, children: list) -> Tree:
         return Tree("variant_certain", children)
 
-    def p_variant_predicted(self, children):
+    def p_variant_predicted(self, children: list) -> Tree:
         return Tree("variant_predicted", children)
 
-    def p_location(self, children):
+    def p_location(self, children: list) -> Tree:
         return Tree("location", children)
 
-    def p_range(self, children):
+    def p_range(self, children: list) -> Tree:
         return Tree("range", children)
 
-    def p_length(self, children):
+    def p_length(self, children: list) -> Tree:
         return Tree("length", children)
 
-    def p_point(self, children):
+    def p_point(self, children: list) -> Tree:
         return Tree("point", children)
 
-    def p_deletion(self, children):
+    def p_deletion(self, children: list) -> Tree:
         return Tree("deletion", children)
 
-    def p_deletion_insertion(self, children):
+    def p_deletion_insertion(self, children: list) -> Tree:
         return Tree("deletion_insertion", children)
 
-    def p_duplication(self, children):
+    def p_duplication(self, children: list) -> Tree:
         return Tree("duplication", children)
 
-    def p_equal(self, children):
+    def p_equal(self, children: list) -> Tree:
         return Tree("equal", children)
 
-    def extension(self, children):
+    def extension(self, children: list) -> Tree:
         return Tree("extension", children)
 
-    def extension_n(self, children):
+    def extension_n(self, children: list) -> Tree:
         point = Tree(
             "point", [Token("NUMBER", children[0].value), Token("OUTSIDE_CDS", "-")]
         )
-        location = [Tree("location", [point])]
+        location = [Tree("location", [point])]  # type: ignore[misc]
         return Tree("inserted", [Tree("insert", location)])
 
-    def extension_c(self, children):
+    def extension_c(self, children: list) -> Tree:
         new_children = []
         for child in children:
             if isinstance(child, Token):
@@ -751,7 +761,7 @@ class ProteinTransformer(Transformer):
         else:
             return Tree("extension", [])
 
-    def frame_shift(self, children):
+    def frame_shift(self, children: list) -> Tree:
         new_children = []
         for child in children:
             if isinstance(child, Token):
@@ -763,56 +773,57 @@ class ProteinTransformer(Transformer):
         else:
             return Tree("frame_shift", [])
 
-    def p_insertion(self, children):
+    def p_insertion(self, children: list) -> Tree:
         return Tree("insertion", children)
 
-    def p_repeat(self, children):
+    def p_repeat(self, children: list) -> Tree:
         return Tree("repeat", children)
 
-    def p_substitution(self, children):
+    def p_substitution(self, children: list) -> Tree:
         return Tree("substitution", children)
 
-    def p_inserted(self, children):
+    def p_inserted(self, children: list) -> Tree:
         return Tree("inserted", children)
 
-    def p_insert(self, children):
+    def p_insert(self, children: list) -> Tree:
         return Tree("insert", children)
 
-    def p_repeat_number(self, children):
+    def p_repeat_number(self, children: list) -> Tree:
         return Tree("repeat_number", children)
 
-    def p_repeat_mixed(self, children):
+    def p_repeat_mixed(self, children: list) -> Tree:
         return Tree("repeat_mixed", children)
 
-    def P_COORDINATE_SYSTEM(self, name):
+    def P_COORDINATE_SYSTEM(self, name: Token) -> Token:
         return Token("COORDINATE_SYSTEM", name.value)
 
 
 class FinalTransformer(Transformer):
-    def variants(self, children):
+    def variants(self, children: list) -> Tree:
         if children[0].data == "variants_certain":
             return Tree("variants", children[0].children)
         if children[0].data == "variants_predicted":
             return Tree("variants_predicted", children[0].children)
         return Tree("variants", children)
 
-    def variant_predicted(self, children):
+    def variant_predicted(self, children: list) -> Tree:
         return Tree("variant_predicted", children[0].children)
 
-    def variant(self, children):
+    def variant(self, children: list) -> Tree:
         if children[0].data == "variant_certain":
             return Tree("variant", children[0].children)
         elif children[0].data == "variant_predicted":
             return Tree("variant_predicted", children[0].children)
+        return Tree("variant", children)
 
 
-def _read_grammar_file(file_name):
+def _read_grammar_file(file_name: str) -> str:
     grammar_path = os.path.join(os.path.dirname(__file__), f"ebnf/{file_name}")
     with open(grammar_path) as grammar_file:
         return grammar_file.read()
 
 
-def _replace_annon_terminals(grammar):
+def _replace_annon_terminals(grammar: str) -> str:
     updated_grammar = grammar
     terminals = {
         "PREDICTED_EQUAL": "(=)",
@@ -822,7 +833,7 @@ def _replace_annon_terminals(grammar):
         "RPAR_RSQB": ")]",
     }
     for name in terminals:
-        updated_grammar = updated_grammar.replace('"terminals[name]"', name)
+        updated_grammar = updated_grammar.replace(f'"{terminals[name]}"', name)
         updated_grammar += f'\n\n{name}: "{terminals[name]}"'
     return updated_grammar
 
@@ -832,7 +843,12 @@ class HgvsParser:
     HGVS parser object.
     """
 
-    def __init__(self, grammar_path=None, start_rule=None, ignore_white_spaces=True):
+    def __init__(
+        self,
+        grammar_path: str | None = None,
+        start_rule: str | None = None,
+        ignore_white_spaces: bool = True,
+    ):
         """
         :arg str grammar_path: Path to a different EBNF grammar file.
         :arg str start_rule: Alternative start rule for the grammar.
@@ -843,17 +859,15 @@ class HgvsParser:
         self._ignore_whitespaces = ignore_white_spaces
         self._create_parser()
 
-    def _create_parser(self):
+    def _create_parser(self) -> None:
         if self._grammar_path:
             with open(self._grammar_path) as grammar_file:
                 grammar = grammar_file.read()
         else:
-            grammar = _read_grammar_file("top.g")
-            grammar += _read_grammar_file("dna.g")
-            grammar += _read_grammar_file("protein.g")
-            grammar += _read_grammar_file("reference.g")
-            grammar += _read_grammar_file("common.g")
-            grammar = _replace_annon_terminals(grammar)
+            grammar = _replace_annon_terminals("".join(
+                _read_grammar_file(f)
+                for f in ["top.g", "dna.g", "protein.g", "reference.g", "common.g"]
+            ))
 
         start_rule = self._start_rule if self._start_rule else "description"
 
@@ -864,7 +878,7 @@ class HgvsParser:
             grammar, parser="earley", start=start_rule, ambiguity="explicit"
         )
 
-    def parse(self, description):
+    def parse(self, description: str) -> Tree:
         """
         Parse the provided description.
 
@@ -880,31 +894,27 @@ class HgvsParser:
             raise UnexpectedEnd(e, description)
         return parse_tree
 
-    def status(self):
+    def status(self) -> None:
         """
         Print parser's status information.
         """
-        print("Parser type: %s" % self._parser_type)
-        if self._parser_type == "lark":
-            print(" Employed grammar path: %s" % self._grammar_path)
-            print(" Options:")
-            print("  Parser class: %s" % self._parser.parser_class)
-            print("  Parser: %s" % self._parser.options.parser)
-            print("  Lexer: %s" % self._parser.options.lexer)
-            print("  Ambiguity: %s" % self._parser.options.ambiguity)
-            print("  Start: %s" % self._parser.options.start)
-            print("  Tree class: %s" % self._parser.options.tree_class)
-            print(
-                "  Propagate positions: %s" % self._parser.options.propagate_positions
-            )
+        print(f" Employed grammar path: {self._grammar_path}")
+        print(" Options:")
+        print(f"  Parser class: {self._parser.parser_class}")  # type: ignore[attr-defined]
+        print(f"  Parser: {self._parser.options.parser}")
+        print(f"  Lexer: {self._parser.options.lexer}")
+        print(f"  Ambiguity: {self._parser.options.ambiguity}")
+        print(f"  Start: {self._parser.options.start}")
+        print(f"  Tree class: {self._parser.options.tree_class}")
+        print(f"  Propagate positions: {self._parser.options.propagate_positions}")
 
 
 @functools.lru_cache
-def get_parser(grammar_path=None, start_rule=None):
+def get_parser(grammar_path: str | None = None, start_rule: str | None = None) -> HgvsParser:
     return HgvsParser(grammar_path, start_rule)
 
 
-def parse(description, grammar_path=None, start_rule=None):
+def parse(description: str, grammar_path: str | None = None, start_rule: str | None = None) -> Tree:
     """
     Parse the provided HGVS `description`, or the description part,
     e.g., a location, a variants list, etc., if an appropriate alternative

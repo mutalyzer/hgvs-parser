@@ -37,5 +37,9 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
+# Docs build output
+docs/_build/
+docs/hgvs_mutalyzer.g
+
 # Other files
 *.png

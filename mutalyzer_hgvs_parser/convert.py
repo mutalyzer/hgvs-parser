@@ -3,7 +3,11 @@ Module for converting HGVS descriptions and lark parse trees
 to their equivalent dictionary models.
 """
 
-from lark import Token, Transformer
+from __future__ import annotations
+
+from typing import Any
+
+from lark import Token, Transformer, Tree
 from lark.exceptions import VisitError
 
 from .exceptions import NestedDescriptions
@@ -11,7 +15,7 @@ from .hgvs_parser import parse
 from .util import get_only_value, to_dict
 
 
-def to_model(description, start_rule=None):
+def to_model(description: str, start_rule: str | None = None) -> dict:
     """
     Convert an  HGVS description, or parts of it, e.g., a location,
     a variants list, etc., if an appropriate alternative `start_rule`
@@ -26,7 +30,7 @@ def to_model(description, start_rule=None):
     return parse_tree_to_model(parse_tree)
 
 
-def parse_tree_to_model(parse_tree):
+def parse_tree_to_model(parse_tree: Tree) -> dict:
     """
     Convert a parse tree to a nested dictionary model.
 
@@ -39,68 +43,67 @@ def parse_tree_to_model(parse_tree):
     except VisitError as e:
         raise e.orig_exc
 
-    return model[list(model)[0]]
+    return model[next(iter(model))]
 
 
 class Converter(Transformer):
-    def description(self, children):
+    def description(self, children: list) -> dict:
         return {"description": get_only_value(children)}
 
-    def description_dna(self, children):
+    def description_dna(self, children: list) -> dict:
         output = {"type": "description_dna"}
         output.update(to_dict(children))
         _predicted(output)
         return {"description_dna": output}
 
-    def description_protein(self, children):
+    def description_protein(self, children: list) -> dict:
         output = {"type": "description_protein"}
         output.update(to_dict(children))
         _predicted(output)
         return {"description_protein": output}
 
-    def reference(self, children):
+    def reference(self, children: list) -> dict:
         output = {}
         output.update(children[0])
         if len(children) == 2:
-            output.update(children[0])
             output["selector"] = children[1]["reference"]
         return {"reference": output}
 
-    def ID(self, name):
+    def ID(self, name: Token) -> dict:
         return {"id": name.value}
 
-    def COORDINATE_SYSTEM(self, name):
+    def COORDINATE_SYSTEM(self, name: Token) -> dict:
         return {"coordinate_system": name.value}
 
-    def variants(self, children):
+    def variants(self, children: list) -> dict:
         return {"variants": [child["variant"] for child in children]}
 
-    def variants_predicted(self, children):
-        return {"variants_predicted": [child["variant"] for child in children]}
+    def variants_predicted(self, children: list) -> dict:
+        return {"variants_predicted": [child["variant"] for child in children if isinstance(child, dict)]}
 
-    def variant_certain(self, children):
+    def variant_certain(self, children: list) -> dict:
         return {"variant_certain": to_dict(children)}
 
-    def variant_predicted(self, children):
+    def variant_predicted(self, children: list) -> dict:
         output = {"variant": to_dict(children)}
         output["variant"]["predicted"] = True
         return output
 
-    def variant(self, children):
+    def variant(self, children: list) -> dict:
         return {"variant": to_dict(children)}
 
-    def conversion(self, children):
+    def conversion(self, children: list) -> dict:
         output = {"type": "conversion", "source": "reference"}
         output.update(to_dict(children))
         return output
 
-    def deletion(self, children):
+    def deletion(self, children: list) -> dict:
         output = {"type": "deletion", "source": "reference"}
         if children:
             output["deleted"] = children[0]["inserted"]
         return output
 
-    def deletion_insertion(self, children):
+    def deletion_insertion(self, children: list) -> dict:
         output = {"type": "deletion_insertion", "source": "reference"}
         if len(children) == 1:
             output["inserted"] = children[0]["inserted"]
@@ -110,34 +113,34 @@ class Converter(Transformer):
 
         return output
 
-    def duplication(self, children):
+    def duplication(self, children: list) -> dict:
         output = {"type": "duplication", "source": "reference"}
         if children:
             output["inserted"] = children[0]["inserted"]
         return output
 
-    def equal(self, children):
+    def equal(self, children: list) -> dict:
         output = {"type": "equal", "source": "reference"}
         output.update(to_dict(children))
         return output
 
-    def insertion(self, children):
+    def insertion(self, children: list) -> dict:
         output = {"type": "insertion", "source": "reference"}
         output.update(to_dict(children))
         return output
 
-    def inversion(self, children):
+    def inversion(self, children: list) -> dict:
         output = {"type": "inversion", "source": "reference"}
         output.update(to_dict(children))
         return output
 
-    def repeat(self, children):
+    def repeat(self, children: list) -> dict:
         output = {"type": "repeat", "source": "reference"}
         output.update(to_dict(children))
         return output
 
-    def substitution(self, children):
-        output = {"type": "substitution", "source": "reference"}
+    def substitution(self, children: list) -> dict:
+        output: dict[str, Any] = {"type": "substitution", "source": "reference"}
         if len(children) == 2:
             children[0]["source"] = "description"
             output["deleted"] = [children[0]]
@@ -146,21 +149,21 @@ class Converter(Transformer):
             output.update(to_dict(children))
         return output
 
-    def extension(self, children):
+    def extension(self, children: list) -> dict:
         output = {"type": "extension", "source": "reference"}
         output.update(to_dict(children))
         return output
 
-    def frame_shift(self, children):
+    def frame_shift(self, children: list) -> dict:
         output = {"type": "frame_shift", "source": "reference"}
         output.update(to_dict(children))
         return output
 
-    def location(self, children):
+    def location(self, children: list) -> dict:
         return {"location": get_only_value(children)}
 
-    def point(self, children):
-        output = {"type": "point"}
+    def point(self, children: list) -> dict:
+        output: dict[str, Any] = {"type": "point"}
         for child in children:
             if isinstance(child, dict):
                 output.update(child)
@@ -170,7 +173,7 @@ class Converter(Transformer):
                 output["position"] = child.value
         return {"point": output}
 
-    def uncertain_point(self, children):
+    def uncertain_point(self, children: list) -> dict:
         return {
             "uncertain_point": {
                 "start": get_only_value([children[0]]),
@@ -180,7 +183,7 @@ class Converter(Transformer):
             }
         }
 
-    def range(self, children):
+    def range(self, children: list) -> dict:
         return {
             "range": {
                 "start": get_only_value([children[0]]),
@@ -189,15 +192,15 @@ class Converter(Transformer):
             }
         }
 
-    def exact_range(self, children):
+    def exact_range(self, children: list) -> dict:
         return {
             "start": get_only_value([self.point([children[0]])]),
             "end": get_only_value([self.point([children[1]])]),
             "type": "range",
         }
 
-    def OFFSET(self, name):
-        output = {}
+    def OFFSET(self, name: Token) -> dict:
+        output: dict[str, Any] = {}
         if "?" in name.value:
             output["uncertain"] = True
             if "+" in name.value:
@@ -208,7 +211,7 @@ class Converter(Transformer):
             output["value"] = int(name.value)
         return {"offset": output}
 
-    def OUTSIDE_CDS(self, name):
+    def OUTSIDE_CDS(self, name: Token) -> dict:
         output = {}
         if name.value == "*":
             output["outside_cds"] = "downstream"
@@ -216,16 +219,16 @@ class Converter(Transformer):
             output["outside_cds"] = "upstream"
         return output
 
-    def UNKNOWN(self, name):
+    def UNKNOWN(self, name: Token) -> dict:
         return {"uncertain": True}
 
-    def inserted(self, children):
+    def inserted(self, children: list) -> dict:
         output = []
         for child in children:
             output.extend(child["insert"])
         return {"inserted": output}
 
-    def insert(self, children):
+    def insert(self, children: list) -> dict:
         if children[0].get("repeat_mixed"):
             return _insert_repeat_mixed(children)
         new_children = []
@@ -236,10 +239,10 @@ class Converter(Transformer):
                 new_children.append(child)
         return _insert(new_children)
 
-    def repeat_number(self, children):
+    def repeat_number(self, children: list) -> dict:
         return {"repeat_number": self.length(children)["length"]}
 
-    def repeat_mixed(self, children):
+    def repeat_mixed(self, children: list) -> dict:
         output = to_dict(children)
         if output.get("sequence"):
             output["source"] = "description"
@@ -247,10 +250,10 @@ class Converter(Transformer):
             output["source"] = "reference"
         return {"repeat_mixed": output}
 
-    def INVERTED(self, name):
+    def INVERTED(self, name: Token) -> dict:
         return {"inverted": True}
 
-    def length(self, children):
+    def length(self, children: list) -> dict:
         length = children[0]
         if isinstance(length, Token) and length.type == "NUMBER":
             return {"length": {"type": "point", "value": int(length.value)}}
@@ -266,18 +269,19 @@ class Converter(Transformer):
             elif length.get("uncertain"):
                 length["type"] = "point"
             return {"length": length}
+        raise ValueError(f"Unexpected length child type: {type(length)}")
 
-    def SEQUENCE(self, name):
+    def SEQUENCE(self, name: Token) -> dict:
         return {"sequence": name.value}
 
-    def P_SEQUENCE(self, name):
+    def P_SEQUENCE(self, name: Token) -> dict:
         return {"sequence": name.value}
 
-    def AA(self, name):
+    def AA(self, name: Token) -> dict:
         return {"amino_acid": name.value}
 
 
-def _predicted(model):
+def _predicted(model: dict) -> None:
     """
 
     :param model:
@@ -288,7 +292,7 @@ def _predicted(model):
         model.pop("variants_predicted")
 
 
-def _insert_repeat_mixed(children):
+def _insert_repeat_mixed(children: list) -> dict:
     """
     A repeat mixed ("AA[5]TTT[7]") is a list.
     """
@@ -301,7 +305,7 @@ def _insert_repeat_mixed(children):
     return {"insert": output}
 
 
-def _insert(children):
+def _insert(children: list) -> dict:
     output = to_dict(children)
     if output.get("sequence"):
         output["source"] = "description"
@@ -309,7 +313,7 @@ def _insert(children):
         output["source"] = "reference"
     elif output.get("type"):
         variants = output.get("variants", [])
-        if len(output["variants"]) > 1:
+        if len(variants) > 1:
             raise NestedDescriptions()
         elif len(variants) == 1:
             if variants[0].get("type") is None:
@@ -317,7 +321,7 @@ def _insert(children):
                 output.update(output["variants"][0])
                 output.pop("reference")
                 output.pop("variants")
-            elif variants[0].get("type") is "inversion":
+            elif variants[0].get("type") == "inversion":
                 output["source"] = output["reference"]
                 output["location"] = variants[0]["location"]
                 output["location"]["inverted"] = True

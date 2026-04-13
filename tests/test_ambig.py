@@ -4,7 +4,7 @@ from lark.tree import Tree
 from mutalyzer_hgvs_parser.convert import to_model
 from mutalyzer_hgvs_parser.hgvs_parser import get_child
 
-from .test_convert import DESCRIPTIONS, INSERTED, LOCATIONS, REFERENCES, VARIANTS
+from .test_convert import DESCRIPTIONS, INSERTED, VARIANTS
 from .test_protein import HGVS_NOMENCLATURE
 
 

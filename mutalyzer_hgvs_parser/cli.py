@@ -2,17 +2,20 @@
 CLI entry point.
 """
 
+from __future__ import annotations
+
 import argparse
 import json
 
+from lark import Tree
 from lark.tree import pydot__tree_to_png
 
 from . import usage, version
 from .convert import parse_tree_to_model
-from .hgvs_parser import parse, HgvsParser
+from .hgvs_parser import get_parser, parse
 
 
-def _parse(description, grammar_path, start_rule):
+def _parse(description: str, grammar_path: str | None, start_rule: str | None) -> Tree:
     """
     CLI wrapper for parsing with no conversion to model.
     """
@@ -21,25 +24,24 @@ def _parse(description, grammar_path, start_rule):
     return parse_tree
 
 
-def _to_model(description, start_rule):
+def _to_model(description: str, start_rule: str | None) -> Tree:
     """
     CLI wrapper for parsing, converting, and printing the model.
     """
     parse_tree = parse(description, start_rule=start_rule)
     model = parse_tree_to_model(parse_tree)
-    if isinstance(model, dict) or isinstance(model, list):
+    if isinstance(model, (dict, list)):
         print(json.dumps(model, indent=2))
     else:
         print(model)
     return parse_tree
 
 
-def _parse_raw(description, grammar_path, start_rule):
-    parser = HgvsParser(grammar_path, start_rule)
-    return parser.parse(description)
+def _parse_raw(description: str, grammar_path: str | None, start_rule: str | None) -> Tree:
+    return get_parser(grammar_path, start_rule).parse(description)
 
 
-def _arg_parser():
+def _arg_parser() -> argparse.ArgumentParser:
     """
     Command line argument parsing.
     """
@@ -60,7 +62,7 @@ def _arg_parser():
     parser.add_argument("-r", help="alternative start (top) rule for the grammar")
 
     alt.add_argument(
-        "-g", help="alternative input grammar file path (do not use with -c)"
+        "-g", help="alternative input grammar file path (model conversion not supported)"
     )
 
     alt.add_argument(
@@ -76,7 +78,7 @@ def _arg_parser():
     return parser
 
 
-def _cli(args):
+def _cli(args: argparse.Namespace) -> None:
     if args.c:
         parse_tree = _to_model(args.description, args.r)
     elif args.p:
@@ -90,7 +92,7 @@ def _cli(args):
         print("Parse tree image saved to:\n {}".format(args.i))
 
 
-def main():
+def main() -> None:
 
     parser = _arg_parser()
 

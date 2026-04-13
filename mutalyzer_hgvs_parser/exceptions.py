@@ -1,17 +1,19 @@
-from lark.load_grammar import _TERMINAL_NAMES
+from __future__ import annotations
+
+from lark.exceptions import UnexpectedCharacters, UnexpectedEOF
 
 
 class UnexpectedCharacter(Exception):
-    def __init__(self, exception, description):
+    def __init__(self, exception: UnexpectedCharacters, description: str):
         self.line = exception.line
         self.column = exception.column
         self.allowed = exception.allowed
         self.considered_tokens = exception.considered_tokens
-        self.pos_in_stream = exception.pos_in_stream
+        self.pos_in_stream: int = exception.pos_in_stream or 0
         self.state = exception.state
         self.unexpected_character = description[self.pos_in_stream]
         self.description = description
-        self.expecting = _get_expecting(exception.allowed)
+        self.expecting = _get_expecting(list(exception.allowed))
 
         message = "Unexpected character '{}' at position {}:\n".format(
             self.unexpected_character, self.column
@@ -22,10 +24,10 @@ class UnexpectedCharacter(Exception):
             message += "\n - {}".format(expecting)
         super(UnexpectedCharacter, self).__init__(message)
 
-    def get_context(self):
+    def get_context(self) -> str:
         return "\n {}\n {}{}".format(self.description, " " * self.pos_in_stream, "^")
 
-    def serialize(self):
+    def serialize(self) -> dict:
         return {
             "line": self.line,
             "column": self.column,
@@ -37,10 +39,10 @@ class UnexpectedCharacter(Exception):
 
 
 class UnexpectedEnd(Exception):
-    def __init__(self, exception, description):
+    def __init__(self, exception: UnexpectedEOF, description: str):
         self.pos_in_stream = len(description) - 1
         self.description = description
-        lark_terminals = [terminal for terminal in exception.expected]
+        lark_terminals = [str(terminal) for terminal in exception.expected]
         self.expecting = _get_expecting(lark_terminals)
 
         message = "Unexpected character end of input"
@@ -50,10 +52,10 @@ class UnexpectedEnd(Exception):
             message += "\n - {}".format(expecting)
         super(UnexpectedEnd, self).__init__(message)
 
-    def get_context(self):
+    def get_context(self) -> str:
         return "\n {}\n {}{}".format(self.description, " " * self.pos_in_stream, "^")
 
-    def serialize(self):
+    def serialize(self) -> dict:
         return {
             "pos_in_stream": self.pos_in_stream,
             "unexpected_character": self.description[-1],
@@ -62,14 +64,14 @@ class UnexpectedEnd(Exception):
         }
 
 
-def _get_expecting(lark_terminal_list):
+def _get_expecting(lark_terminal_list: list[str]) -> list[str]:
     expecting = set()
     for lark_terminal in lark_terminal_list:
         if TERMINALS.get(lark_terminal):
             expecting.add(TERMINALS[lark_terminal])
         else:
             expecting.add(lark_terminal)
-    return list(expecting)
+    return sorted(expecting)
 
 
 TERMINALS = {

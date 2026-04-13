@@ -1,6 +1,7 @@
 import sys
+
+from mutalyzer_hgvs_parser.exceptions import UnexpectedCharacter, UnexpectedEnd
 from mutalyzer_hgvs_parser.hgvs_parser import parse
-from mutalyzer_hgvs_parser.exceptions import UnexpectedCharacter, UnexpectedEnd, NestedDescriptions
 
 ok = []
 unexpected = []

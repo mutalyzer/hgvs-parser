@@ -57,13 +57,36 @@ To obtain the model of a description add the ``-c`` flag.
     }
 
 
-Grammar start rule
-------------------
+Parsing a partial description
+-----------------------------
 
-By default, the Mutalyzer
-:download:`grammar <../mutalyzer_hgvs_parser/ebnf/hgvs_mutalyzer_3.g>` is used,
-with ``description`` as the start (top) rule. It is however possible
-to choose a different start rule with the ``-r`` option.
+By default the parser expects a complete HGVS description
+(e.g. ``NG_012337.1:g.274G>T``). If you only have a *part* of a
+description — a bare variant, a location, or a reference — you can tell
+the parser where to start by passing a **start rule** with the ``-r``
+option.
+
+A start rule is the name of the grammar rule that the input must match.
+The most useful alternatives to the default (``description``) are:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 80
+
+   * - Start rule
+     - Matches
+   * - ``description``
+     - A complete HGVS description *(default)*
+   * - ``variant``
+     - A single variant without a reference, e.g. ``274G>T`` or ``10del``
+   * - ``variants``
+     - A semicolon-separated list of variants, e.g. ``[274G>T;280del]``
+   * - ``location``
+     - A position or range, e.g. ``274`` or ``10_20``
+   * - ``reference``
+     - A reference identifier, e.g. ``NG_012337.1`` or ``NG_012337.1(SDHD_v001)``
+   * - ``inserted``
+     - An inserted sequence, e.g. ``ATG`` or ``NG_012337.1:c.1_10``
 
 .. code-block:: console
 
@@ -71,7 +94,8 @@ to choose a different start rule with the ``-r`` option.
     Successfully parsed:
      274G>T
 
-The ``-c`` flag can be employed together with a different start rule.
+The ``-c`` flag can be combined with ``-r`` to convert a partial
+description to its model.
 
 .. code-block:: console
 
@@ -101,8 +125,15 @@ The ``-c`` flag can be employed together with a different start rule.
 Parse tree representation
 -------------------------
 
-If pydot_ is installed, an image of the lark parse tree can be obtained
-with the ``-i`` option.
+An image of the parse tree can be obtained with the ``-i`` option.
+This requires Graphviz_ to be installed on your system (e.g.
+``apt install graphviz`` on Debian/Ubuntu) and pydot_:
+
+.. code-block:: console
+
+    pip install mutalyzer-hgvs-parser[plot]
+
+
 
 .. code-block:: console
 
@@ -115,4 +146,5 @@ with the ``-i`` option.
 .. image:: images/tree.png
   :alt: Parse tree representation.
 
+.. _Graphviz: https://graphviz.org/
 .. _pydot: https://pypi.org/project/pydot/

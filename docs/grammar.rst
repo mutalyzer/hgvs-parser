@@ -1,9 +1,14 @@
 Grammar
 =======
 
-The derived :download:`EBNF grammar <../mutalyzer_hgvs_parser/ebnf/hgvs_mutalyzer_3.g>`
-does not consider all the HGVS_ nomenclature recommendations. Currently,
-the focus is mostly on descriptions at the DNA level. Examples of
+The :download:`EBNF grammar <hgvs_mutalyzer.g>`, derived from the HGVS_
+nomenclature recommendations and first formally described in `Laros et al.
+(2011) <https://pmc.ncbi.nlm.nih.gov/articles/PMC3194197/>`_, is split across
+several files in the ``mutalyzer_hgvs_parser/ebnf/`` directory and combined
+here for reference.
+
+The grammar does not consider all the HGVS_ nomenclature recommendations.
+Examples of
 descriptions not supported:
 
 - ``LRG_199t1:c.[2376G>C];[3103del]``

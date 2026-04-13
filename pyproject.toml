@@ -1,0 +1,90 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mutalyzer-hgvs-parser"
+version = "0.3.9"
+description = "Mutalyzer HGVS variant description parser."
+readme = {file = "README.rst", content-type = "text/x-rst"}
+authors = [{name = "Mihai Lefter", email = "M.Lefter@lumc.nl"}]
+license = {text = "MIT"}
+keywords = ["Mutalyzer", "HGVS", "description", "parser", "genomic"]
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Typing :: Typed",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+requires-python = ">=3.8"
+dependencies = ["lark>=1.0.0"]
+
+[project.urls]
+Homepage = "https://github.com/mutalyzer/hgvs-parser"
+
+[project.optional-dependencies]
+dev = [
+    "coverage",
+    "mypy",
+    "pytest",
+    "ruff",
+    "twine",
+]
+plot = [
+    "pydot",
+]
+docs = [
+    "sphinx",
+    "sphinx-argparse",
+]
+
+[project.scripts]
+mutalyzer_hgvs_parser = "mutalyzer_hgvs_parser.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["mutalyzer_hgvs_parser"]
+
+[tool.setuptools.package-data]
+mutalyzer_hgvs_parser = ["py.typed", "ebnf/*.g"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["mutalyzer_hgvs_parser"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.coverage.run]
+command_line = "-m pytest"
+
+[tool.coverage.report]
+omit = ["tests/*"]
+show_missing = true
+
+[tool.coverage.html]
+show_contexts = true
+
+[tool.tox]
+env_list = ["lint", "type", "py38", "py39", "py310", "py311", "py312", "py313"]
+
+[tool.tox.env_run_base]
+deps = ["pytest"]
+commands = [["pytest"]]
+
+[tool.tox.env.lint]
+deps = ["ruff"]
+commands = [["ruff", "check", "."]]
+
+[tool.tox.env.type]
+deps = ["mypy", "lark>=1.0.0"]
+commands = [["mypy", "mutalyzer_hgvs_parser/"]]
