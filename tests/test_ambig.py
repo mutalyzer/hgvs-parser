@@ -50,6 +50,72 @@ from .test_protein import HGVS_NOMENCLATURE
         # repeat | location - location
         ("100?", "variant", VARIANTS["100?"]),
         ("??", "variant", VARIANTS["??"]),
+        # variants_certain_variant_predicted | variants_predicted - variants_predicted
+        (
+            "R1:p.[(Gly10=)]",
+            "description",
+            {
+                "type": "description_protein",
+                "reference": {"id": "R1"},
+                "coordinate_system": "p",
+                "variants": [
+                    {
+                        "location": {"type": "point", "amino_acid": "Gly", "position": 10},
+                        "type": "equal",
+                        "source": "reference",
+                    }
+                ],
+                "predicted": True,
+            },
+        ),
+        # variants_certain_location | variants_predicted_location - variants_certain
+        (
+            "R1:c.[(10_15)]",
+            "description",
+            {
+                "type": "description_dna",
+                "reference": {"id": "R1"},
+                "coordinate_system": "c",
+                "variants": [
+                    {
+                        "location": {
+                            "type": "range",
+                            "uncertain": True,
+                            "start": {"type": "point", "position": 10},
+                            "end": {"type": "point", "position": 15},
+                        }
+                    }
+                ],
+            },
+        ),
+        # insert location repeat_number | insert length repeat_number | insert repeat_mixed - location
+        (
+            "R1:g.10_11ins20[42]",
+            "description",
+            {
+                "type": "description_dna",
+                "reference": {"id": "R1"},
+                "coordinate_system": "g",
+                "variants": [
+                    {
+                        "location": {
+                            "type": "range",
+                            "start": {"type": "point", "position": 10},
+                            "end": {"type": "point", "position": 11},
+                        },
+                        "type": "insertion",
+                        "source": "reference",
+                        "inserted": [
+                            {
+                                "location": {"type": "point", "position": 20},
+                                "repeat_number": {"type": "point", "value": 42},
+                                "source": "reference",
+                            }
+                        ],
+                    }
+                ],
+            },
+        ),
     ],
 )
 def test_ambiguities(description, start_rule, model):

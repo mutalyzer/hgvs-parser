@@ -681,7 +681,67 @@ AMBIGUITIES: list[_Ambiguity] = [
         ),
         "selected": 1,
     },
+    {
+        "type": "variants_certain_variant_predicted | variants_predicted - variants_predicted",
+        # R1:p.[(Gly10=)]
+        "conditions": lambda children: (
+            len(children) == 2
+            and children[0].data == children[1].data == "variants"
+            and data_equals(children, [0, 0], "variants_certain")
+            and data_equals(children, [0, 0, 0], "variant")
+            and data_equals(children, [0, 0, 0, 0], "variant_predicted")
+            and data_equals(children, [1, 0], "variants_predicted")
+            and getattr(get_child(children, [1, 0, 0]), "type", None) == "LSQB_LPAR"
+        ),
+        "selected": 1,
+    },
+    {
+        "type": "variants_certain_location | variants_predicted_location - variants_certain",
+        # R1:c.[(10_20)]
+        "conditions": lambda children: (
+            len(children) == 2
+            and children[0].data == children[1].data == "variants"
+            and data_equals(children, [0, 0], "variants_certain")
+            and data_equals(children, [0, 0, 0], "variant")
+            and data_equals(children, [0, 0, 0, 0], "variant_certain")
+            and len(get_tree_child(children, [0, 0, 0, 0]).children) == 1
+            and data_equals(children, [0, 0, 0, 0, 0], "location")
+            and data_equals(children, [1, 0], "variants_predicted")
+            and getattr(get_child(children, [1, 0, 0]), "type", None) == "LSQB_LPAR"
+        ),
+        "selected": 0,
+    },
+    {
+        "type": "insert location repeat_number | insert length repeat_number | insert repeat_mixed - location",
+        # R1:g.10_11ins20[42]
+        "conditions": lambda children: (
+            len(children) == 3
+            and all_tree_children_equal(children, "insert")
+            and data_equals(children, [0, 0], "location")
+            and data_equals(children, [0, 1], "repeat_number")
+            and data_equals(children, [1, 0], "length")
+            and data_equals(children, [1, 1], "repeat_number")
+            and data_equals(children, [2, 0], "repeat_mixed")
+        ),
+        "selected": 0,
+    },
 ]
+
+
+def _has_nested_description(tree: Tree) -> bool:
+    """
+    Check for an insert holding a description with a variant (other than
+    an inversion), which the converter rejects as a nested description.
+    """
+    for insert in tree.find_data("insert"):
+        for child in insert.children:
+            if isinstance(child, Tree) and child.data in ("description_dna", "description_protein"):
+                variants = list(child.find_data("variant_certain"))
+                if len(variants) > 1 or any(
+                    len(v.children) > 1 and v.children[1].data != "inversion" for v in variants
+                ):
+                    return True
+    return False
 
 
 class AmbigTransformer(Transformer):
@@ -693,6 +753,11 @@ class AmbigTransformer(Transformer):
                 # from lark.tree import pydot__tree_to_png
                 # pydot__tree_to_png(Tree("ambig", children), "ambig_2.png")
                 return children[ambig["selected"]]
+        # Descriptions run together: let the converter raise NestedDescriptions.
+        # TODO: report these as multiple descriptions instead of nested ones.
+        for child in children:
+            if _has_nested_description(child):
+                return child
         raise Exception("Ambiguity not solved.")
 
 

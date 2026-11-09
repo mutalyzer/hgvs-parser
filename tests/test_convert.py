@@ -1288,6 +1288,13 @@ def test_mix(description, model):
         "R1:c.10-5_10-2delinsTCTR2.2:c.10insT",
         "REF_1:10del REF_2:20insA REF_3:30insT",
         "R1:c.10-5_10-2delins[R2:10;R1:10_20del]",
+        # Descriptions run together.
+        "R1 R2:10_20delR1 R2:30_40del",
+        "R1:10del R1:20dup",
+        "R 1.1:c.10 11del R 1.1:c.20+1G>A",
+        "R1:c.10_15delGAinsTTR1:c.10_15delGAinsTT",
+        "R1:c.10_10delCinsGG:c.12_13insAG",
+        "R1:10_20dupinvR2:30_40dup",
     ],
 )
 def test_nested_descriptions(description):
