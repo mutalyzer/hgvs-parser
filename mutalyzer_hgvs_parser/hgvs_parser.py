@@ -164,23 +164,6 @@ AMBIGUITIES: list[_Ambiguity] = [
         "selected": 1,
     },
     {
-        "type": "deletion | deletion_insertion | repeat | substitution - deletion_insertion",
-        # R1:[1del;10_11insR2:2del]
-        "conditions": lambda children: (
-            len(children) == 4
-            and children[0].data
-            == children[1].data
-            == children[2].data
-            == children[3].data
-            == "variant_certain"
-            and data_equals(children, [0, 1], "deletion")
-            and data_equals(children, [1, 1], "deletion_insertion")
-            and data_equals(children, [2, 1], "repeat")
-            and data_equals(children, [3, 1], "substitution")
-        ),
-        "selected": 1,
-    },
-    {
         "type": "inversion | repeat - inversion",
         # R1(t1):c.-5-3inv
         "conditions": lambda children: (
@@ -401,54 +384,6 @@ AMBIGUITIES: list[_Ambiguity] = [
         "selected": 1,
     },
     {
-        "type": "variant_certain_repeat | variant_certain_repeat_range_length - length 0",
-        # R1:c.10-2_10-4[5]
-        "conditions": lambda children: (
-            len(children) == 3
-            and children[0].data == children[1].data == "variant_certain"
-            and len(get_tree_child(children, [0]).children) == 2
-            and data_equals(children, [0, 0], "location")
-            and data_equals(children, [0, 1], "repeat")
-            and len(get_tree_child(children, [1]).children) == 2
-            and data_equals(children, [1, 0], "location")
-            and data_equals(children, [1, 1], "repeat")
-            and len(get_tree_child(children, [2]).children) == 2
-            and data_equals(children, [2, 0], "location")
-            and data_equals(children, [2, 1], "repeat")
-            and len(get_tree_child(children, [0, 1]).children) == 1
-            and data_equals(children, [0, 1, 0], "inserted")
-            and len(get_tree_child(children, [0, 1, 0]).children) == 1
-            and data_equals(children, [0, 1, 0, 0], "insert")
-            and len(get_tree_child(children, [0, 1, 0, 0]).children) == 1
-            and data_equals(children, [0, 1, 0, 0, 0], "length")
-        ),
-        "selected": 0,
-    },
-    {
-        "type": "variant_certain_repeat | variant_certain_repeat_range_length - length 1",
-        # R1:c.10-2_10-4[5]
-        "conditions": lambda children: (
-            len(children) == 3
-            and children[0].data == children[1].data == "variant_certain"
-            and len(get_tree_child(children, [0]).children) == 2
-            and data_equals(children, [0, 0], "location")
-            and data_equals(children, [0, 1], "repeat")
-            and len(get_tree_child(children, [1]).children) == 2
-            and data_equals(children, [1, 0], "location")
-            and data_equals(children, [1, 1], "repeat")
-            and len(get_tree_child(children, [2]).children) == 2
-            and data_equals(children, [2, 0], "location")
-            and data_equals(children, [2, 1], "repeat")
-            and len(get_tree_child(children, [1, 1]).children) == 1
-            and data_equals(children, [1, 1, 0], "inserted")
-            and len(get_tree_child(children, [1, 1, 0]).children) == 1
-            and data_equals(children, [1, 1, 0, 0], "insert")
-            and len(get_tree_child(children, [1, 1, 0, 0]).children) == 1
-            and data_equals(children, [1, 1, 0, 0, 0], "length")
-        ),
-        "selected": 1,
-    },
-    {
         "type": "variant_certain_repeat | variant_certain_repeat_range_length - length 2",
         # R1:c.10-2_10-4[5]
         "conditions": lambda children: (
@@ -518,59 +453,6 @@ AMBIGUITIES: list[_Ambiguity] = [
             )
         ),
         "selected": 1,
-    },
-    {
-        "type": "inserted | inserted ",
-        # in the inserted rule
-        # NG_000001.1(NM_000002.3):c.(170_?)_420+60[19]
-        "conditions": lambda children: (
-            len(children) == 2
-            and children[0].data == children[1].data == "inserted"
-            and len(get_tree_child(children, [0]).children) == 1
-            and data_equals(children, [0, 0], "insert")
-            and len(get_tree_child(children, [0, 0]).children) == 1
-            and data_equals(children, [0, 0, 0], "description_dna")
-            and len(get_tree_child(children, [1]).children) == 1
-            and data_equals(children, [1, 0], "insert")
-            and len(get_tree_child(children, [1, 0]).children) == 2
-            and data_equals(children, [1, 0, 0], "description_dna")
-            and data_equals(children, [1, 0, 1], "repeat_number")
-        ),
-        "selected": 1,
-    },
-    {
-        "type": "inserted insert repeat_mixed - 0 ",
-        # in the variant rule
-        # 123_191delins[CAG[19];CAA[4]]
-        "conditions": lambda children: (
-            all_tree_children_equal(children, "inserted")
-            and all_tree_children_equal(children[0].children, "insert")
-        ),
-        "selected": 0,
-    },
-    {
-        "type": "variant_certain repeat | variant_certain substitution - 0 ",
-        # for proteins
-        # R1:p.Ala1207_Asp1208Thr1207_Asn1208
-        "conditions": lambda children: (
-            len(children) == 2
-            and children[0].data == children[1].data == "variant_certain"
-            and len(get_tree_child(children, [0]).children) == 2
-            and data_equals(children, [0, 0], "location")
-            and data_equals(children, [0, 1], "repeat")
-            and len(get_tree_child(children, [0, 1]).children) == 1
-            and data_equals(children, [0, 1, 0], "inserted")
-            and len(get_tree_child(children, [0, 1, 0]).children) == 1
-            and data_equals(children, [0, 1, 0, 0], "insert")
-            and len(get_tree_child(children, [0, 1, 0, 0]).children) == 1
-            and data_equals(children, [0, 1, 0, 0, 0], "repeat_mixed")
-            and len(get_tree_child(children, [0, 1, 0, 0, 0]).children) == 2
-            and data_equals(children, [0, 1, 0, 0, 0, 1], "repeat_number")
-            and len(get_tree_child(children, [1]).children) == 2
-            and data_equals(children, [1, 0], "location")
-            and data_equals(children, [1, 1], "substitution")
-        ),
-        "selected": 0,
     },
     {
         "type": "variant_certain repeat | variant_certain substitution - 1 ",
@@ -648,20 +530,6 @@ AMBIGUITIES: list[_Ambiguity] = [
                 len(children) == 2
                 and children[0].data == children[1].data == "insert"
                 and len(get_tree_child(children, [0]).children) in [2, 3]
-                and data_equals(children, [0, 1], "repeat_number")
-                and len(get_tree_child(children, [1]).children) == 1
-                and data_equals(children, [1, 0], "repeat_mixed")
-        ),
-        "selected": 0,
-    },
-    {
-        "type": "insert location repeat_number | insert repeat_mixed - 0 ",
-        # test_variant_to_model 123_191[CAG[19];CAA[4];10_15[6]
-        "conditions": lambda children: (
-                len(children) == 2
-                and children[0].data == children[1].data == "insert"
-                and len(get_tree_child(children, [0]).children) == 2
-                and data_equals(children, [0, 0], "location")
                 and data_equals(children, [0, 1], "repeat_number")
                 and len(get_tree_child(children, [1]).children) == 1
                 and data_equals(children, [1, 0], "repeat_mixed")

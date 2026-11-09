@@ -50,6 +50,50 @@ from .test_protein import HGVS_NOMENCLATURE
         # repeat | location - location
         ("100?", "variant", VARIANTS["100?"]),
         ("??", "variant", VARIANTS["??"]),
+        # variant_certain_repeat | variant_certain_repeat_length - length 1
+        (
+            "R1:c.10-20_30+40[3]",
+            "description",
+            {
+                "type": "description_dna",
+                "reference": {"id": "R1"},
+                "coordinate_system": "c",
+                "variants": [
+                    {
+                        "location": {
+                            "type": "range",
+                            "start": {"type": "point", "position": 10, "offset": {"value": -20}},
+                            "end": {"type": "point", "position": 30, "offset": {"value": 40}},
+                        },
+                        "type": "repeat",
+                        "source": "reference",
+                        "inserted": [{"length": {"type": "point", "value": 3}}],
+                    }
+                ],
+            },
+        ),
+        # variant_certain_repeat | variant_certain_repeat_range_length - length 2
+        (
+            "R1:c.10-2_10-4[5]",
+            "description",
+            {
+                "type": "description_dna",
+                "reference": {"id": "R1"},
+                "coordinate_system": "c",
+                "variants": [
+                    {
+                        "location": {
+                            "type": "range",
+                            "start": {"type": "point", "position": 10, "offset": {"value": -2}},
+                            "end": {"type": "point", "position": 10, "offset": {"value": -4}},
+                        },
+                        "type": "repeat",
+                        "source": "reference",
+                        "inserted": [{"length": {"type": "point", "value": 5}}],
+                    }
+                ],
+            },
+        ),
         # variants_certain_variant_predicted | variants_predicted - variants_predicted
         (
             "R1:p.[(Gly10=)]",
