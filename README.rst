@@ -1,23 +1,25 @@
 Mutalyzer HGVS Parser
 =====================
 
-.. image:: https://img.shields.io/github/last-commit/mutalyzer/hgvs-parser.svg
+|last-commit| |docs| |release-date| |release| |pypi| |code-size| |languages| |top-language| |license|
+
+.. |last-commit| image:: https://img.shields.io/github/last-commit/mutalyzer/hgvs-parser.svg
    :target: https://github.com/mutalyzer/hgvs-parser/graphs/commit-activity
-.. image:: https://img.shields.io/readthedocs/mutalyzer-hgvs-parser.svg
+.. |docs| image:: https://img.shields.io/readthedocs/mutalyzer-hgvs-parser.svg
    :target: https://mutalyzer-hgvs-parser.readthedocs.io/en/latest
-.. image:: https://img.shields.io/github/release-date/mutalyzer/hgvs-parser.svg
+.. |release-date| image:: https://img.shields.io/github/release-date/mutalyzer/hgvs-parser.svg
    :target: https://github.com/mutalyzer/hgvs-parser/releases
-.. image:: https://img.shields.io/github/release/mutalyzer/hgvs-parser.svg
+.. |release| image:: https://img.shields.io/github/release/mutalyzer/hgvs-parser.svg
    :target: https://github.com/mutalyzer/hgvs-parser/releases
-.. image:: https://img.shields.io/pypi/v/mutalyzer-hgvs-parser.svg
+.. |pypi| image:: https://img.shields.io/pypi/v/mutalyzer-hgvs-parser.svg
    :target: https://pypi.org/project/mutalyzer-hgvs-parser/
-.. image:: https://img.shields.io/github/languages/code-size/mutalyzer/hgvs-parser.svg
+.. |code-size| image:: https://img.shields.io/github/languages/code-size/mutalyzer/hgvs-parser.svg
    :target: https://github.com/mutalyzer/hgvs-parser
-.. image:: https://img.shields.io/github/languages/count/mutalyzer/hgvs-parser.svg
+.. |languages| image:: https://img.shields.io/github/languages/count/mutalyzer/hgvs-parser.svg
    :target: https://github.com/mutalyzer/hgvs-parser
-.. image:: https://img.shields.io/github/languages/top/mutalyzer/hgvs-parser.svg
+.. |top-language| image:: https://img.shields.io/github/languages/top/mutalyzer/hgvs-parser.svg
    :target: https://github.com/mutalyzer/hgvs-parser
-.. image:: https://img.shields.io/github/license/mutalyzer/hgvs-parser.svg
+.. |license| image:: https://img.shields.io/github/license/mutalyzer/hgvs-parser.svg
    :target: https://raw.githubusercontent.com/mutalyzer/hgvs-parser/master/LICENSE
 
 ----
