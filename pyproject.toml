@@ -1,90 +1,70 @@
 [build-system]
-requires = ["setuptools>=61"]
-build-backend = "setuptools.build_meta"
+requires = ['setuptools>=77']
+build-backend = 'setuptools.build_meta'
 
 [project]
-name = "mutalyzer-hgvs-parser"
-version = "0.4.0"
-description = "Mutalyzer HGVS variant description parser."
-readme = {file = "README.rst", content-type = "text/x-rst"}
-authors = [{name = "Mihai Lefter", email = "M.Lefter@lumc.nl"}]
-license = {text = "MIT"}
-keywords = ["Mutalyzer", "HGVS", "description", "parser", "genomic"]
-classifiers = [
-    "Intended Audience :: Science/Research",
-    "Intended Audience :: Developers",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3",
-    "Topic :: Scientific/Engineering :: Bio-Informatics",
-    "Typing :: Typed",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-]
-requires-python = ">=3.8"
-dependencies = ["lark>=1.3.0"]
+name = 'mutalyzer-hgvs-parser'
+description = 'Mutalyzer HGVS variant description parser.'
+version = '0.4.0'
 
-[project.urls]
-Homepage = "https://github.com/mutalyzer/hgvs-parser"
+authors = [
+    {name = 'LUMC, Mihai Lefter', email = 'M.Lefter@lumc.nl'}]
+readme = 'README.rst'
+urls = {Homepage = 'https://github.com/mutalyzer/hgvs-parser'}
+keywords = ['Mutalyzer', 'HGVS', 'description', 'parser', 'genomic']
+license = 'MIT'
+classifiers = [
+    'Intended Audience :: Developers',
+    'Intended Audience :: Science/Research',
+    'Operating System :: OS Independent',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Topic :: Scientific/Engineering :: Bio-Informatics',
+    'Typing :: Typed']
+
+requires-python = '>=3.9'
+dependencies = ['lark>=1.3.0']
+
+[project.scripts]
+mutalyzer_hgvs_parser = 'mutalyzer_hgvs_parser.cli:main'
+
+[tool.setuptools.packages.find]
+include = ['mutalyzer_hgvs_parser']
+
+[tool.setuptools.package-data]
+mutalyzer_hgvs_parser = ['py.typed', 'ebnf/*.g']
 
 [project.optional-dependencies]
 dev = [
-    "coverage",
-    "mypy",
-    "pytest",
-    "ruff",
-    "twine",
-]
+    'coverage',
+    'mypy',
+    'pytest',
+    'ruff']
+release = [
+    'build>=1.6.1',
+    'twine>=7.0.0']
 plot = [
-    "pydot",
-]
+    'pydot']
 docs = [
-    "sphinx",
-    "sphinx-argparse",
-]
-
-[project.scripts]
-mutalyzer_hgvs_parser = "mutalyzer_hgvs_parser.cli:main"
-
-[tool.setuptools.packages.find]
-include = ["mutalyzer_hgvs_parser"]
-
-[tool.setuptools.package-data]
-mutalyzer_hgvs_parser = ["py.typed", "ebnf/*.g"]
-
-[tool.hatch.build.targets.wheel]
-packages = ["mutalyzer_hgvs_parser"]
+    'sphinx',
+    'sphinx-argparse']
 
 [tool.ruff]
-line-length = 120
+line-length = 89
 
 [tool.ruff.lint]
-select = ["E", "F", "I"]
+select = ['C90', 'E', 'F', 'I', 'W']
+ignore = ['E501', 'F401', 'F403']
+
+[tool.ruff.lint.mccabe]
+max-complexity = 18
 
 [tool.coverage.run]
-command_line = "-m pytest"
+command_line = '-m pytest'
 
 [tool.coverage.report]
-omit = ["tests/*"]
+omit = ['tests/*']
 show_missing = true
 
 [tool.coverage.html]
 show_contexts = true
-
-[tool.tox]
-env_list = ["lint", "type", "py38", "py39", "py310", "py311", "py312", "py313"]
-
-[tool.tox.env_run_base]
-deps = ["pytest"]
-commands = [["pytest"]]
-
-[tool.tox.env.lint]
-deps = ["ruff"]
-commands = [["ruff", "check", "."]]
-
-[tool.tox.env.type]
-deps = ["mypy", "lark>=1.3.0"]
-commands = [["mypy", "mutalyzer_hgvs_parser/"]]

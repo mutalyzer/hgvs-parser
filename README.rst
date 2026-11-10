@@ -18,7 +18,7 @@ Mutalyzer HGVS Parser
 .. image:: https://img.shields.io/github/languages/top/mutalyzer/hgvs-parser.svg
    :target: https://github.com/mutalyzer/hgvs-parser
 .. image:: https://img.shields.io/github/license/mutalyzer/hgvs-parser.svg
-   :target: https://raw.githubusercontent.com/mutalyzer/hgvs-parser/master/LICENSE.md
+   :target: https://raw.githubusercontent.com/mutalyzer/hgvs-parser/master/LICENSE
 
 ----
 
