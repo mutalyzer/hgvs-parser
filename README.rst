@@ -3,7 +3,7 @@ Mutalyzer HGVS Parser
 
 .. image:: https://img.shields.io/github/last-commit/mutalyzer/hgvs-parser.svg
    :target: https://github.com/mutalyzer/hgvs-parser/graphs/commit-activity
-.. image:: https://readthedocs.org/projects/mutalyzer-hgvs-parser/badge/?version=latest
+.. image:: https://img.shields.io/readthedocs/mutalyzer-hgvs-parser.svg
    :target: https://mutalyzer-hgvs-parser.readthedocs.io/en/latest
 .. image:: https://img.shields.io/github/release-date/mutalyzer/hgvs-parser.svg
    :target: https://github.com/mutalyzer/hgvs-parser/releases
