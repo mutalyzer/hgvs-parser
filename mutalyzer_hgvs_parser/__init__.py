@@ -12,7 +12,7 @@ __all__ = ["parse", "to_model"]
 
 def _extract(key: str, delim: str = r'[^\s\S]', index: int = 0) -> str:
     try:
-        value = metadata(__package__).get(key, '')
+        value = metadata(__package__).get(key, '')  # type: ignore[attr-defined]
     except PackageNotFoundError:
         return '<NO DATA>'
     return split(delim, value)[index]
