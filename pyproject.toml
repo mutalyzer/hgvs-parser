@@ -29,7 +29,7 @@ dependencies = ['lark>=1.3.0']
 mutalyzer_hgvs_parser = 'mutalyzer_hgvs_parser.cli:main'
 
 [tool.setuptools.packages.find]
-include = ['mutalyzer_hgvs_parser']
+include = ['mutalyzer_hgvs_parser*']
 
 [tool.setuptools.package-data]
 mutalyzer_hgvs_parser = ['py.typed', 'ebnf/*.g']
@@ -57,7 +57,7 @@ select = ['C90', 'E', 'F', 'I', 'W']
 ignore = ['E501', 'F401', 'F403']
 
 [tool.ruff.lint.mccabe]
-max-complexity = 18
+max-complexity = 10
 
 [tool.coverage.run]
 command_line = '-m pytest'
